@@ -86,7 +86,10 @@ git push origin feature/기능명   # 예: git push origin feature/login
    - **제목**: 무엇을 했는지 한 줄 요약
    - **내용**: 변경사항 간단히 설명
 4. **base: `dev`** ← **compare: `feature/기능명`** 확인 후 PR 생성
-5. 팀장 + 팀원 1명 코드 검토 후 Merge 완료
+>  ( 💡 1 ~ 4 까지는 전원가능한 작업, 5 ~ 6 은 검증하는 인원 )
+5. (PR승인 시)팀장 + 팀원 1명 코드 검토 후 Merge 완료
+6. (PR승인 시)PR->Merge 시 Merge pull request #숫자 뒤에 어느정도 제목 적어주기 
+>  (예 : Merge pull request #100 fix: 버그수정 )
 
 > ⚠️ PR 없이 dev, main에 직접 merge 금지!
 
