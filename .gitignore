@@ -57,8 +57,5 @@ Thumbs.db
 # 기타
 ############################
 coverage/
-<<<<<<< HEAD
-/.metadata/
-=======
 .metadata/
->>>>>>> dev
+
