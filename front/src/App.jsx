@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useEffect } from "react"
 import axiosInstance from "./api/axios";
 import MainPage from './pages/main/MainPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -37,6 +38,9 @@ function App() {
 
         {/* 주문 - 김슬기 담당 */}
         {/* <Route path="/orders" element={<OrderPage />} /> */}
+
+        {/* 어드민 */}
+        <Route path="/admin" element={<AdminDashboardPage />} />
 
       </Routes>
     </BrowserRouter>
