@@ -172,6 +172,20 @@ CONFLICT (content): Merge conflict in src/components/Login.jsx
 
 ---
 
+### ❌ Case 4. .metadata의 내용이 변경사항으로 들어가는 경우
+
+**해결 방법:**
+
+1. git checkout dev
+
+2. git pull origin dev
+
+3. git rm -r --cached .metadata
+
+
+
+---
+
 ## 🚫 절대 금지 사항
 
 | ❌ 금지 | ✅ 대신 이렇게 |
