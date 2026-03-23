@@ -50,7 +50,7 @@ const BasicMenu =() => {
                             type="text" />
                         </div>
                         {/* 장바구니 */}
-                        <Link to={"/"} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative">
+                        <Link to={"/cart"} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative">
                             <span className="material-symbols-outlined">shopping_cart</span>
                             <span className="absolute top-1 right-1 bg-secondary text-[10px] font-bold px-1 rounded-full text-white">3</span>
                         </Link>
