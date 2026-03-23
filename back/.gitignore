@@ -58,3 +58,6 @@ gradle-app.setting
 # Sensitive Information
 application-local.properties
 application-local.yml
+
+# 개인 실험용 테스트
+/src/test/java/com/example/gmall/sandbox/
