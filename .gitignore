@@ -1,3 +1,61 @@
-# OS
+############################
+# Common
+############################
 .DS_Store
 Thumbs.db
+*.log
+*.tmp
+*.swp
+
+############################
+# Environment Variables
+############################
+.env
+.env.*
+!.env.example
+
+############################
+# Frontend (React + Vite)
+############################
+front/node_modules/
+front/dist/
+front/.vite/
+front/.cache/
+front/coverage/
+
+# Vite env
+front/.env
+front/.env.*
+
+############################
+# Backend (Spring Boot + Gradle)
+############################
+back/build/
+back/out/
+back/.gradle/
+back/logs/
+
+############################
+# Gradle wrapper cache
+############################
+back/.gradle/
+
+############################
+# IDE
+############################
+.vscode/
+.idea/
+*.iml
+
+############################
+# OS
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# 기타
+############################
+coverage/
+.metadata/
+/.metadata/
