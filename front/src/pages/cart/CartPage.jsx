@@ -1,6 +1,5 @@
 import { useState } from "react";
 import BasicLayout from "../../layouts/BasicLayout";
-import FooterMenu from "../../components/menus/FooterMenu";
 
 // ─────────────────────────────────────────
 // Mock 데이터 (API 연동 후 제거)
