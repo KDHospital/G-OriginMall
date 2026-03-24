@@ -7,7 +7,7 @@ import com.example.gmall.domain.Product;
 import lombok.Getter;
 
 @Getter
-public class ProductListResponse {
+public class ProductListResponseDTO {
 	//상품 아이디, 상품명, 정가(리스트프라이스), 할인가, 판매가, 재고,배송비
 	private Long productId;
 	private String pname;
@@ -25,7 +25,7 @@ public class ProductListResponse {
 	private String name;
 	private LocalDateTime createdAt;
 	
-	public ProductListResponse(Product p) {
+	public ProductListResponseDTO(Product p) {
 		this.productId = p.getProductId();
 		this.pname = p.getPname();
 		this.listprice = p.getListPrice();
