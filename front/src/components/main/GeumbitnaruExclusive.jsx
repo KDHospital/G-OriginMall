@@ -32,7 +32,7 @@ const cardItem = [
 ]
 const GeumbitnaruExclusive = () => {
     return(
-        <section class="py-24 bg-accent dark:bg-black overflow-hidden relative">
+        <section class="py-24 bg-accent overflow-hidden relative">
             <div class="absolute top-0 right-0 w-1/3 h-full opacity-20 pointer-events-none">
                 <svg class="w-full h-full text-secondary" fill="none" viewbox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
                     <path d="M400 200C400 310.457 310.457 400 200 400C89.543 400 0 310.457 0 200C0 89.543 89.543 0 200 0C310.457 0 400 89.543 400 200Z" fill="currentColor" fill-opacity="0.1"></path>
@@ -47,7 +47,7 @@ const GeumbitnaruExclusive = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {/* <!-- 금빛나루 상품 --> */}
                     {cardItem.map((item)=>(
-                        <Link key={item.id} to={item.path} className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-slate-100 dark:border-slate-800 group">
+                        <Link key={item.id} to={item.path} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-slate-100 group">
                             <div className="relative h-64 overflow-hidden">
                                 <img src={item.imgSrc} alt={item.imgAlt}
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />

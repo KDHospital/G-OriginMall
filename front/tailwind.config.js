@@ -11,7 +11,7 @@ export default {
             "secondary": "#f4b41a", // Harvest Gold
             "accent": "#2d3a25", // Forest Green/Brown
             "background-light": "#fcfbf7",
-            "background-dark": "#1a1c18",
+            
             },
             fontFamily: {
             sans: ['Noto Sans KR', 'sans-serif'],
