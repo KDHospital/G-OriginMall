@@ -1,4 +1,4 @@
-package com.example.gmall.service.Impl;
+package com.example.gmall.service.impl;
 
 import org.springframework.stereotype.Service;
 
