@@ -23,7 +23,7 @@ const BasicMenu =() => {
     ]
 
     return(
-        <div className="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div className="sticky top-0 z-50 bg-background-light/80 backdrop-blur-md border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo 영역 */}
@@ -43,7 +43,7 @@ const BasicMenu =() => {
                     
                     <div className="flex items-center gap-4">
                         {/* 검색창 */}
-                        <div className="hidden lg:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-1.5">
+                        <div className="hidden lg:flex items-center bg-slate-100 rounded-full px-4 py-1.5">
                             <span className="material-symbols-outlined text-slate-400 text-lg leading-none">search</span>
                             <input className="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-400" 
                             placeholder="검색어를 입력해주세요" 
