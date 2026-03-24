@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class ProductCreateRequestDTO {
 	private Integer categoryId;
-	private Member seller;
+	private Long sellerId;
 	private String pname;
 	private String pdesc;
 	private Integer listprice;
