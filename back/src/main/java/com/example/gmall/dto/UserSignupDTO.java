@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserSignupDto {
+public class UserSignupDTO {
 
 	@NotBlank(message = "아이디(이메일)를 입력해주새요.")
 	@Email(message = "올바른 이메일 형식이 아닙니다.")
@@ -31,9 +31,11 @@ public class UserSignupDto {
 	@NotBlank(message = "연락처를 입력해주세요")
 	@Size(max = 15, message = "연락처는 15자 이하로 입력해주세요")
 	@Pattern(
-			regexp = "^01(?:0|1|[6-9]{7,8}$",message = "연락처는 숫자만 7~8자리로 입력해주세요.")
+			regexp = "^01(?:0|1|[6-9])\\d{7,8}$",message = "연락처는 '01012345678' 형식의 숫자만 입력해주세요.")
 	private String tel;
 	
 	@NotNull(message = "성별을 선택해주세요.")
 	private Byte gender; // 0: 미지정 , 1: 남성 , 2: 여성
+	
+	private String verificationCode;
 }
