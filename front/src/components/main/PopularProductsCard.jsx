@@ -38,11 +38,11 @@ const cardItem = [
 
 const PopularProductsCard = () =>{
 return(
-    <section className="py-16 bg-slate-50 dark:bg-slate-800/50">
+    <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-end justify-between mb-10">
                 <div>
-                    <h2 className="text-3xl font-black text-accent dark:text-white">인기 상품</h2>
+                    <h2 className="text-3xl font-black text-accent">인기 상품</h2>
                     <p className="text-slate-500 mt-2">G-Origin Mall에서 가장 인기 있는 상품들을 만나보세요!</p>
                 </div>
                 <Link to={"/"} className="text-primary font-bold flex items-center gap-1 group" href="#">
@@ -52,7 +52,7 @@ return(
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* <!-- Product Card 1 --> */}
                 {cardItem.map((item)=>(
-                    <Link key={item.id} to={item.path} className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-slate-100 dark:border-slate-800 group">
+                    <Link key={item.id} to={item.path} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-slate-100 group">
                         <div className="relative h-64 overflow-hidden">
                             <img src={item.imgSrc} alt={item.imgAlt}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />

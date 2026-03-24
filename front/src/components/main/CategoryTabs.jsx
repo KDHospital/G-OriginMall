@@ -11,7 +11,7 @@ const categories = [
 
 const CategoryTabs = () => {
     return(
-        <section className="py-12 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+        <section className="py-12 bg-white border-b border-slate-100">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex overflow-x-auto pb-4 gap-8 no-scrollbar justify-between">                    
                     {categories.map((item)=>(
