@@ -16,12 +16,10 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "member")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Member {
  
