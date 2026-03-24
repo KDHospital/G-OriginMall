@@ -27,11 +27,14 @@ public class MemberController {
 	private final MemberService memberService;
 	private final EmailService emailService;
 	
+	//아이디 중복확인
 	@GetMapping("/check-id")
 	public ResponseEntity<String> checkId(@RequestParam("loginId") String loginId){
 		memberService.checkLoginId(loginId);
 		return ResponseEntity.ok("사용 가능한 아이디입니다.");
 	}
+	
+	// 이메일 인증코드 발송
 	@PostMapping("/email/send")
 	public ResponseEntity<String> sendEmailCode(@RequestBody Map<String, String> request){
 		String email = request.get("email");
@@ -39,9 +42,19 @@ public class MemberController {
 		return ResponseEntity.ok("인증 코드가 발송되었습니다.");
 	}
 	
+	//이메일 인증코드 확인
+	public ResponseEntity<String> verifyEmailCode(@RequestBody Map<String, String> request){
+		String email = request.get("email");
+		String code = request.get("code");
+		emailService.verifyCode(email, code);
+		return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
+	}
+	
+	
+	//일반 회원가입
 	@PostMapping("/signup")
 	public ResponseEntity<String> signup(@RequestBody @Valid UserSignupDTO signupDTO){
-		log.info("회원가입ㅇ 요청 이메일: {}", signupDTO.getLoginId());
+		log.info("회원가입 요청 이메일: {}", signupDTO.getLoginId());
 		memberService.signup(signupDTO);
 		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
