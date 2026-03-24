@@ -9,6 +9,8 @@ import com.example.gmall.dto.CartSummaryDTO;
 import com.example.gmall.repository.CartItemRepository;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.repository.ProductRepository;
+import com.example.gmall.service.CartService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,13 +21,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CartService {
+public class CartServiceImpl implements CartService {
 
     private final CartItemRepository cartItemRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
-    // ✅ 장바구니 조회
+    // 장바구니 조회
     @Transactional(readOnly = true)
     public CartSummaryDTO getCartItems(Long memberId) {
         List<CartItemResponseDTO> dtoList = cartItemRepository.findByMemberId(memberId)
@@ -35,7 +37,7 @@ public class CartService {
         return new CartSummaryDTO(dtoList);
     }
 
-    // ✅ 상품 추가 (이미 담긴 상품이면 수량 누적)
+    // 상품 추가 (이미 담긴 상품이면 수량 누적)
     public CartItemResponseDTO addItem(Long memberId, CartItemRequestDTO dto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
