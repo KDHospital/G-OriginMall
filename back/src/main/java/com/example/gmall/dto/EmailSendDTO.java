@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class EmailSendDto {
+public class EmailSendDTO {
 
 	
 	@NotBlank(message = "이메일을 입력해주세요")

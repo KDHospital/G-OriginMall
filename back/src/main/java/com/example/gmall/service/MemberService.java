@@ -1,6 +1,6 @@
 package com.example.gmall.service;
 
-import com.example.gmall.dto.UserSignupDto;
+import com.example.gmall.dto.UserSignupDTO;
 
 public interface MemberService {
 	
@@ -9,6 +9,6 @@ public interface MemberService {
 	
 	
 	//일반 회원가입
-	void signup(UserSignupDto signupDto);
+	void signup(UserSignupDTO signupDto);
 
 }
