@@ -19,7 +19,7 @@ public class JwtTokenProvider {
     private final long EXPIRATION_TIME = 1000L * 60 * 60 * 24; // 24시간 (1일)
 
     // 1. 토큰 생성 (회원 아이디를 담아서 만듦)
-    public String createToken(String loginId) {
+    public String createToken(String loginId, Long memberId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
 

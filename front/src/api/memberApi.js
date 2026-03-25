@@ -38,8 +38,8 @@ export const userSignup = (payload) =>
     axiosInstance.post("/member/signup",payload)
 
 //로그인
-export const login = (loginId,mpwd) =>
-    axiosInstance.post("/member/login",loginId,mpwd)
+export const login = (loginParam) =>
+    axiosInstance.post("/member/login",loginParam)
 
 //아이디 중복 체크
 export const checkLoginId = (loginId) =>

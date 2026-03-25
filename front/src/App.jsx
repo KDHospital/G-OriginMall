@@ -7,6 +7,7 @@ import CartPage from './pages/cart/CartPage';
 import UserSignupPage from './pages/member/UserSignupPage';
 import JoinPage from './pages/member/JoinPage';
 import AdminProductNewPage from './pages/admin/AdminProductNewPage';
+import OrderFormPage from './pages/orders/OrderFormPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -47,6 +48,7 @@ function App() {
         {/* <Route path="/products" element={<ProductListPage />} /> */}
 
         {/* 주문 - 김슬기 담당 */}
+        <Route path="/orders/new" element={<OrderFormPage />} />
         {/* <Route path="/orders" element={<OrderPage />} /> */}
 
         {/* 어드민 */}

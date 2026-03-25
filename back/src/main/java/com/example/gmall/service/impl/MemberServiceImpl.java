@@ -77,7 +77,7 @@ public class MemberServiceImpl implements MemberService {
  	 	}
  	 	
  	// 인증 성공 시 JWT 토큰 생성 및 반환
- 	  return jwtTokenProvider.createToken(member.getLoginId());
+ 	  return jwtTokenProvider.createToken(member.getLoginId(), member.getId());
  	
  	}
  	
