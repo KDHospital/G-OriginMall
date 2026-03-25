@@ -55,7 +55,7 @@ const BasicMenu =() => {
                             <span className="absolute top-1 right-1 bg-secondary text-[10px] font-bold px-1 rounded-full text-white">3</span>
                         </Link>
                         {/* 로그인 */}
-                        <Link to={"/"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                        <Link to={"/login"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
                             <span className="material-symbols-outlined text-lg">person</span>
                             로그인
                         </Link>

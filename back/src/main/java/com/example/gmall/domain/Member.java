@@ -14,12 +14,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "member")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Member {
  
@@ -33,7 +37,7 @@ public class Member {
     @Column(name = "mname", length = 15, nullable = false)
     private String mname;
  
-    @Column(name = "mpwd", length = 20)
+    @Column(name = "mpwd", length = 255)
     private String mpwd; // 소셜 로그인 시 NULL 허용
  
     @Column(name = "tel", length = 15, nullable = false)

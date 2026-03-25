@@ -18,7 +18,6 @@ public class UserSignupDTO {
 	private String loginId;
 	
 	@NotBlank(message = "비밀번호를 입력해주세요")
-	
 	@Pattern(
 			regexp = "^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*]).{8,20}$",
 			message = "비밀번호는 8~20자이며 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.")
