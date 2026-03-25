@@ -2,6 +2,7 @@ package com.example.gmall.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.gmall.domain.Member;
 import com.example.gmall.domain.Product;
@@ -42,6 +43,7 @@ public class ProductDetailResponseDTO {
         this.categoryId = p.getCategory().getCategoryId();
         this.name = p.getCategory().getName();
         this.sellerId = p.getSeller().getId();
+        
         
 	}
 	
