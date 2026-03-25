@@ -6,6 +6,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import CartPage from './pages/cart/CartPage';
 import UserSignupPage from './pages/member/UserSignupPage';
 import JoinPage from './pages/member/JoinPage';
+import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -13,6 +14,8 @@ import JoinPage from './pages/member/JoinPage';
 // import SellerPage from './pages/member/SellerPage';
 // import ProductListPage from './pages/product/ProductListPage';
 // import OrderPage from './pages/order/OrderPage';
+
+
 
 function App() {
 
@@ -48,6 +51,10 @@ function App() {
 
         {/* 어드민 */}
         <Route path="/admin" element={<AdminDashboardPage />} />
+
+
+        {/* 어드민-상품등록 */}
+        <Route path="/admin/products/new" element={<AdminProductNewPage />} />
 
       </Routes>
     </BrowserRouter>
