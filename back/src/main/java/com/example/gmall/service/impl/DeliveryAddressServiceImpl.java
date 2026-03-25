@@ -2,8 +2,8 @@ package com.example.gmall.service.impl;
 
 import com.example.gmall.domain.DeliveryAddress;
 import com.example.gmall.domain.Member;
-import com.example.gmall.dto.DeliveryAddressRequestDTO;
-import com.example.gmall.dto.DeliveryAddressResponseDTO;
+import com.example.gmall.dto.delivery.DeliveryAddressRequestDTO;
+import com.example.gmall.dto.delivery.DeliveryAddressResponseDTO;
 import com.example.gmall.repository.DeliveryAddressRepository;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.service.DeliveryAddressService;

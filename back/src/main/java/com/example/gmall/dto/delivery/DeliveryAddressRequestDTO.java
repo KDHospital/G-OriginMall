@@ -1,4 +1,4 @@
-package com.example.gmall.dto;
+package com.example.gmall.dto.delivery;
 
 import lombok.Getter;
 

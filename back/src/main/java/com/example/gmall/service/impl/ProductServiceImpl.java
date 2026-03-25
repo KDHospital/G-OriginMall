@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.gmall.dto.ProductListResponseDTO;
+import com.example.gmall.dto.product.ProductListResponseDTO;
 import com.example.gmall.repository.ProductRepository;
 import com.example.gmall.service.ProductService;
 

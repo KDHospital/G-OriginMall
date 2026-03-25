@@ -1,11 +1,11 @@
 package com.example.gmall.service.impl;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.gmall.domain.Member;
-import com.example.gmall.dto.MemberLoginDTO;
-import com.example.gmall.dto.UserSignupDTO;
+import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
@@ -21,7 +21,7 @@ public class MemberServiceImpl implements MemberService {
 	private final MemberRepository memberRepository;
 	private final EmailService emailService;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final BCryptPasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 	@Override
 	public void checkLoginId(String logId) {
 	if(	memberRepository.existsByLoginId(logId)) {

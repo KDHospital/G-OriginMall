@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.gmall.dto.MemberLoginDTO;
-import com.example.gmall.dto.UserSignupDTO;
+import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
 

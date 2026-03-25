@@ -1,4 +1,4 @@
-package com.example.gmall.dto;
+package com.example.gmall.dto.cart;
 
 import java.util.List;
 import java.util.stream.Collectors;

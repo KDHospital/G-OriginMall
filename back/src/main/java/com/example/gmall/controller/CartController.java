@@ -1,8 +1,8 @@
 package com.example.gmall.controller;
 
-import com.example.gmall.dto.CartItemRequestDTO;
-import com.example.gmall.dto.CartItemResponseDTO;
-import com.example.gmall.dto.CartSummaryDTO;
+import com.example.gmall.dto.cart.CartItemRequestDTO;
+import com.example.gmall.dto.cart.CartItemResponseDTO;
+import com.example.gmall.dto.cart.CartSummaryDTO;
 import com.example.gmall.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

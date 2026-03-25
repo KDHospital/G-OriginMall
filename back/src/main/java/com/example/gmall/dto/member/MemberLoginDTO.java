@@ -1,4 +1,4 @@
-package com.example.gmall.dto;
+package com.example.gmall.dto.member;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

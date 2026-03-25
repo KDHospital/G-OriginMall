@@ -1,4 +1,4 @@
-package com.example.gmall.dto;
+package com.example.gmall.dto.product;
 
 import com.example.gmall.domain.Member;
 
