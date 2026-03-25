@@ -37,7 +37,7 @@ public class Member {
     @Column(name = "mname", length = 15, nullable = false)
     private String mname;
  
-    @Column(name = "mpwd", length = 20)
+    @Column(name = "mpwd", length = 255)
     private String mpwd; // 소셜 로그인 시 NULL 허용
  
     @Column(name = "tel", length = 15, nullable = false)

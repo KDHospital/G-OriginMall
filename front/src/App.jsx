@@ -4,6 +4,8 @@ import axiosInstance from "./api/axios";
 import MainPage from './pages/main/MainPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import CartPage from './pages/cart/CartPage';
+import UserSignupPage from './pages/member/UserSignupPage';
+import JoinPage from './pages/member/JoinPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -30,10 +32,11 @@ function App() {
 
         {/* 회원(구매자) - 유재영 담당 */}
         {/* <Route path="/join" element={<JoinPage />} /> */}
-
+        <Route path='/signup' element={<UserSignupPage />} />
+        <Route path='/login' element={<JoinPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
-
+        
         {/* 장바구니 - 김슬기 담당 */}
         <Route path="/cart" element={<CartPage />} />
 

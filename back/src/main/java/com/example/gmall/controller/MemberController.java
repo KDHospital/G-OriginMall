@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.gmall.dto.MemberLoginDTO;
 import com.example.gmall.dto.UserSignupDTO;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
@@ -59,4 +60,13 @@ public class MemberController {
 		memberService.signup(signupDTO);
 		return ResponseEntity.ok("회원가입이 완료되었습니다.");
 	}
+	
+	//로그인
+	@PostMapping("/login")
+	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid MemberLoginDTO loginDTO){
+		String accessToken = memberService.login(loginDTO);
+		
+		return ResponseEntity.ok(Map.of("accessToken",accessToken));
+	}
+	
 }
