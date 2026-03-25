@@ -1,7 +1,7 @@
 package com.example.gmall.service;
 
-import com.example.gmall.dto.MemberLoginDTO;
-import com.example.gmall.dto.UserSignupDTO;
+import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.UserSignupDTO;
 
 public interface MemberService {
 	
