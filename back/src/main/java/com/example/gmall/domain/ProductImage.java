@@ -12,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +21,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "product_image")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductImage {
  
     @Id
@@ -41,5 +45,10 @@ public class ProductImage {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+    }
+    
+    // 이미지 순서 변경용
+    public void updateSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
     }
 }
