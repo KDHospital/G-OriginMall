@@ -1,4 +1,4 @@
-package com.example.gmall.exception;
+package com.example.gmall.handler;
 
 import java.util.List;
 import java.util.Map;

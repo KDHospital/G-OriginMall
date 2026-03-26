@@ -1,7 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 
 const BasicMenu =() => {
+
+const navigate = useNavigate()
+
+const isLoggedIn = !!localStorage.getItem("member")
+
+const handleLogout= () => {
+    localStorage.removeItem("member")
+    navigate("/")
+    window.location.reload()
+}
 
     const menuItem = [
         {
@@ -55,10 +65,29 @@ const BasicMenu =() => {
                             <span className="absolute top-1 right-1 bg-secondary text-[10px] font-bold px-1 rounded-full text-white">3</span>
                         </Link>
                         {/* 로그인 */}
-                        <Link to={"/login"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                        {isLoggedIn ?(
+                           <>
+                           <Link
+                           to="/mypage"
+                           className="hidden sm:flex items-center gap-2 text-sm font-bold bg-slate-100 text-slate-700 px-5 py-2 rounded-full hover:bg-slate-200 transition-colors"
+                           >
+                            <span className="material-symbols-outlined text-lg">account_circle</span>
+                            마이페이지
+                           </Link>
+                           <button
+                            onClick={handleLogout}
+                            className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                       <span className="material-symbols-outlined text-lg">logout</span>
+                       로그아웃</button></>) : ( <>
+                        <Link to={"/member/login"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
                             <span className="material-symbols-outlined text-lg">person</span>
                             로그인
                         </Link>
+                       <Link to={"/signup"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                            <span className="material-symbols-outlined text-lg">person</span>
+                            회원가입
+                        </Link></>
+                        )}
                     </div>
                 </div>
             </div>

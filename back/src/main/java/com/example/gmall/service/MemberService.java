@@ -1,5 +1,6 @@
 package com.example.gmall.service;
 
+import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 
@@ -14,5 +15,7 @@ public interface MemberService {
 	
 	//로그인
 	String login(MemberLoginDTO loginDTO);
+	
+	MemberDTO getMemberLoginId(String loginId);
 
 }

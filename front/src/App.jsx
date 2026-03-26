@@ -8,6 +8,7 @@ import UserSignupPage from './pages/member/UserSignupPage';
 import JoinPage from './pages/member/JoinPage';
 import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 import OrderFormPage from './pages/orders/OrderFormPage';
+import Mypapge from './pages/member/MyPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -37,7 +38,8 @@ function App() {
         {/* 회원(구매자) - 유재영 담당 */}
         {/* <Route path="/join" element={<JoinPage />} /> */}
         <Route path='/signup' element={<UserSignupPage />} />
-        <Route path='/login' element={<JoinPage />} />
+        <Route path='/member/login' element={<JoinPage />} />
+        <Route path='/mypage' element={<Mypapge />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
         
