@@ -17,5 +17,7 @@ public interface MemberService {
 	String login(MemberLoginDTO loginDTO);
 	
 	MemberDTO getMemberLoginId(String loginId);
+	
+	MemberDTO getMemberId(String MemberId);
 
 }

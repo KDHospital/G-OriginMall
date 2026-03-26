@@ -100,6 +100,20 @@ public class MemberServiceImpl implements MemberService {
  				.build();
  	}
  	
+ 	@Override
+ 	public MemberDTO getMemberId(String memberId) {
+ 		Member member = memberRepository.findById(memberId)
+ 				.orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+ 		
+ 		return MemberDTO.builder()
+ 				.id(member.getId())
+ 				.loginId(member.getLoginId())
+ 				.mname(member.getMname())
+ 				.tel(member.getTel())
+ 				.gender(member.getGender())
+ 				.build();
+ 	}
+ 	
  	
 
 }
