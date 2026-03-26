@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 
 const initState = {
     loginId:'',
@@ -33,6 +34,10 @@ const LoginComponent = () => {
             console.log("로그인 성공:", data)
 
             localStorage.setItem("member",JSON.stringify(data))
+
+            if(data.accessToken){
+                axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`
+            }
 
             alert("로그인에 성공했습니다.")
             navigate("/")

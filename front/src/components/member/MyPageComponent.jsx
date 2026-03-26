@@ -45,6 +45,9 @@ useEffect(() => {
       });
   }, [navigate]);
 
+  const moveToModidyPage = () => {
+        navigate("/modifypage")
+  }
   if(loading){
     return <div className="text-center p-20 font-bold">데이터를 불러오는 중입니다.</div>
   }
@@ -52,7 +55,7 @@ useEffect(() => {
     <div className="max-w-7xl mx-auto flex gap-8 p-10 bg-gray-50 min-h-screen">
         {/*--- 좌측 사이드바 ---*/}
 
-        <asied className="w-64 flex-shrink-0 bg-white p-6 shadow-sm rounded-lg border border-gray-100">
+        <aside className="w-64 flex-shrink-0 bg-white p-6 shadow-sm rounded-lg border border-gray-100">
         <div className="flex flex-col items-center mb-8">
         <div className="w-20 h-20 bg-gray-200 rounded-full mb-3 flex items-center justify-center">
             <span className="text-3xl">👤</span>
@@ -67,13 +70,13 @@ useEffect(() => {
           <div className="p-2 hover:bg-gray-50 rounded cursor-pointer text-gray-600">배송 조회</div>
 
           <div className="font-bold text-gray-400 mb-2 mt-4 text-xs uppercase">계정</div>
-          <div className="p-2 hover:bg-gray-50 rounded cursor-pointer text-gray-600">회원 정보 수정</div>
+          <div className="p-2 hover:bg-gray-50 rounded cursor-pointer text-gray-600" onClick={moveToModidyPage}>회원 정보 수정</div>
           <div className="p-2 hover:bg-gray-50 rounded cursor-pointer text-gray-600">배송지 관리</div>
         <button className="w-full mt-10 p-2 text-gray-300 text-xs border border-gray-200 rounded hover:bg-red-50 hover:text-red-400 transition-all">
             탈퇴하기
           </button>
         </nav>
-        </asied>
+        </aside>
    {/* --- 우측 메인 컨텐츠 --- */}
       <main className="flex-grow space-y-6">
         <h2 className="text-2xl font-bold border-l-4 border-black pl-3">마이페이지</h2>
@@ -85,7 +88,7 @@ useEffect(() => {
         <section className="bg-white p-8 border border-gray-200 shadow-sm rounded-md">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-lg">회원 정보</h3>
-            <button className="text-sm border border-gray-300 px-4 py-1 hover:bg-gray-50">수정하기</button>
+            <button className="text-sm border border-gray-300 px-4 py-1 hover:bg-gray-50" onClick={moveToModidyPage}>수정하기</button>
           </div>
 
           <table className="w-full text-sm border-t border-gray-100">

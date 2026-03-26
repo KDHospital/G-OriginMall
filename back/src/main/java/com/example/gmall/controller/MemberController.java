@@ -66,10 +66,12 @@ public class MemberController {
 	
 	//로그인
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid MemberLoginDTO loginDTO){
+	public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid MemberLoginDTO loginDTO){
 		String accessToken = memberService.login(loginDTO);
 		
-		return ResponseEntity.ok(Map.of("accessToken",accessToken));
+		MemberDTO memberDTO = memberService.getMemberLoginId(loginDTO.getLoginId());
+		
+		return ResponseEntity.ok(Map.of("accessToken",accessToken,"member",memberDTO));
 	}
 	
 	@GetMapping("/me")
