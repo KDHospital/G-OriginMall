@@ -22,7 +22,7 @@ public class ProductListResponseDTO {
 	private boolean isCertified;
 	//카테고리 id,카테고리 명, 생성일시 
 	private Integer categoryId;
-	private String name;
+	private String categoryName;
 	private LocalDateTime createdAt;
 	
 	public ProductListResponseDTO(Product p) {
@@ -37,7 +37,7 @@ public class ProductListResponseDTO {
 		this.soldStatus = p.getSoldStatus();
 		this.isCertified = p.isCertified();
 		this.categoryId = p.getCategory().getCategoryId();
-		this.name = p.getCategory().getCategoryName();
+		this.categoryName = p.getCategory().getCategoryName();
 		this.createdAt = p.getCreatedAt();
 	}
 	
