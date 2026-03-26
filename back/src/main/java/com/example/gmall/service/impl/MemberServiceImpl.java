@@ -40,18 +40,18 @@ public class MemberServiceImpl implements MemberService {
 		 throw new IllegalArgumentException("이미 사용 중인 전화번호입니다.");
 	 }
 	 
-	 Member member = new Member();
-	 member.setLoginId(signupDTO.getLoginId());
-	 member.setMpwd(signupDTO.getMpwd());
-	 member.setMname(signupDTO.getMname());
-	 member.setTel(signupDTO.getTel());
-	 member.setEmail(signupDTO.getLoginId());
-	 member.setGender(signupDTO.getGender());
-	 member.setEmailVerified(true); //프론트애서 인증 완료 후 요청
-	 member.setRole((byte) 0);
-	 member.setDeleted(false);
-	 
-	 memberRepository.save(member);
+//	 Member member = new Member();
+//	 member.setLoginId(signupDTO.getLoginId());
+//	 member.setMpwd(signupDTO.getMpwd());
+//	 member.setMname(signupDTO.getMname());
+//	 member.setTel(signupDTO.getTel());
+//	 member.setEmail(signupDTO.getLoginId());
+//	 member.setGender(signupDTO.getGender());
+//	 member.setEmailVerified(true); //프론트애서 인증 완료 후 요청
+//	 member.setRole((byte) 0);
+//	 member.setDeleted(false);
+//	 
+//	 memberRepository.save(member);
  }
 	
 

@@ -16,7 +16,7 @@ public class QuerydslConfig {
 	
 	@Bean
 	public JPAQueryFactory jpaQueryFactory() {
-		// JPAQueryFactory가 데이터를 쿼리할 때 사용할 EntityManager를 넘겨줍니다.
+		
 		return new JPAQueryFactory(entityManager);
 	}
 	
