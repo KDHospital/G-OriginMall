@@ -72,6 +72,22 @@ const SignupComponent = () =>{
         alert(msg)
     })
   }
+  //연락처 전용 자동 하이픈 핸들러
+  const handleTelChange = (e) => {
+    const value = e.target.value.replace(/[^0-9]/g,'')
+    let formattedNumber = ''
+    if(value.length <=3){
+        formattedNumber = value
+    }else if(value.length <= 7) {
+        formattedNumber = `${value.slice(0,3)}-${value.slice(3)}`
+    }else{
+        formattedNumber = `${value.slice(0,3)}-${value.slice(3,7)}-${value.slice(7,11)}`
+    }
+    setform({
+        ...form,
+        tel: formattedNumber
+    })
+  }
 
 
     return(
@@ -137,7 +153,7 @@ const SignupComponent = () =>{
                 </div>
                 <div className="flex flex-col">
                     <label className="font-bold mb-1 text-gray-700 text-sm">연락처</label>
-                    <input className="p-3 border border-gray-300 rounded" name="tel" value={form.tel} placeholder="010-0000-0000" onChange={handleChange} />
+                    <input className="p-3 border border-gray-300 rounded" name="tel" value={form.tel} placeholder="010-0000-0000" maxLength="13" onChange={handleTelChange} />
                 </div>
             </div>
             <div>

@@ -6,15 +6,26 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.gmall.filter.JWTCheckFilter;
+import com.example.gmall.util.JWTUtil;
+
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+	
+	private final JWTUtil jwtUtil;
+	
 	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // 1. CSRF 보호 비활성화 (테스트 단계에서는 이걸 꺼야 POST 요청이 먹힙니다!)
             .csrf(csrf -> csrf.disable()) 
             
+            .addFilterBefore(new JWTCheckFilter(jwtUtil), 
+            		org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             // 2. 모든 경로에 대해 인증 없이 접근 허용
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll() 
