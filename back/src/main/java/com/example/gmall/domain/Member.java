@@ -14,6 +14,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +23,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "member")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Member {
  
     @Id
@@ -42,6 +46,7 @@ public class Member {
     @Column(name = "email", length = 50, nullable = false)
     private String email;
  
+    //이메일 인증 여부
     @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT 0")
     private boolean emailVerified = false;
  

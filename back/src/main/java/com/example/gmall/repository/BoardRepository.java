@@ -1,4 +1,4 @@
-package com.example.gmall.repository.board;
+package com.example.gmall.repository;
 
 import java.util.Optional;
 
