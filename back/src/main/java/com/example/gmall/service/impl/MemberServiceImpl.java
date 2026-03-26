@@ -79,7 +79,8 @@ public class MemberServiceImpl implements MemberService {
  	 	
  	 	java.util.Map<String, Object> claims = java.util.Map.of(
  	 			"loginId",member.getLoginId(),
- 	 			"memberId",member.getId()
+ 	 			"memberId",member.getId(),
+ 	 			"role",member.getRole()
  	 			);
  	// 인증 성공 시 JWT 토큰 생성 및 반환
  	  return jwtUtil.generateToken(claims, 60);
@@ -88,6 +89,20 @@ public class MemberServiceImpl implements MemberService {
  	@Override
  	public MemberDTO getMemberLoginId(String loginId) {
  		Member member = memberRepository.findByLoginId(loginId)
+ 				.orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+ 		
+ 		return MemberDTO.builder()
+ 				.id(member.getId())
+ 				.loginId(member.getLoginId())
+ 				.mname(member.getMname())
+ 				.tel(member.getTel())
+ 				.gender(member.getGender())
+ 				.build();
+ 	}
+ 	
+ 	@Override
+ 	public MemberDTO getMemberId(String memberId) {
+ 		Member member = memberRepository.findById(memberId)
  				.orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
  		
  		return MemberDTO.builder()

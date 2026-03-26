@@ -22,7 +22,8 @@ import lombok.extern.log4j.Log4j2;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-
+    
+    //웹-상품 목록 조회
 	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int page, int size){
 		log.info("ProductServiceImpl 파일 내부의 getProducts 접근");
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"createdAt"));

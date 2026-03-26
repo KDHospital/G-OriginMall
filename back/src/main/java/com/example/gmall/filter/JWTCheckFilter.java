@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,8 +31,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 		String authHeader = request.getHeader("Authorization");
 		
 		if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-		filterChain.doFilter(request, response);
-		return;
+			filterChain.doFilter(request, response);
+			return;
 		}
 		
 		try {
@@ -41,11 +42,20 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 			Map<String, Object> claims = jwtUtil.validateToken(accessToken);
 			
 			String loginId = (String) claims.get("loginId");
-			log.info("인증 성공 아이디:{}",loginId);
+			Long memberId = ((Number) claims.get("memberId")).longValue();
+			Integer role = ((Number) claims.get("role")).intValue();
+			log.info("인증 성공 아이디:{}, memberId: {}, role: {}",loginId, memberId, role);
+			
+			// role에 따라 권한 설정
+			String authority = switch(role) {
+				case 1 -> "ROLE_SELLER";
+				case 2 -> "ROLE_ADMIN";
+				default -> "ROLE_USER";
+			};
 			
 			
 			UsernamePasswordAuthenticationToken authenticationToken =
-					new UsernamePasswordAuthenticationToken(loginId, null,List.of());
+					new UsernamePasswordAuthenticationToken(memberId, null, List.of(new SimpleGrantedAuthority(authority)));
 			
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 		} catch (Exception e) {
