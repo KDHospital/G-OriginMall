@@ -2,7 +2,7 @@ import { useEffect,useState } from "react";
 import { getMemberInfo, updateMemberInfo } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
-import {formatPhoneNymber} from "../../components/member/LoginComponent"
+
 
 const initState ={
     loginId:'',
@@ -13,7 +13,13 @@ const initState ={
     mpwd:'',
     reMpwd:''
 }
-
+ const formatPhoneNumber = (value) => {
+        if (!value) return "";
+        const num = value.replace(/[^0-9]/g, '');
+        if (num.length <= 3) return num;
+        if (num.length <= 7) return `${num.slice(0, 3)}-${num.slice(3)}`;
+        return `${num.slice(0, 3)}-${num.slice(3, 7)}-${num.slice(7, 11)}`;
+    }
 
 const ModifyComponent = () =>{
     const [form, setForm] = useState({...initState})
@@ -22,13 +28,14 @@ const ModifyComponent = () =>{
 
     useEffect( () => {
         getMemberInfo()
-        .then( (data) => {
+        .then( (res) => {
+           const memberData = res.data || res
             setForm({
                 ...initState,
-                loginId: data.loginId,
-                mname: data.mname,
-                tel: formatPhoneNymber(data.tel),
-                gender : data.gender
+                loginId: memberData.loginId || "",
+                mname: memberData.mname || '',
+                tel: formatPhoneNumber(memberData.tel || ''),
+                gender : memberData.gender ?? 0
             })
             setLoading(false)
         })
@@ -44,7 +51,7 @@ const ModifyComponent = () =>{
     const handleChange = (e) => {
         const {name,value} = e.target
         if(name === "tel") {
-            setForm({...form, [name]: formatPhoneNymber(value)})
+            setForm({...form, [name]: formatPhoneNumber(value)})
         }else{
             setForm({...form,[name]: name === 'gender' ? parseInt(value) : value})
         }
@@ -83,79 +90,112 @@ const ModifyComponent = () =>{
 
     return(
         <div className="max-w-lg mx-auto border-2 border-indigo-100 mt-10 p-8 bg-white shadow-xl rounded-2xl">
-            <h2 className="text-3xl mb-8 font-black text-indigo-700 text-center">회원 정보 수정</h2>
+        <h2 className="text-3xl mb-8 font-black text-indigo-700 text-center">회원 정보 수정</h2>
 
-            <div className="space-y-5">
-                <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
-                    <label className="font-bold text-sm text-indigo-800 block mb-1">현재 비밀번호 확인</label>
-                    <input 
+        <div className="space-y-6"> {/* 간격을 위해 space-y-6으로 변경 */}
+            
+            {/* 1. 현재 비밀번호 확인 (독립) */}
+            <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                <label className="font-bold text-sm text-indigo-800 block mb-1">현재 비밀번호 확인</label>
+                <input 
                     type="password"
                     name="currentMpwd"
                     className="w-full p-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                     placeholder="기존 비밀번호를 입력하세요"
                     value={form.currentMpwd}
-                    onChange={handleChange} />
+                    onChange={handleChange} 
+                />
+            </div>
+
+            <hr className="border-gray-100" />
+
+           
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="font-bold text-xs text-gray-500 block mb-1">아이디(이메일)</label>
+                    <input className="w-full p-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed" value={form.loginId} readOnly />
                 </div>
-                <hr className="border-gray-100 my-2" />
+                <div>
+                    <label className="font-bold text-xs text-gray-500 block mb-1">이름</label>
+                    <input className="w-full p-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed" value={form.mname} readOnly />
+                </div>
+            </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="font-bold text-xs text-gray-500 block mb-1">아이디(이메일)</label>
-                        <input className="w-full p-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed" value={form.loginId} readOnly />
-                    </div>
-                    <div>
-                        <label className="font-bold text-xs text-gray-500 block mb-1">이름</label>
-                        <input className="w-full p-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed" value={form.mname} readOnly />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="font-bold text-sm text-gray-700 block mb-1">새 비밀번호</label>
-                            <input 
-                            type="password"
-                            name="mpwd"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
-                            placeholder="변경 시에만 입력"
-                            value={form.mpwd}
-                            onChange={handleChange}/>
-                        </div>
-                        <div>
-                            <label className="font-bold text-sm text-gray-700 block mb-1">새 비밀번호 확인</label>
-                        <input 
-                            type="password"
-                            name="reMpwd"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
-                            placeholder="한 번 더 입력"
-                            value={form.reMpwd}
-                            onChange={handleChange}/>
-                        </div>
-                    </div>
-                    <div>
-                        <label className="font-bold text-sm text-gray-700 block mb-1">연락처</label>
-                        <input 
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none "
-                        name="tel"
-                        value={form.tel}
+           
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="font-bold text-sm text-gray-700 block mb-1">새 비밀번호</label>
+                    <input 
+                        type="password"
+                        name="mpwd"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+                        placeholder="변경 시에만 입력해주세요"
+                        value={form.mpwd}
                         onChange={handleChange}
-                        maxLength="13"/>
+                    />
+                </div>
+                <div>
+                    <label className="font-bold text-sm text-gray-700 block mb-1">새 비밀번호 확인</label>
+                    <input 
+                        type="password"
+                        name="reMpwd"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+                        placeholder="한 번 더 입력해주세요"
+                        value={form.reMpwd}
+                        onChange={handleChange}
+                    />
+                </div>
+            </div>
 
-                    </div>
+            
+            <div>
+                <label className="font-bold text-sm text-gray-700 block mb-1">연락처</label>
+                <input 
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 outline-none"
+                    name="tel"
+                    value={form.tel}
+                    onChange={handleChange}
+                    maxLength="13"
+                />
+            </div>
 
-                    <div>
-                        <label className="font-bold text-sm text-gray-700 block mb-1">성별</label>
+           
+            <div>
+                <label className="font-bold text-sm text-gray-700 block mb-1">성별</label>
                 <div className="flex gap-4 p-3 bg-gray-50 rounded-lg border border-gray-200 justify-around">
-                    {['미지정','남성','여성'].map((label,idx) => (
-                        <label key={idx} className="flex items-center gap-2 cursor-pointer text-sm">
-                            <input />
+                    {['미지정', '남성', '여성'].map((label, idx) => (
+                        <label key={idx} className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                            <input 
+                                type="radio" 
+                                name="gender" 
+                                value={idx} 
+                                checked={form.gender === idx} 
+                                onChange={handleChange} 
+                                className="w-4 h-4 accent-indigo-600"
+                            />
+                            {label}
                         </label>
                     ))}
                 </div>
-                    </div>
+            </div>
 
-                </div>
+           
+            <div className="flex gap-4 pt-6">
+                <button 
+                    className="flex-1 p-4 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all"
+                    onClick={() => navigate(-1)}
+                >
+                    취소
+                </button>
+                <button 
+                    className="flex-1 p-4 bg-indigo-600 text-white rounded-xl font-black shadow-lg hover:bg-indigo-700 transition-all"
+                    onClick={handleClickModify}
+                >
+                    정보 수정 완료
+                </button>
             </div>
         </div>
-
+    </div>
     )
 }
 
