@@ -4,12 +4,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.gmall.domain.Member;
+import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
-import com.example.gmall.util.JwtTokenProvider;
+import com.example.gmall.util.JWTUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class MemberServiceImpl implements MemberService {
 	
 	private final MemberRepository memberRepository;
 	private final EmailService emailService;
-	private final JwtTokenProvider jwtTokenProvider;
+	private final JWTUtil jwtUtil;
 	private final PasswordEncoder passwordEncoder;
 	@Override
 	public void checkLoginId(String logId) {
@@ -76,9 +77,27 @@ public class MemberServiceImpl implements MemberService {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
  	 	}
  	 	
+ 	 	java.util.Map<String, Object> claims = java.util.Map.of(
+ 	 			"loginId",member.getLoginId(),
+ 	 			"memberId",member.getId(),
+ 	 			"role",member.getRole()
+ 	 			);
  	// 인증 성공 시 JWT 토큰 생성 및 반환
- 	  return jwtTokenProvider.createToken(member.getLoginId(), member.getId());
+ 	  return jwtUtil.generateToken(claims, 60);
  	
+ 	}
+ 	@Override
+ 	public MemberDTO getMemberLoginId(String loginId) {
+ 		Member member = memberRepository.findByLoginId(loginId)
+ 				.orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+ 		
+ 		return MemberDTO.builder()
+ 				.id(member.getId())
+ 				.loginId(member.getLoginId())
+ 				.mname(member.getMname())
+ 				.tel(member.getTel())
+ 				.gender(member.getGender())
+ 				.build();
  	}
  	
  	

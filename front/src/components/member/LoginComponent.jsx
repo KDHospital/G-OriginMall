@@ -17,6 +17,12 @@ const LoginComponent = () => {
         setLoginParam({...loginParam})
     }
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        handleClickLogin()
+
+    }
+
     const handleClickLogin = () => {
         if(!loginParam.loginId || !loginParam.mpwd) {
             return alert("아이디와 비밀번호 모두 입력해주세요")
@@ -41,7 +47,7 @@ const LoginComponent = () => {
         <div className="max-w-md mx-auto border-2 border-green-200 mt-20 p-8 bg-white shadow-lg rounded-lg">
             <div className="text-3xl mb-8 font-extrabold text-green-600 text-center">로그인</div>
         
-        <div className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
                 <label className="font-bold mb-1 block text-gray-700">아이디(이메일)</label>
             <input 
@@ -64,8 +70,9 @@ const LoginComponent = () => {
             </div>
 
             <button
+            type="submit"
             className="w-full bg-green-600 text-wrap p-4 rounded font-extrabold text-xl shadow-md hover:bg-green-700 transition-all"
-            onClick={handleClickLogin}>로그인</button>
+            >로그인</button>
 
             <div className="text-center text-sm text-gray-500 mt-4">
                 계정이 없으신가요?{" "}
@@ -76,7 +83,7 @@ const LoginComponent = () => {
                 </span>
 
             </div>
-        </div>
+        </form>
         </div>
     )
 
