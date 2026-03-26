@@ -44,3 +44,8 @@ export const login = (loginParam) =>
 //아이디 중복 체크
 export const checkLoginId = (loginId) =>
  axiosInstance.get(`/member/check-id?loginId=${loginId}`)
+
+//마이페이지 정보 조회 함수
+export const getMemberInfo = () => {
+    return axiosInstance.get(`/member/me`)
+}

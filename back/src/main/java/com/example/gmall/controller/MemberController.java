@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
@@ -69,4 +70,15 @@ public class MemberController {
 		return ResponseEntity.ok(Map.of("accessToken",accessToken));
 	}
 	
+	@GetMapping("/me")
+	public ResponseEntity<MemberDTO> getMemberInfo(@AuthenticationPrincipal autgentication){
+		if (autgentication == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+		
+		String loginId = autgentication.getName();
+	    
+		MemberDTO dto = memberService.getMemberLoginId(loginId);
+		return ResponseEntity.ok(dto);
+	}
 }

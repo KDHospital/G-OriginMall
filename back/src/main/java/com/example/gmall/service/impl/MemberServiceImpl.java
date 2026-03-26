@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.gmall.domain.Member;
+import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.repository.MemberRepository;
@@ -79,6 +80,19 @@ public class MemberServiceImpl implements MemberService {
  	// 인증 성공 시 JWT 토큰 생성 및 반환
  	  return jwtTokenProvider.createToken(member.getLoginId(), member.getId());
  	
+ 	}
+ 	@Override
+ 	public MemberDTO getMemberLoginId(String loginId) {
+ 		Member member = memberRepository.findByLoginId(loginId)
+ 				.orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+ 		
+ 		return MemberDTO.builder()
+ 				.id(member.getId())
+ 				.loginId(member.getLoginId())
+ 				.mname(member.getMname())
+ 				.tel(member.getTel())
+ 				.gender(member.getGender())
+ 				.build();
  	}
  	
  	
