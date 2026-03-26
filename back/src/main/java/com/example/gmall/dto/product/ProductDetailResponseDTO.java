@@ -21,7 +21,7 @@ public class ProductDetailResponseDTO {
 	private Byte soldStatus;
 	private boolean isCertified;
 	private Integer categoryId;
-	private String name;
+	private String categoryName;
 	private Long sellerId;
 	private List<ProductImage> productImages;
 	private LocalDateTime createdAt;
@@ -41,9 +41,9 @@ public class ProductDetailResponseDTO {
         this.soldStatus = p.getSoldStatus();
         this.isCertified = p.isCertified();
         this.categoryId = p.getCategory().getCategoryId();
-        this.name = p.getCategory().getName();
+        this.categoryName = p.getCategory().getCategoryName();
         this.sellerId = p.getSeller().getId();
-        
+        //코드 추가 작성 필요
         
 	}
 	
