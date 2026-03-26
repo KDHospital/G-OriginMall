@@ -79,7 +79,8 @@ public class MemberServiceImpl implements MemberService {
  	 	
  	 	java.util.Map<String, Object> claims = java.util.Map.of(
  	 			"loginId",member.getLoginId(),
- 	 			"memberId",member.getId()
+ 	 			"memberId",member.getId(),
+ 	 			"role",member.getRole()
  	 			);
  	// 인증 성공 시 JWT 토큰 생성 및 반환
  	  return jwtUtil.generateToken(claims, 60);
