@@ -41,7 +41,7 @@ public class ProductDetailResponseDTO {
         this.soldStatus = p.getSoldStatus();
         this.isCertified = p.isCertified();
         this.categoryId = p.getCategory().getCategoryId();
-        this.name = p.getCategory().getName();
+        this.name = p.getCategory().getCategoryName();
         this.sellerId = p.getSeller().getId();
         
         
