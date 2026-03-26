@@ -22,8 +22,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "member")
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
