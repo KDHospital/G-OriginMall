@@ -12,6 +12,13 @@ const MyPageComponent = () => {
         1: "남성",
         2: "여성"
     }
+    const formatPhoneNumber = (phoneNumber) => {
+        if(!phoneNumber) return""
+
+        const savedNumber = phoneNumber.replace(/[^0-9]/g,"")
+
+        return savedNumber.replace(/(\d{3})(\d{4})(\d{4})/,"$1-$2-$3")
+    }
 
 useEffect(() => {
     
@@ -85,7 +92,7 @@ useEffect(() => {
             <tbody>
               <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">아이디</td><td className="p-4">{member.loginId}</td></tr>
               <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">이름</td><td className="p-4">{member.mname}</td></tr>
-              <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">연락처</td><td className="p-4">{member.tel}</td></tr>
+              <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">연락처</td><td className="p-4">{formatPhoneNumber(member.tel)}</td></tr>
               <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">성별</td><td className="p-4">{genderMap[member.gender] || "정보 없음"}</td></tr>
               <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">가입일</td><td className="p-4">2026-01-15</td></tr>
             </tbody>

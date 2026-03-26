@@ -38,7 +38,7 @@ function App() {
         {/* 회원(구매자) - 유재영 담당 */}
         {/* <Route path="/join" element={<JoinPage />} /> */}
         <Route path='/signup' element={<UserSignupPage />} />
-        <Route path='/login' element={<JoinPage />} />
+        <Route path='/member/login' element={<JoinPage />} />
         <Route path='/mypage' element={<Mypapge />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}

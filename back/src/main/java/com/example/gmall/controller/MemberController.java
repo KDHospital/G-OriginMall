@@ -2,7 +2,9 @@ package com.example.gmall.controller;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,7 +73,7 @@ public class MemberController {
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<MemberDTO> getMemberInfo(@AuthenticationPrincipal autgentication){
+	public ResponseEntity<MemberDTO> getMemberInfo(Authentication autgentication){
 		if (autgentication == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	    }
