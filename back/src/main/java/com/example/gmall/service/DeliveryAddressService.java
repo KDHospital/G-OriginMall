@@ -2,8 +2,8 @@ package com.example.gmall.service;
 
 import java.util.List;
 
-import com.example.gmall.dto.DeliveryAddressRequestDTO;
-import com.example.gmall.dto.DeliveryAddressResponseDTO;
+import com.example.gmall.dto.delivery.DeliveryAddressRequestDTO;
+import com.example.gmall.dto.delivery.DeliveryAddressResponseDTO;
 
 public interface DeliveryAddressService {
 	

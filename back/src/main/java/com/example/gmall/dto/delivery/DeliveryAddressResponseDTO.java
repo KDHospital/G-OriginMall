@@ -1,4 +1,4 @@
-package com.example.gmall.dto;
+package com.example.gmall.dto.delivery;
 
 import com.example.gmall.domain.DeliveryAddress;
 import lombok.Getter;

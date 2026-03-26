@@ -1,6 +1,7 @@
 package com.example.gmall.service;
 
-import com.example.gmall.dto.UserSignupDTO;
+import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.UserSignupDTO;
 
 public interface MemberService {
 	
@@ -10,5 +11,8 @@ public interface MemberService {
 	
 	//일반 회원가입
 	void signup(UserSignupDTO signupDto);
+	
+	//로그인
+	String login(MemberLoginDTO loginDTO);
 
 }

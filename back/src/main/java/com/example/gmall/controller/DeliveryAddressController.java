@@ -1,7 +1,7 @@
 package com.example.gmall.controller;
 
-import com.example.gmall.dto.DeliveryAddressRequestDTO;
-import com.example.gmall.dto.DeliveryAddressResponseDTO;
+import com.example.gmall.dto.delivery.DeliveryAddressRequestDTO;
+import com.example.gmall.dto.delivery.DeliveryAddressResponseDTO;
 import com.example.gmall.service.DeliveryAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

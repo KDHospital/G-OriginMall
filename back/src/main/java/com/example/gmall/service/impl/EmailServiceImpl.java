@@ -24,7 +24,6 @@ public class EmailServiceImpl  implements EmailService{
 	//인증 코드 유효 시간 (3분)
 	private static final Long VERIFICATION_CODE_TTL = 180L;
 	
-	@Override
 	public void sendCode(String email) {
 		// 6자리 난수 생성
 		String code = String.format("%06d", new Random().nextInt(1000000));
@@ -38,19 +37,19 @@ public class EmailServiceImpl  implements EmailService{
 		log.info("인증 코드 발송 완료: {} -> {}",email, code);
 	}
 	
-	@Override
 	public boolean verifyCode(String email, String code) {
 		
 		String savedCode = redisTemplate.opsForValue().get("EMAIL_CODE:"+email);
 		
 		if(savedCode == null) {
 			log.warn("인증 코드 만료 또는 존재하지 않음:{}",email);
-			return false;
+			return Boolean.TRUE.equals(redisTemplate.hasKey("EMAIL_VERIFIED:" + email));
 		}
 		
 		if(savedCode.equals(code)) {
 			//인증 성공시 Redis에서 코드 삭제(재사용 방지)
 			redisTemplate.delete("EMAIL_CODE:"+email);
+			redisTemplate.opsForValue().set("EMAIL_VERIFIED:" + email, "TRUE", 5, TimeUnit.MINUTES);
 			log.info("인증 성공: {}", email);
 			return true;
 		}
