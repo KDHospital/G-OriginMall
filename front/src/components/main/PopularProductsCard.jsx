@@ -64,8 +64,8 @@ return(
                             <p className="text-slate-500 text-sm mb-4 line-clamp-2">{item.desc}</p>
                             <div className="flex items-center justify-between">
                                 <div className="flex flex-col">
-                                    <span className="text-slate-400 line-through text-xs font-medium">{item.price}원</span>
-                                    <span className="text-xl font-black text-primary">{item.dcPrice}원<span className="text-red-500 text-sm font-bold">{item.discountRate}%</span></span>
+                                    <span className="text-slate-400 line-through text-xs font-medium">{item.price.toLocaleString()}원</span>
+                                    <span className="text-xl font-black text-primary">{item.dcPrice.toLocaleString()}원<span className="text-red-500 text-sm font-bold">{item.discountRate}%</span></span>
                                 </div>
                                 <button className="p-3 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-white transition-all">
                                     <span className="material-symbols-outlined">add_shopping_cart</span>
