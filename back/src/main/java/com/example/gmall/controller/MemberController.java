@@ -73,14 +73,15 @@ public class MemberController {
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<MemberDTO> getMemberInfo(Authentication autgentication){
-		if (autgentication == null) {
+	public ResponseEntity<MemberDTO> getMemberInfo(Authentication authentication){
+		if (authentication == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	    }
 		
-		String loginId = autgentication.getName();
+		String loginId = authentication.getName();
+		log.info(authentication.toString());
 	    
-		MemberDTO dto = memberService.getMemberLoginId(loginId);
+		MemberDTO dto = memberService.getMemberId(loginId);
 		return ResponseEntity.ok(dto);
 	}
 }

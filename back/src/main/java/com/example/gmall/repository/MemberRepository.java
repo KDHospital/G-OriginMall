@@ -46,6 +46,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      // 사용: 로그인 시 탈퇴 회원 접근 차단
     
     Optional<Member> findByLoginIdAndIsDeletedFalse(String loginId);
+    
+    
+    // * Member의 id로 회원 조회
+    // * 사용: JWT 관련 처리
+    Optional<Member> findById(String memberId);
  
    
 }
