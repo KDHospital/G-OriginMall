@@ -37,7 +37,7 @@ public class ProductListResponseDTO {
 		this.soldStatus = p.getSoldStatus();
 		this.isCertified = p.isCertified();
 		this.categoryId = p.getCategory().getCategoryId();
-		this.name = p.getCategory().getName();
+		this.name = p.getCategory().getCategoryName();
 		this.createdAt = p.getCreatedAt();
 	}
 	
