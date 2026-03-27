@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,6 +60,26 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 				.status(HttpStatus.BAD_REQUEST)
 				.body(Map.of("message",ex.getParameterName() + "파라미터가 필요합니다."));
+	}
+	
+	// 파일 업로드 크기 초과
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<Map<String, String>> handleMaxUploadSize(
+	        MaxUploadSizeExceededException ex) {
+		 // 더 자세한 로그
+	    log.warn("파일 업로드 크기 초과");
+	    log.warn("getMessage: {}", ex.getMessage());
+	    log.warn("getCause: {}", ex.getCause() != null ? ex.getCause().getMessage() : "null");
+	    log.warn("getMostSpecificCause: {}", ex.getMostSpecificCause().getMessage());
+	    
+	    // 실제 제한 크기 확인
+	    if (ex.getCause() != null) {
+	        log.warn("원인 클래스: {}", ex.getCause().getClass().getName());
+	    }
+	    
+	    return ResponseEntity
+	            .status(HttpStatus.BAD_REQUEST)
+	            .body(Map.of("message", ex.getMostSpecificCause().getMessage()));
 	}
 	
 	//그 외 예상치 못한 서버 오류

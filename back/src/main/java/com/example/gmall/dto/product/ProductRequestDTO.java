@@ -1,12 +1,16 @@
 package com.example.gmall.dto.product;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
+@Setter
 public class ProductRequestDTO {
 
     private Integer categoryId;

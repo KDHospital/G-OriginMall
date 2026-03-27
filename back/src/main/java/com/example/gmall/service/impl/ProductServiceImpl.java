@@ -55,87 +55,74 @@ public class ProductServiceImpl implements ProductService {
     // 상품 등록
 	@Override
     public ProductResponseDTO register(Long sellerId, ProductRequestDTO dto) {
+		
+		
+		Member seller = memberRepository.findById(sellerId)
+	            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 판매자입니다."));
 
-        // 판매자 조회
-        Member seller = memberRepository.findById(sellerId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 판매자입니다."));
+	    Category category = categoryRepository.findById(dto.getCategoryId())
+	            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
 
-        // 카테고리 조회
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+	    // 1. 이미지 없이 상품 먼저 저장 → productId 생성
+	    Product product = Product.builder()
+	            .seller(seller)
+	            .category(category)
+	            .pname(dto.getPname())
+	            .pdesc(dto.getPdesc())
+	            .listPrice(dto.getListPrice())
+	            .discountPrice(dto.getDiscountPrice() != null ? dto.getDiscountPrice() : 0)
+	            .price(dto.getPrice())
+	            .stock(dto.getStock())
+	            .deliveryFee(dto.getDeliveryFee() != null ? dto.getDeliveryFee() : 0)
+	            .isCertified(dto.isCertified())
+	            .isExhibition(dto.isExhibition())
+	            .soldStatus((byte) 0)
+	            .build();
 
-        // 이미지 업로드 처리
-        String thumbnailImageUrl = null;
-        List<String> imageUrls = null;
+	    productRepository.save(product); // ← productId 생성됨
 
-        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
-            imageUrls = uploadImages(dto.getImages(), sellerId);
-            // 첫 번째 이미지 → 썸네일 자동 지정
-            thumbnailImageUrl = imageUrls.get(0);
-        }
+	    // 2. productId 폴더에 이미지 업로드
+	    if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+	        List<String> imageUrls = uploadImages(dto.getImages(), product.getProductId());
 
-        // 상품 저장
-        Product product = Product.builder()
-                .seller(seller)
-                .category(category)
-                .pname(dto.getPname())
-                .pdesc(dto.getPdesc())
-                .listPrice(dto.getListPrice())
-                .discountPrice(dto.getDiscountPrice() != null ? dto.getDiscountPrice() : 0)
-                .price(dto.getPrice())
-                .stock(dto.getStock())
-                .deliveryFee(dto.getDeliveryFee() != null ? dto.getDeliveryFee() : 0)
-                .thumbnailImageUrl(thumbnailImageUrl)
-                .isCertified(dto.isCertified())
-                .isExhibition(dto.isExhibition())
-                .soldStatus((byte) 0) // 기본 ACTIVE
-                .build();
+	        // 첫 번째 이미지 → 썸네일 업데이트
+	        product.updateThumbnailImageUrl(imageUrls.get(0));
 
-        productRepository.save(product);
+	        // 두 번째부터 → ProductImage 테이블 저장
+	        for (int i = 1; i < imageUrls.size(); i++) {
+	            ProductImage productImage = ProductImage.builder()
+	                    .product(product)
+	                    .imageUrl(imageUrls.get(i))
+	                    .sortOrder(i)
+	                    .build();
+	            productImageRepository.save(productImage);
+	        }
+	    }
 
-        // 추가 이미지 저장 (두 번째 이미지부터 ProductImage 테이블에 저장)
-        if (imageUrls != null && imageUrls.size() > 1) {
-            for (int i = 1; i < imageUrls.size(); i++) {
-                ProductImage productImage = ProductImage.builder()
-                        .product(product)
-                        .imageUrl(imageUrls.get(i))
-                        .sortOrder(i) // 순서 저장
-                        .build();
-                productImageRepository.save(productImage);
-            }
-        }
+	    return new ProductResponseDTO(product);
+	}
 
-        return new ProductResponseDTO(product);
-    }
+	// uploadImages() - sellerId → productId로 변경
+	private List<String> uploadImages(List<MultipartFile> files, Long productId) {
+	    String dirPath = uploadPath + productId + "/"; // ← productId로 변경
+	    File dir = new File(dirPath);
+	    if (!dir.exists()) dir.mkdirs();
 
-    // 이미지 업로드 처리 (여러 장)
-    private List<String> uploadImages(List<MultipartFile> files, Long sellerId) {
-        // 판매자별 폴더 생성
-        String dirPath = uploadPath + sellerId + "/";
-        File dir = new File(dirPath);
-        if (!dir.exists()) dir.mkdirs();
-
-        return files.stream()
-                .filter(file -> file != null && !file.isEmpty())
-                .map(file -> {
-                    try {
-                        // UUID로 파일명 중복 방지
-                        String originalFilename = file.getOriginalFilename();
-                        String extension = originalFilename
-                                .substring(originalFilename.lastIndexOf("."));
-                        String savedFilename = UUID.randomUUID() + extension;
-
-                        // 파일 저장
-                        file.transferTo(new File(dirPath + savedFilename));
-
-                        // URL 반환
-                        return "/uploads/products/" + sellerId + "/" + savedFilename;
-
-                    } catch (IOException e) {
-                        log.error("이미지 업로드 실패: {}", e.getMessage());
-                        throw new RuntimeException("이미지 업로드에 실패했습니다.");
-                    }
-                })
-                .toList();
-    }
+	    return files.stream()
+	            .filter(file -> file != null && !file.isEmpty())
+	            .map(file -> {
+	                try {
+	                    String originalFilename = file.getOriginalFilename();
+	                    String extension = originalFilename
+	                            .substring(originalFilename.lastIndexOf("."));
+	                    String savedFilename = UUID.randomUUID() + extension;
+	                    file.transferTo(new File(dirPath + savedFilename));
+	                    return "/uploads/products/" + productId + "/" + savedFilename;
+	                } catch (IOException e) {
+	                    log.error("이미지 업로드 실패: {}", e.getMessage());
+	                    throw new RuntimeException("이미지 업로드에 실패했습니다.");
+	                }
+	            })
+	            .toList();
+	}
 }

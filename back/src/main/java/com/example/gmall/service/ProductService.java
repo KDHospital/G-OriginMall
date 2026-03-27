@@ -1,9 +1,7 @@
 package com.example.gmall.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.example.gmall.dto.product.ProductCreateRequestDTO;
 import com.example.gmall.dto.product.ProductListResponseDTO;
 import com.example.gmall.dto.product.ProductRequestDTO;
 import com.example.gmall.dto.product.ProductResponseDTO;
