@@ -1,7 +1,5 @@
 package com.example.gmall.dto.product;
 
-import com.example.gmall.domain.Member;
-
 import lombok.Getter;
 
 @Getter

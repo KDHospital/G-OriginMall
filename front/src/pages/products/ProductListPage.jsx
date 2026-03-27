@@ -1,13 +1,11 @@
 import BasicLayout from "../../layouts/BasicLayout"
-import ProductList from "../../components/products/ProductList"
-
+import ProductListComponents from "../../components/products/ProductListComponents"
 const ProductListPage = () => {
     return(
         <BasicLayout>
-            <ProductList />
+            <ProductListComponents />
         </BasicLayout>
     )
-
 }
 
 export default ProductListPage

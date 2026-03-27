@@ -5,3 +5,8 @@ import axiosInstance from "./axios"
 export const getProducts = (params) => {
   return axiosInstance.get('/products', {params});
 };
+
+// 상품 상세 조회
+export const getProductDetail = (productId) => {
+  return axiosInstance.get(`/products/${productId}`);
+};

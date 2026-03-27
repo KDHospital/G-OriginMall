@@ -1,4 +1,7 @@
 const Pagination = ({serverData, movePage}) => {
+    if (!serverData || !serverData.pageNumList) {
+        return null
+    }
     return(
         <div className="mt-20 flex justify-center gap-2 font-manrope">
             {/* 이전버튼 */}
@@ -11,12 +14,10 @@ const Pagination = ({serverData, movePage}) => {
             className={`w-10 h-10 flex items-center justify-center rounded-lg ${serverData.current === pageNum ? 'bg-surface-container-highest text-primary font-bold' : 'hover:bg-surface-container-low transition-colors'}`} 
             onClick={()=>movePage({page:pageNum})}>{pageNum}</button>
             )}
-            
             {/* next btn */}
             {serverData.next ? <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
                 <span className="material-symbols-outlined">chevron_right</span>
             </button> : <></>}
-
         </div>
     )
 }
