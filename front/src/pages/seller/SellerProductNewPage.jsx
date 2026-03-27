@@ -1,24 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerLayout from "../../layouts/SellerLayout";
-
-// ─────────────────────────────────────────
-// Mock 데이터 (API 연동 후 제거)
-// ─────────────────────────────────────────
-const MOCK_CATEGORIES = [
-  { categoryId: 1, categoryName: "곡류/잡곡", parentId: null },
-  { categoryId: 2, categoryName: "채소/과일", parentId: null },
-  { categoryId: 3, categoryName: "가공식품", parentId: null },
-  { categoryId: 4, categoryName: "쌀", parentId: 1 },
-  { categoryId: 5, categoryName: "잡곡", parentId: 1 },
-  { categoryId: 6, categoryName: "견과류", parentId: 1 },
-  { categoryId: 7, categoryName: "채소", parentId: 2 },
-  { categoryId: 8, categoryName: "과일", parentId: 2 },
-  { categoryId: 9, categoryName: "나물/버섯", parentId: 2 },
-  { categoryId: 10, categoryName: "김치/장류", parentId: 3 },
-  { categoryId: 11, categoryName: "두부/콩나물", parentId: 3 },
-  { categoryId: 12, categoryName: "음료/차", parentId: 3 },
-];
+import axiosInstance from "../../api/axios";
 
 // ─────────────────────────────────────────
 // 유틸
@@ -45,12 +28,18 @@ export default function SellerProductNewPage() {
   //   axiosInstance.get("/categories")
   //     .then((res) => setCategories(res.data))
   // }, []);
-  const [categories] = useState(MOCK_CATEGORIES);
+  const [categories, setCategories] = useState([]);
   const [selectedParentId, setSelectedParentId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
   const parentCategories = categories.filter((c) => c.parentId === null);
   const childCategories = categories.filter((c) => c.parentId === selectedParentId);
+
+  useEffect(()=>{
+    axiosInstance.get("/categories")
+      .then((res) => setCategories(res.data))
+      .catch((err) => console.error("카테고리 로드 실패 : " + err));
+  }, [])
 
   // ── 폼 상태 ───────────────────────────
   const [form, setForm] = useState({
@@ -125,7 +114,7 @@ export default function SellerProductNewPage() {
   const handleDragEnd = () => setDragIndex(null);
 
   // 저장
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 필수값 검증
     if (!selectedCategoryId) return alert("카테고리를 선택해주세요.");
     if (!form.pname) return alert("상품명을 입력해주세요.");
@@ -134,26 +123,30 @@ export default function SellerProductNewPage() {
     if (!form.deliveryFee && form.deliveryFee !== 0) return alert("배송비를 입력해주세요.");
     if (images.length === 0) return alert("대표 이미지를 등록해주세요.");
 
-    // TODO: API 연동 후 교체
-    // const formData = new FormData();
-    // formData.append("categoryId", selectedCategoryId);
-    // formData.append("pname", form.pname);
-    // formData.append("pdesc", form.pdesc);
-    // formData.append("listPrice", parsePrice(form.listPrice));
-    // formData.append("discountPrice", parsePrice(form.discountPrice));
-    // formData.append("price", price);
-    // formData.append("stock", form.stock);
-    // formData.append("deliveryFee", parsePrice(form.deliveryFee));
-    // formData.append("soldStatus", form.soldStatus);
-    // formData.append("isCertified", form.isCertified);
-    // formData.append("isExhibition", false); // 판매자는 기획전 불가
-    // images.forEach((img) => formData.append("images", img.file));
-    // axiosInstance.post("/seller/products", formData, {
-    //   headers: { "Content-Type": "multipart/form-data" }
-    // }).then(() => navigate("/seller/products"));
+    const formData = new FormData();
+    formData.append("categoryId", selectedCategoryId);
+    formData.append("pname", form.pname);
+    formData.append("pdesc", form.pdesc);
+    formData.append("listPrice", parsePrice(form.listPrice));
+    formData.append("discountPrice", parsePrice(form.discountPrice));
+    formData.append("price", price > 0 ? price : 0);
+    formData.append("stock", form.stock);
+    formData.append("deliveryFee", parsePrice(form.deliveryFee));
+    formData.append("soldStatus", form.soldStatus);
+    formData.append("isCertified", form.isCertified);
+    formData.append("isExhibition", false); // 판매자는 기획전 불가
+    images.forEach((img) => formData.append("images", img.file));
 
-    alert("상품이 등록되었습니다. (mock)");
-    navigate("/seller/products");
+    try {
+        await axiosInstance.post("/seller/products", formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        });
+        alert("상품이 등록되었습니다.");
+        navigate("/seller/products");
+    } catch (err) {
+        console.error(err);
+        alert("상품 등록에 실패했습니다.");
+    }
   };
 
   // ── 렌더 ──────────────────────────────
