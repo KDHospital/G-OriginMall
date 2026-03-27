@@ -25,9 +25,9 @@ public class ProductController {
     // GET /api/products?page=0&size=12&categoryId=1
     @GetMapping
     public ResponseEntity<Page<ProductListResponseDTO>> getProducts(
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(defaultValue = "0")  int page,
-            @RequestParam(defaultValue = "12") int size) {
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "page",defaultValue = "0")  int page,
+            @RequestParam(value = "size",defaultValue = "12") int size) {
         return ResponseEntity.ok(productService.getProducts(categoryId, page, size));
     }
 	

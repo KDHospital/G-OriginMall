@@ -1,12 +1,22 @@
-const Pagination = () => {
+const Pagination = ({serverData, movePage}) => {
     return(
         <div className="mt-20 flex justify-center gap-2 font-manrope">
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-highest text-primary font-bold">1</button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">2</button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">3</button>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
+            {/* 이전버튼 */}
+            {serverData.prev ? <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
+                <span className="material-symbols-outlined">chevron_left</span>
+            </button> : <></> }
+            {/* page 수 */}
+            {serverData.pageNumList.map(pageNum => 
+            <button key={pageNum} 
+            className={`w-10 h-10 flex items-center justify-center rounded-lg ${serverData.current === pageNum ? 'bg-surface-container-highest text-primary font-bold' : 'hover:bg-surface-container-low transition-colors'}`} 
+            onClick={()=>movePage({page:pageNum})}>{pageNum}</button>
+            )}
+            
+            {/* next btn */}
+            {serverData.next ? <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-low transition-colors">
                 <span className="material-symbols-outlined">chevron_right</span>
-            </button>
+            </button> : <></>}
+
         </div>
     )
 }
