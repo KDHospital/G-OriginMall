@@ -10,6 +10,8 @@ import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 import OrderFormPage from './pages/orders/OrderFormPage';
 import ProductListPage from './pages/products/ProductListPage';
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
+import ProductDetailPage from './pages/products/ProductDetailPage';
+
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
 
@@ -51,6 +53,7 @@ function App() {
 
         {/* 상품 - 이효진 담당 */}
         <Route path="/products" element={<ProductListPage />} />
+        <Route path="/products/:productId" element={<ProductDetailPage />} />
 
         {/* 주문 - 김슬기 담당 */}
         <Route path="/orders/new" element={<OrderFormPage />} />
