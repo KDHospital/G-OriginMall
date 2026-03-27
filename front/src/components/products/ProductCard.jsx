@@ -13,8 +13,8 @@ const ProductCard = ({item}) => {
                 <h3 className="font-manrope font-bold text-lg text-on-surface">{item.pname}</h3>
                 <p className="font-manrope text-xs text-on-surface-variant line-clamp-1 italic">{item.categoryName}</p>
                 <div className="flex items-center gap-2 pt-2">
-                    <span className="font-manrope font-extrabold text-primary text-xl tracking-tight">{(item.discountPrice||0).toLocaleString()}원</span>
-                    <span className="font-manrope text-sm text-outline line-through">{item.price.toLocaleString()}원</span>
+                    <span className="font-manrope font-extrabold text-primary text-xl tracking-tight">{(item.price||0).toLocaleString()}원</span>
+                    <span className="font-manrope text-sm text-outline line-through">{item.listprice.toLocaleString()}원</span>
                     <span className="font-manrope text-xs font-bold text-secondary">{item.stock}% OFF</span>
                 </div>
             </div>
