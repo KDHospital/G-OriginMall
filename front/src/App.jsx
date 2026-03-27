@@ -12,6 +12,7 @@ import ProductListPage from './pages/products/ProductListPage';
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
 import ProductDetailPage from './pages/products/ProductDetailPage';
 
+import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
@@ -43,6 +44,7 @@ function App() {
         <Route path='/signup' element={<UserSignupPage />} />
         <Route path='/member/login' element={<JoinPage />} />
         <Route path='/mypage' element={<Mypapge />} />
+        <Route path='/modifypage' element={<ModifyPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
         

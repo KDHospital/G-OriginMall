@@ -66,21 +66,24 @@ public class MemberController {
 	
 	//로그인
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, String>> login(@RequestBody @Valid MemberLoginDTO loginDTO){
+	public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid MemberLoginDTO loginDTO){
 		String accessToken = memberService.login(loginDTO);
 		
-		return ResponseEntity.ok(Map.of("accessToken",accessToken));
+		MemberDTO memberDTO = memberService.getMemberLoginId(loginDTO.getLoginId());
+		
+		return ResponseEntity.ok(Map.of("accessToken",accessToken,"member",memberDTO));
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<MemberDTO> getMemberInfo(Authentication autgentication){
-		if (autgentication == null) {
+	public ResponseEntity<MemberDTO> getMemberInfo(Authentication authentication){
+		if (authentication == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	    }
 		
-		String loginId = autgentication.getName();
+		String loginId = authentication.getName();
+		log.info(authentication.toString());
 	    
-		MemberDTO dto = memberService.getMemberLoginId(loginId);
+		MemberDTO dto = memberService.getMemberId(loginId);
 		return ResponseEntity.ok(dto);
 	}
 }

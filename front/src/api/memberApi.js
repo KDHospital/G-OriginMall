@@ -49,3 +49,8 @@ export const checkLoginId = (loginId) =>
 export const getMemberInfo = () => {
     return axiosInstance.get(`/member/me`)
 }
+
+//회원 정보 수정
+export const updateMemberInfo = (payload) => {
+    return axiosInstance.put("/member/modift",payload)
+}
