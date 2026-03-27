@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import axiosInstance from "../../api/axios";
 
 const BasicMenu =() => {
 
@@ -9,6 +10,8 @@ const isLoggedIn = !!localStorage.getItem("member")
 
 const handleLogout= () => {
     localStorage.removeItem("member")
+
+    delete axiosInstance.defaults.headers.common["Authorization"]
     navigate("/")
     window.location.reload()
 }
@@ -16,7 +19,7 @@ const handleLogout= () => {
     const menuItem = [
         {
             name: "상품",
-            path:"/"
+            path:"/products"
         },
         {
             name: "기획전",

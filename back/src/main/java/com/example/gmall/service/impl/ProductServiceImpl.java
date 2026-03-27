@@ -11,6 +11,7 @@ import com.example.gmall.domain.Category;
 import com.example.gmall.domain.Member;
 import com.example.gmall.domain.Product;
 import com.example.gmall.domain.ProductImage;
+import com.example.gmall.dto.product.ProductDetailResponseDTO;
 import com.example.gmall.dto.product.ProductListResponseDTO;
 import com.example.gmall.dto.product.ProductRequestDTO;
 import com.example.gmall.dto.product.ProductResponseDTO;
@@ -48,6 +49,19 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.findActiveProducts(categoryId, pageable)
 				.map(ProductListResponseDTO::new);
 	}
+	//웹-상품 상세 조회
+    public ProductDetailResponseDTO getProduct(Long productId) {
+        Product product = findProductOrThrow(productId);
+        return new ProductDetailResponseDTO(product);
+    }
+    
+    
+    
+    //공통 유틸
+    private Product findProductOrThrow(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품: " + productId));
+    }
 	
 	@Value("${file.upload.products}")
     private String uploadPath;

@@ -2,6 +2,11 @@ package com.example.gmall.service;
 
 import org.springframework.data.domain.Page;
 
+<<<<<<< HEAD
+=======
+import com.example.gmall.dto.product.ProductCreateRequestDTO;
+import com.example.gmall.dto.product.ProductDetailResponseDTO;
+>>>>>>> dev
 import com.example.gmall.dto.product.ProductListResponseDTO;
 import com.example.gmall.dto.product.ProductRequestDTO;
 import com.example.gmall.dto.product.ProductResponseDTO;
@@ -16,4 +21,6 @@ public interface ProductService {
     ProductResponseDTO register(Long sellerId, ProductRequestDTO dto);
 
 	
+	//웹-상품 상세 조회
+    ProductDetailResponseDTO getProduct(Long productId);
 }

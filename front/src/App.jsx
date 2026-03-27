@@ -9,7 +9,9 @@ import JoinPage from './pages/member/JoinPage';
 import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 import OrderFormPage from './pages/orders/OrderFormPage';
 import ProductListPage from './pages/products/ProductListPage';
+import ProductDetailPage from './pages/products/ProductDetailPage';
 
+import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
 
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
@@ -44,6 +46,7 @@ function App() {
         <Route path='/signup' element={<UserSignupPage />} />
         <Route path='/member/login' element={<JoinPage />} />
         <Route path='/mypage' element={<Mypapge />} />
+        <Route path='/modifypage' element={<ModifyPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
         
@@ -52,6 +55,7 @@ function App() {
 
         {/* 상품 - 이효진 담당 */}
         <Route path="/products" element={<ProductListPage />} />
+        <Route path="/products/:productId" element={<ProductDetailPage />} />
 
         {/* 주문 - 김슬기 담당 */}
         <Route path="/orders/new" element={<OrderFormPage />} />

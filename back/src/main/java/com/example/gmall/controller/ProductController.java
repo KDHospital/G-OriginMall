@@ -7,10 +7,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.gmall.dto.product.ProductDetailResponseDTO;
 import com.example.gmall.dto.product.ProductListResponseDTO;
 import com.example.gmall.dto.product.ProductRequestDTO;
 import com.example.gmall.dto.product.ProductResponseDTO;
@@ -31,9 +33,9 @@ public class ProductController {
     // GET /api/products?page=0&size=12&categoryId=1
     @GetMapping("/products")
     public ResponseEntity<Page<ProductListResponseDTO>> getProducts(
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(defaultValue = "0")  int page,
-            @RequestParam(defaultValue = "12") int size) {
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "page",defaultValue = "0")  int page,
+            @RequestParam(value = "size",defaultValue = "12") int size) {
         return ResponseEntity.ok(productService.getProducts(categoryId, page, size));
     }
     
@@ -62,5 +64,11 @@ public class ProductController {
         return ResponseEntity.ok(productService.register(adminId, dto));
     }
 	
-	
+    // 상품 상세
+    // GET /api/products/{productId}
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<ProductDetailResponseDTO> getProduct(@PathVariable("productId") Long productId) {
+    	log.info("상품 상세 조회 ID: " + productId);
+    	return ResponseEntity.ok(productService.getProduct(productId));
+    }
 }
