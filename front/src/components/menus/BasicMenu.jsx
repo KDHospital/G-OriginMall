@@ -14,7 +14,7 @@ const BasicMenu =() => {
         },
         {
             name: "고객센터",
-            path:"/"
+            path:"/board"
         },
         {
             name: "입점신청",

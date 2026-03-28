@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.gmall.domain.Board;
 import com.example.gmall.domain.Post;
 
-public interface PostRepository extends JpaRepository<Post, Long>{
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 	
 	//특정 게시판의 글을 페이징하여 조회(공지사항/QnA)
 	Page<Post> findByAndIsDeletedFalse(Board board, Pageable pageable);
