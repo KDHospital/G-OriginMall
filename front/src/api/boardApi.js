@@ -3,7 +3,7 @@ import axios from "axios";
 // 1. 서버 기본 주소 
 export const API_SERVER_HOST = 'http://localhost:8080';
 
-// 2. 게시판 공통 경로 (컨트롤러의 @RequestMapping과 일치)
+// 2. 게시판 공통 경로
 const host = `${API_SERVER_HOST}/api/board`;
 
 // 공지사항 목록 조회

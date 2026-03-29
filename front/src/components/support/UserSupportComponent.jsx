@@ -21,7 +21,6 @@ const UserSupportComponent = ({ children, title, description }) => {
         <div className="w-48 flex-shrink-0">
           <h2 className="text-2xl font-bold text-[#1D3C28] mb-7 tracking-tight">고객센터</h2>
           
-          {/* ✅ 사이드바 상단 선 두께 수정 (border-t-2 -> border-t) */}
           <nav className="border-t border-gray-800">
             {menus.map((menu) => (
               <button
@@ -42,7 +41,6 @@ const UserSupportComponent = ({ children, title, description }) => {
 
         {/* 3. 우측 영역: 소제목 + 콘텐츠 */}
         <div className="flex-1 min-w-0">
-          {/* 우측 소제목 높이를 좌측 대제목 "고객센터"와 시각적 수평 선상에 배치 */}
           <div className="mb-7 flex items-baseline gap-3 h-[32px]">
             <h3 className="text-xl font-bold text-gray-900">{title}</h3>
             {description && (
