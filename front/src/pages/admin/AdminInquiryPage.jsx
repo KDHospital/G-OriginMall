@@ -6,7 +6,7 @@ import AdminLayout from '../../layouts/AdminLayout';
 const AdminInquiryPage = () => {
   const navigate = useNavigate();
 
-  const moveToAdd = () => navigate('/admin/board/add'); // 고객문의도 공통 add 사용
+  const moveToAdd = () => navigate('/admin/board/add'); 
   const moveToRead = (bno) => navigate(`/admin/board/read/${bno}`);
 
   return (

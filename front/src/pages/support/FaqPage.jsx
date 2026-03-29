@@ -103,7 +103,7 @@ const FaqPage = () => {
                   </span>
                 </button>
 
-                {/* 답변 (Answer) 영역 - 펼쳤을 때만 노출 (WF 스타일 반영) */}
+                {/* 답변 (Answer) 영역 - 펼쳤을 때만 노출 */}
                 <div 
                   className={`overflow-hidden transition-all duration-300 ${
                     openIdx === idx ? 'max-h-[500px] border-t border-gray-100' : 'max-h-0'

@@ -8,7 +8,7 @@ const BoardPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // 한 페이지당 10개씩 노출
 
-  // 1. 더미 데이터 20개 이상 생성 (WF_09_공지사항목록_v1.1 기준 반영)
+  // 1. 더미 데이터 20개 이상 생성
   const allNotices = [
     { id: 30, title: '[안내] 2026년 봄 특산물 행사 안내', writer: '관리자', date: '2026-03-25', views: '1,240', isPin: true },
     { id: 29, title: '개인정보처리방침 개정 안내', writer: '관리자', date: '2026-03-20', views: '452', isPin: true },
@@ -20,7 +20,7 @@ const BoardPage = () => {
     { id: 23, title: '설 연휴 배송 일정 안내', writer: '관리자', date: '2026-01-25', views: '512', isPin: false },
     { id: 22, title: '회원가입 이메일 인증 절차 안내', writer: '관리자', date: '2026-01-15', views: '429', isPin: false },
     { id: 21, title: '판매자 입점 안내 및 신청 방법', writer: '관리자', date: '2026-01-10', views: '386', isPin: false },
-    // 추가 데이터 (20개 이상을 위해 자동 생성 패턴)
+    // 추가 데이터
     ...Array.from({ length: 15 }, (_, i) => ({
       id: 20 - i,
       title: `G-Origin Mall 서비스 이용 안내 (${20 - i})`,
@@ -43,7 +43,6 @@ const BoardPage = () => {
       title="공지사항" 
       description="G-Origin Mall의 새로운 소식들과 유용한 정보들을 확인하세요."
     >
-      {/* 표 상단 선 두께 1/2 반영 (border-t) */}
       <div className="border-t border-gray-800">
         <table className="w-full text-[13px] border-collapse">
           <thead>
@@ -79,7 +78,7 @@ const BoardPage = () => {
           </tbody>
         </table>
 
-        {/* 3. 하단 페이지네이션 UI (컬리 스타일) */}
+        {/* 3. 하단 페이지네이션 UI */}
         <div className="flex justify-center items-center gap-1 mt-12">
           <button 
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}

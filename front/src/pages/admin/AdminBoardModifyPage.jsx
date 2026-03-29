@@ -23,7 +23,6 @@ const AdminBoardModifyPage = () => {
   return (
     <AdminLayout>
     <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
-      {/* 상단 이동경로 - 디자인 가이드 반영 */}
       <div className="mb-8 flex justify-between items-center">
         <div className="text-sm text-gray-400">
           게시판 관리 &gt; {isInquiry ? '고객문의' : '공지사항'} &gt; 

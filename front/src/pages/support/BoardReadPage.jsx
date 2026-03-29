@@ -7,7 +7,7 @@ const BoardReadPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // 실제 연동 시에는 id를 기반으로 API 호출을 하겠지만, 현재는 하드코딩 데이터를 사용합니다.
+  // 하드코딩 데이터 사용
   const noticeDetail = {
     id: id,
     title: '[안내] 2026년 봄 특산물 행사 안내',
@@ -67,7 +67,7 @@ const BoardReadPage = () => {
             {noticeDetail.content}
           </div>
           
-          {/* 개발 참고용 주석 (WF 메모 반영) */}
+          {/* 개발 참고용 주석 */}
           <p className="mt-20 text-[11px] text-gray-300 font-mono italic">
             board.content · board.member_id → member.mname
           </p>
