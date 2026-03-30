@@ -12,6 +12,8 @@ import ProductListPage from './pages/products/ProductListPage';
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
+import FindIdPage from './pages/member/FindIdPage';
+import FindPwdPage from './pages/member/FindPwdPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -43,6 +45,8 @@ function App() {
         <Route path='/member/login' element={<JoinPage />} />
         <Route path='/mypage' element={<Mypapge />} />
         <Route path='/modifypage' element={<ModifyPage />} />
+        <Route path='/findid' element={<FindIdPage />} />
+        <Route path='/findpwd' element={<FindPwdPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
         

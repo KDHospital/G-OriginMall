@@ -19,5 +19,10 @@ public interface MemberService {
 	MemberDTO getMemberLoginId(String loginId);
 	
 	MemberDTO getMemberId(String MemberId);
+	
+	void modifyMember(MemberDTO memberDTO);
 
+	public String findLoginId(String mname, String tel);
+	
+	void resetPassword(String loginId, String nmpwd);
 }

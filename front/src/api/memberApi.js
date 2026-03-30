@@ -24,9 +24,13 @@ return {_global:"알 수 없는 오류가 발생했습니다."}
 // 2. 이메일 인증관련 api
 
 //인증코드 발송
-export const sendEmailCode = (email) => 
-    axiosInstance.post("/member/email/send",{email})
-
+export const sendEmailCode = (emailOrObject) => {
+    const data= typeof emailOrObject === "string"
+    ?{email : emailOrObject}
+    : emailOrObject
+    
+   return axiosInstance.post("/member/email/send",data)
+}
 //인증코드 확인
 export const verifyEmailCode = (email,code) =>
     axiosInstance.post("/member/email/verify",{email,code})
@@ -52,5 +56,15 @@ export const getMemberInfo = () => {
 
 //회원 정보 수정
 export const updateMemberInfo = (payload) => {
-    return axiosInstance.put("/member/modift",payload)
+    return axiosInstance.put(`/member/modify`,payload)
+}
+
+//회원 아이디 찾기
+export const findMemberId = (data) => {
+    return axiosInstance.post(`/member/find-id`,data)
+}
+
+//회원 비밀번호 찾기
+export const resetPassword = (data) => {
+    return axiosInstance.post(`/member/reset-password`,data)
 }

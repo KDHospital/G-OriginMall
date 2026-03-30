@@ -107,4 +107,9 @@ public class Member {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+    
+    public void changeName(String mname) {this.mname = mname;}
+    public void changeTel(String tel) {this.tel = tel;}
+    public void changePassword(String mpwd) {this.mpwd = mpwd;}
+    public void changeGender(Byte gender) {this.gender =  gender;}
 }

@@ -86,7 +86,19 @@ const LoginComponent = () => {
                 onClick={() =>navigate("/signup")}>
                     회원가입 하러가기
                 </span>
-
+            </div>
+            <div className="flex justify-center items-center gap-4 mt-4 text-sm text-gray-400">
+             <span
+                className="text-gray-600 font-bold cursor-pointer hover:underline"
+                onClick={() => navigate("/findid")}>
+                    아이디 찾기
+                </span>
+                <span className="text-gray-300">|</span>
+                <span
+                className="text-gray-600 font-bold cursor-pointer hover:underline"
+                onClick={() => navigate("/findpwd")}>
+                     비밀번호 찾기
+                </span>
             </div>
         </form>
         </div>

@@ -51,6 +51,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // * Member의 id로 회원 조회
     // * 사용: JWT 관련 처리
     Optional<Member> findById(String memberId);
+    
+    //회원 아이디찾기
+    Optional<Member> findByMnameAndTel(String mname, String tel);
  
    
 }
