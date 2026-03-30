@@ -8,7 +8,7 @@ public class ProductCreateRequestDTO {
 	private Long sellerId;
 	private String pname;
 	private String pdesc;
-	private Integer listprice;
+	private Integer listPrice;
 	private Integer discountPrice;
 	private Integer price;
 	private Integer stock;

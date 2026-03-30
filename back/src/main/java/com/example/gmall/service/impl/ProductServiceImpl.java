@@ -20,6 +20,8 @@ import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.repository.ProductImageRepository;
 import com.example.gmall.repository.ProductRepository;
 import com.example.gmall.service.ProductService;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +36,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
 	private final ProductRepository productRepository;
@@ -50,10 +52,14 @@ public class ProductServiceImpl implements ProductService {
 				.map(ProductListResponseDTO::new);
 	}
 	//웹-상품 상세 조회
-    public ProductDetailResponseDTO getProduct(Long productId) {
-        Product product = findProductOrThrow(productId);
-        return new ProductDetailResponseDTO(product);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public ProductDetailResponseDTO getProduct(Long productId) {
+	    // 1. 데이터 가져오기
+	    Product product = productRepository.findByProductIdWithCategory(productId)
+	            .orElseThrow(() -> new EntityNotFoundException("해당 상품을 찾을 수 없습니다. ID: " + productId));
+	    return new ProductDetailResponseDTO(product);
+	}
     
     
     
