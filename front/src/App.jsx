@@ -9,11 +9,15 @@ import JoinPage from './pages/member/JoinPage';
 import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 import OrderFormPage from './pages/orders/OrderFormPage';
 import ProductListPage from './pages/products/ProductListPage';
-import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
+import ProductDetailPage from './pages/products/ProductDetailPage';
+
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
 import FindIdPage from './pages/member/FindIdPage';
 import FindPwdPage from './pages/member/FindPwdPage';
+
+import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
+import SellerProductNewPage from './pages/seller/SellerProductNewPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -55,6 +59,7 @@ function App() {
 
         {/* 상품 - 이효진 담당 */}
         <Route path="/products" element={<ProductListPage />} />
+        <Route path="/products/:productId" element={<ProductDetailPage />} />
 
         {/* 주문 - 김슬기 담당 */}
         <Route path="/orders/new" element={<OrderFormPage />} />
@@ -65,6 +70,7 @@ function App() {
 
         {/* 판매자 */}
         <Route path="/seller" element={<SellerDashboardPage />} />
+        <Route path="/seller/products/new" element={<SellerProductNewPage />} />
 
 
         {/* 어드민-상품등록 */}

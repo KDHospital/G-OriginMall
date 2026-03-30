@@ -1,60 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 import BasicLayout from "../../layouts/BasicLayout";
 
-// ─────────────────────────────────────────
-// Mock 데이터 (API 연동 후 제거)
-// CartSummaryDTO 구조 기준
-// ─────────────────────────────────────────
-const MOCK_CART = {
-  items: [
-    {
-      cartItemId: 1,
-      productId: 101,
-      sellerId: 10,
-      sellerName: "김포금쌀농장",
-      pname: "김포금쌀 10kg",
-      listPrice: 45000,
-      discountPrice: 5000,
-      price: 40000,
-      deliveryFee: 3000,
-      quantity: 1,
-      itemSubtotal: 40000,
-      thumbnailImageUrl: null,
-    },
-    {
-      cartItemId: 2,
-      productId: 102,
-      sellerId: 10,
-      sellerName: "김포금쌀농장",
-      pname: "김포 쌀과자 선물세트",
-      listPrice: 15000,
-      discountPrice: 0,
-      price: 15000,
-      deliveryFee: 3000,
-      quantity: 2,
-      itemSubtotal: 30000,
-      thumbnailImageUrl: null,
-    },
-    {
-      cartItemId: 3,
-      productId: 201,
-      sellerId: 20,
-      sellerName: "통진두부마을",
-      pname: "국산콩 통진두부 모둠",
-      listPrice: 12000,
-      discountPrice: 2000,
-      price: 10000,
-      deliveryFee: 2500,
-      quantity: 1,
-      itemSubtotal: 10000,
-      thumbnailImageUrl: null,
-    },
-  ],
-  totalItemPrice: 80000,
-  totalDeliveryFee: 5500,
-  totalPrice: 85500,
-};
+
+
+
 
 // ─────────────────────────────────────────
 // 유틸
@@ -193,21 +144,19 @@ function OrderSummary({ totalItemPrice, totalDeliveryFee, totalPrice, onOrder })
 export default function CartPage() {
   const navigate = useNavigate();
 
-  // ── 상태 ──────────────────────────────
-  // TODO: API 연동 후 아래 useState를 axios 호출로 교체
-  // useEffect(() => {
-  //   axiosInstance.get("/cart")
-  //   // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-  //   // axiosInstance.get("/cart?memberId=${memberId}")
-  //   // ── JWT 적용 후 교체 (토큰에서 memberId 자동 추출) ───────────────
-  //   // axiosInstance.get("/cart")
-  //   // ──────────────────────────────────────────────────────────────
-  //     .then((res) => setCartData(res.data))
-  // }, []);
-  const [cartData, setCartData] = useState(MOCK_CART);
-  const [checkedIds, setCheckedIds] = useState(
-    MOCK_CART.items.map((i) => i.cartItemId)
-  );
+  const [cartData, setCartData] = useState(null);
+  const [checkedIds, setCheckedIds] = useState([]);
+
+  // useEffect 추가
+  useEffect(() => {
+      axiosInstance.get("/cart")
+          .then((res) => {
+              setCartData(res.data);
+              // 전체 선택 초기화
+              setCheckedIds(res.data.items.map((i) => i.cartItemId));
+          })
+          .catch((err) => console.error("장바구니 로드 실패:", err));
+  }, []);
 
   if (!cartData) return null;
 
@@ -240,46 +189,44 @@ export default function CartPage() {
 
   const handleQuantityChange = (cartItemId, newQty) => {
     if (newQty < 1) return;
-    // TODO: API 연동 후 →
-    // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-    // axiosInstance.patch(`/cart/${cartItemId}?memberId=${memberId}`, { quantity: newQty })
-    // ── JWT 적용 후 교체 ────────────────────────────────────────────
-    // axiosInstance.patch(`/cart/${cartItemId}`, { quantity: newQty })
-    // ────────────────────────────────────────────────────────────────
-    setCartData((prev) => ({
-      ...prev,
-      items: prev.items.map((i) =>
-        i.cartItemId === cartItemId ? { ...i, quantity: newQty } : i
-      ),
-    }));
+    axiosInstance.patch(`/cart/${cartItemId}`, { quantity: newQty })
+        .then(() => {
+            setCartData((prev) => ({
+                ...prev,
+                items: prev.items.map((i) =>
+                    i.cartItemId === cartItemId ? { ...i, quantity: newQty } : i
+                ),
+            }));
+        })
+        .catch((err) => console.error(err));
   };
 
   const handleRemove = (cartItemId) => {
-    // TODO: API 연동 후 →
-    // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-    // axiosInstance.delete(`/cart/${cartItemId}?memberId=${memberId}`)
-    // ── JWT 적용 후 교체 ────────────────────────────────────────────
-    // axiosInstance.delete(`/cart/${cartItemId}`)
-    // ────────────────────────────────────────────────────────────────
-    setCartData((prev) => ({
-      ...prev,
-      items: prev.items.filter((i) => i.cartItemId !== cartItemId),
-    }));
-    setCheckedIds((prev) => prev.filter((id) => id !== cartItemId));
+
+    axiosInstance.delete(`/cart/${cartItemId}`)
+        .then(() => {
+            setCartData((prev) => ({
+                ...prev,
+                items: prev.items.filter((i) => i.cartItemId !== cartItemId),
+            }));
+            setCheckedIds((prev) => prev.filter((id) => id !== cartItemId));
+        })
+        .catch((err) => console.error(err));
+
   };
 
   const handleRemoveChecked = () => {
-    // TODO: API 연동 후 → 체크된 항목 순차 delete 또는 전체비우기 API 호출
-    // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-    // axiosInstance.delete(`/cart?memberId=${memberId}`)
-    // ── JWT 적용 후 교체 ────────────────────────────────────────────
-    // axiosInstance.delete(`/cart`)
-    // ────────────────────────────────────────────────────────────────
-    setCartData((prev) => ({
-      ...prev,
-      items: prev.items.filter((i) => !checkedIds.includes(i.cartItemId)),
-    }));
-    setCheckedIds([]);
+
+    axiosInstance.delete("/cart")
+        .then(() => {
+            setCartData((prev) => ({
+                ...prev,
+                items: prev.items.filter((i) => !checkedIds.includes(i.cartItemId)),
+            }));
+            setCheckedIds([]);
+        })
+        .catch((err) => console.error(err));
+
   };
 
   const handleOrder = () => {

@@ -19,7 +19,7 @@ const handleLogout= () => {
     const menuItem = [
         {
             name: "상품",
-            path:"/"
+            path:"/products"
         },
         {
             name: "기획전",
