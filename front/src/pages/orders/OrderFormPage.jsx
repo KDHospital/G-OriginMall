@@ -507,7 +507,7 @@ export default function OrderFormPage() {
   const [agreed, setAgreed] = useState({ purchase: false, privacy: false, marketing: false });
 
   const requiredAgreed = TERMS.filter((t) => t.required).every((t) => agreed[t.id]);
-  const canSubmit = selectedAddressId !== null && addresses.length > 0 && paymentMethod !== "" && requiredAgreed;
+  const canSubmit = selectedAddressId !== null && paymentMethod !== "" && requiredAgreed;
 
   const handleSubmit = () => {
     // TODO: API 연동 후 주문 생성 API 호출
