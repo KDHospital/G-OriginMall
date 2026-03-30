@@ -4,6 +4,26 @@ import { useState } from "react";
 const ProductInfo = ({product}) => {
     if (!product) return null;
     console.log("프로덕트 인포의 프로덕트:", product);
+    // 수량 변경 코드
+    const [quantity, setQuantity] = useState(1);
+    const MIN_QTY = 1;
+    const MAX_QTY = product.stock;
+
+    // 수량 감소 (1 미만 불가)
+    const handleDecrease = () => {
+        setQuantity(prev => Math.max(MIN_QTY, prev - 1));
+    };
+
+    // 수량 증가 (stock 초과 불가)
+    const handleIncrease = () => {
+        setQuantity(prev => Math.min(MAX_QTY, prev + 1));
+    };
+
+    // Buy Now
+    const handleBuyNow = () => {
+        alert('구매 페이지로 이동합니다');
+        // 추후 navigate('/orders/new') 연결 예정
+    };
 
     return(
         <div className="space-y-8">
@@ -28,16 +48,23 @@ const ProductInfo = ({product}) => {
                 </div>
             </div>
             <div className="space-y-6">
+                <div>
+                    <span className="text-s text-primary font-bold">현재 재고 수량 : {MAX_QTY}개</span>
+                </div>
                 <div className="flex items-center gap-6">
                     <span className="font-bold uppercase text-xs tracking-widest text-on-surface-variant">수량</span>
                     <div className="flex items-center border border-outline-variant rounded-lg overflow-hidden">
-                        <button className="px-4 py-2 hover:bg-surface-container-high text-primary"><span className="material-symbols-outlined text-sm">remove</span></button>
-                        <span className="px-6 font-bold">1</span>
-                        <button className="px-4 py-2 hover:bg-surface-container-high text-primary"><span className="material-symbols-outlined text-sm">add</span></button>
+                        <button onClick={handleDecrease} disabled={quantity <= MIN_QTY} className="px-4 py-2 hover:bg-surface-container-high text-primary"><span className="material-symbols-outlined text-sm">remove</span></button>
+                        <span className="px-6 font-bold">{quantity}</span>
+                        <button onClick={handleIncrease} disabled={quantity >= MAX_QTY} className="px-4 py-2 hover:bg-surface-container-high text-primary"><span className="material-symbols-outlined text-sm">add</span></button>
                     </div>
+                    {/* 최대치 도달 시 안내 */}
+                    {quantity >= MAX_QTY && (
+                        <span className="text-xs text-error">구매 가능한 최대 수량입니다.</span>
+                    )}
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+                    <button onClick={handleBuyNow} className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
                         Buy Now
                     </button>
                     <button className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
