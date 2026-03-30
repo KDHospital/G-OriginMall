@@ -21,7 +21,7 @@ const ProductDetailComponents = ({productId}) => {
     const [searchParams] = useSearchParams();    // 목록에서 들고 온 쿼리스트링
     const { moveToList } = useCustomMove();      // 목록 복귀용
 
-    const [product, setProduct] = useState(null);
+    const [product, setProduct] = useState(initState);
     const [loading, setLoading] = useState(true);
     const [error, setError]     = useState(null);
 
@@ -33,8 +33,7 @@ const ProductDetailComponents = ({productId}) => {
                 const response = await getProductDetail(productId)
                 setProduct(response.data)
                 console.log("디테일컴포넌트")
-                console.log(response.data)
-                console.log(product)
+                console.log()
             } catch (err) {
                 setError('상품 정보를 불러올 수 없습니다.')
                 console.error(err)
