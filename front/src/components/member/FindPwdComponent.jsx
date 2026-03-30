@@ -21,7 +21,7 @@ const FindPwdComponent= () => {
 
     const handleSendCode = () => {
         if(!info.loginId) return alert("이메일을 입력해주세요")
-            sendEmailCode({email: info.loginId})
+            sendEmailCode(info.loginId)
         .then( ()=> {
             alert("인증번호가 발송되었습니다")
             setStep(2)
