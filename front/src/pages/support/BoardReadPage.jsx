@@ -1,90 +1,95 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import UserSupportComponent from '../../components/support/UserSupportComponent';
 import BasicLayout from '../../layouts/BasicLayout';
+import { getNoticeOne } from '../../api/boardApi'; // 상세 조회 및 삭제 API 가정
 
 const BoardReadPage = () => {
-  const { id } = useParams();
+  const { bno } = useParams(); // URL 파라미터에서 게시글 번호 추출
   const navigate = useNavigate();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // 하드코딩 데이터 사용
-  const noticeDetail = {
-    id: id,
-    title: '[안내] 2026년 봄 특산물 행사 안내',
-    writer: '관리자',
-    date: '2026-03-25',
-    views: '1,240',
-    content: `
-      안녕하세요. G-Origin Mall입니다.
-      
-      2026년 파릇파릇한 봄을 맞이하여 김포의 우수한 특산물을 한데 모은 
-      '봄 특산물 대잔치' 행사를 진행하게 되었습니다.
-      
-      본 행사에서는 금빛나루 인증을 받은 신선한 농산물부터 
-      장인의 손길이 담긴 가공식품까지 특별한 가격에 만나보실 수 있습니다.
-      
-      [행사 안내]
-      1. 기간: 2026년 4월 1일 ~ 4월 15일 (15일간)
-      2. 혜택: 전 상품 최대 20% 할인 및 무료배송 쿠폰 지급
-      3. 대상: G-Origin Mall 모든 회원
-      
-      풍성한 봄의 맛을 G-Origin Mall과 함께 느껴보시기 바랍니다.
-      감사합니다.
-    `
-  };
+  // DTO 필드명
+  useEffect(() => {
+    setLoading(true);
+    getNoticeOne(bno).then(data => {
+      setPost(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error("데이터 로드 실패:", err);
+      setLoading(false);
+    });
+  }, [bno]);
+
+  const moveToList = () => navigate('/board/list');
+  const moveToModify = () => navigate(`/board/modify/${bno}`);
+
+  if (loading) return <div className="p-10 text-center text-gray-500">데이터를 불러오는 중입니다...</div>;
+  if (!post) return <div className="p-10 text-center text-gray-500">존재하지 않는 게시글입니다.</div>;
 
   return (
     <BasicLayout>
-    <UserSupportComponent 
-      title="공지사항" 
-      description="G-Origin Mall의 새로운 소식들을 상세히 확인하세요."
-    >
-      {/* 1. 상단 정렬 선(border-t) */}
-      <div className="border-t border-gray-800">
+      <div className="max-w-5xl mx-auto py-12 px-6 bg-white min-h-screen">
         
-        {/* 2. 제목 영역*/}
-        <div className="bg-[#F9F9FB] px-8 py-6 border-b border-gray-100">
-          <h4 className="text-lg font-bold text-gray-900 mb-4">{noticeDetail.title}</h4>
-          <div className="flex text-[13px] text-gray-400 gap-6">
-            <div className="flex gap-2">
-              <span className="text-gray-500 font-medium">작성자</span>
-              <span>{noticeDetail.writer}</span>
+        {/* 상단 헤더: 제목 및 정보 [cite: 2026-03-30] */}
+        <div className="border-b-2 border-gray-800 pb-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-[#1D3C28] font-bold text-sm uppercase tracking-wider">Customer Inquiry</span>
+            {post.answerContent && !post.isDeleted && (
+              <span className="bg-[#1D3C28] text-white text-[10px] px-2 py-0.5 rounded-full">답변완료</span>
+            )}
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{post.title}</h1>
+          <div className="flex justify-between items-center text-gray-400 text-sm font-light">
+            <div className="flex gap-4">
+              <span>작성자: <span className="text-gray-600 font-medium">{post.writerName}</span></span>
+              <span>작성일: <span>{post.createdAt?.split('T')[0]}</span></span>
             </div>
-            <div className="flex gap-2 border-l pl-6 border-gray-200">
-              <span className="text-gray-500 font-medium">작성일</span>
-              <span>{noticeDetail.date}</span>
-            </div>
-            <div className="flex gap-2 border-l pl-6 border-gray-200">
-              <span className="text-gray-500 font-medium">조회수</span>
-              <span>{noticeDetail.views}</span>
-            </div>
+            <div>조회수: {post.viewCount}</div>
           </div>
         </div>
 
-        {/* 3. 본문 영역: 와이어프레임 post.content 영역 */}
-        <div className="px-8 py-12 min-h-[400px] border-b border-gray-100">
-          <div className="text-gray-700 leading-8 whitespace-pre-wrap text-[15px]">
-            {noticeDetail.content}
-          </div>
-          
-          {/* 개발 참고용 주석 */}
-          <p className="mt-20 text-[11px] text-gray-300 font-mono italic">
-            board.content · board.member_id → member.mname
-          </p>
+        {/* 본문 내용 */}
+        <div className="min-h-[300px] text-gray-700 leading-relaxed text-lg mb-12 whitespace-pre-wrap">
+          {post.content}
         </div>
 
-        {/* 4. 하단 버튼 영역: 중앙 정렬 목록 버튼 */}
-        <div className="py-10 flex justify-center">
+        {/* 관리자 답변 영역 (답변이 있고 삭제되지 않았을 때만 노출) */}
+        {post.answerContent && !post.isDeleted ? (
+          <div className="bg-[#F9F9FB] rounded-lg p-8 mb-12 border border-gray-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-[#1D3C28] rounded-full flex items-center justify-center text-white font-bold text-sm">A</div>
+              <span className="font-bold text-gray-800">지오리진 몰 관리자 답변</span>
+              <span className="text-xs text-gray-400 ml-auto">
+                답변일: {post.answeredAt?.split('T')[0]}
+              </span>
+            </div>
+            <div className="text-gray-600 leading-7 pl-11">
+              {post.answerContent}
+            </div>
+          </div>
+        ) : post.isDeleted && (
+          <div className="bg-gray-50 rounded-lg p-6 mb-12 border border-dashed border-gray-200 text-center text-gray-400 text-sm">
+            관리자에 의해 삭제된 답변입니다.
+          </div>
+        )}
+
+        {/* 하단 버튼 영역 */}
+        <div className="flex justify-center gap-3 border-t border-gray-100 pt-10">
           <button 
-            onClick={() => navigate('/board')}
-            className="px-14 py-3 border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors"
+            onClick={moveToList}
+            className="px-8 py-3 border border-gray-200 text-gray-600 rounded-sm hover:bg-gray-50 transition-colors text-sm"
           >
             목록으로
           </button>
+          <button 
+            onClick={moveToModify}
+            className="px-8 py-3 bg-gray-800 text-white rounded-sm hover:bg-gray-700 transition-colors text-sm"
+          >
+            수정하기
+          </button>
         </div>
-
       </div>
-    </UserSupportComponent>
     </BasicLayout>
   );
 };

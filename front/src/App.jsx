@@ -18,6 +18,7 @@ import AdminInquiryPage from './pages/admin/AdminInquiryPage';
 import BoardPage from './pages/support/BoardPage';
 import BoardReadPage from './pages/support/BoardReadPage';
 import InquiryPage from './pages/support/InquiryPage';
+import InquiryAddModal from './pages/support/InquiryAddModal';
 import FaqPage from './pages/support/FaqPage';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
@@ -66,6 +67,7 @@ function App() {
         <Route path="/board" element={<BoardPage />} />
         <Route path="/board/read/:bno" element={<BoardReadPage />} />
         <Route path="/inquiry" element={<InquiryPage />} />
+        <Route path="/inquiry/add" element={<InquiryAddModal />} />
         <Route path="/faq" element={<FaqPage />} />
 
 

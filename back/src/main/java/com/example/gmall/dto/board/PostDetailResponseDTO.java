@@ -31,5 +31,8 @@ public class PostDetailResponseDTO {
 	
 	private LocalDateTime answeredAt;
 	
+	// 답변 삭제 여부 추가 (소프트 삭제 대응)
+    private boolean isDeleted;
+	
 
 }

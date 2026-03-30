@@ -1,117 +1,103 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import UserSupportComponent from '../../components/support/UserSupportComponent';
+import React, { useState, useEffect } from 'react';
 import BasicLayout from '../../layouts/BasicLayout';
+import PaginationComponent from '../../components/support/PaginationComponent';
+import { fetchNotice } from '../../api/boardApi'; 
 
 const BoardPage = () => {
-  const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // 한 페이지당 10개씩 노출
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 10;
 
-  // 1. 더미 데이터 20개 이상 생성
-  const allNotices = [
-    { id: 30, title: '[안내] 2026년 봄 특산물 행사 안내', writer: '관리자', date: '2026-03-25', views: '1,240', isPin: true },
-    { id: 29, title: '개인정보처리방침 개정 안내', writer: '관리자', date: '2026-03-20', views: '452', isPin: true },
-    { id: 28, title: '3월 기획전 배송 지연 안내', writer: '관리자', date: '2026-03-08', views: '88', isPin: false },
-    { id: 27, title: '봄철 특산물 입고 안내', writer: '관리자', date: '2026-03-05', views: '213', isPin: false },
-    { id: 26, title: '결제 시스템 점검 안내 (토스페이)', writer: '관리자', date: '2026-02-28', views: '175', isPin: false },
-    { id: 25, title: '금빛나루 인증 상품 추가 등록 안내', writer: '관리자', date: '2026-02-20', views: '301', isPin: false },
-    { id: 24, title: '배송지 등록 기능 업데이트 안내', writer: '관리자', date: '2026-02-15', views: '198', isPin: false },
-    { id: 23, title: '설 연휴 배송 일정 안내', writer: '관리자', date: '2026-01-25', views: '512', isPin: false },
-    { id: 22, title: '회원가입 이메일 인증 절차 안내', writer: '관리자', date: '2026-01-15', views: '429', isPin: false },
-    { id: 21, title: '판매자 입점 안내 및 신청 방법', writer: '관리자', date: '2026-01-10', views: '386', isPin: false },
-    // 추가 데이터
-    ...Array.from({ length: 15 }, (_, i) => ({
-      id: 20 - i,
-      title: `G-Origin Mall 서비스 이용 안내 (${20 - i})`,
-      writer: '관리자',
-      date: `2026-01-${String(Math.max(1, 9 - i)).padStart(2, '0')}`,
-      views: Math.floor(Math.random() * 500),
-      isPin: false
-    }))
-  ];
+  // DTO 필드명(postId, writerName, createdAt, viewCount)을 반영한 로드 함수 [cite: 2026-03-30]
+  const loadBoardData = async (page) => {
+    try {
+      // API 호출 시 page는 0부터 시작하므로 page - 1 처리
+      const response = await fetchNotice(page - 1, itemsPerPage);
+      
+      // 서버 응답에서 dtoList를 추출 (PostDetailResponseDTO 리스트)
+      setPosts(response.dtoList || []);
+      setTotalItems(response.totalElements || 0);
+    } catch (error) {
+      console.error("게시판 목록 로드 실패:", error);
+      setPosts([]);
+    }
+  };
 
-  // 2. 페이지네이션 계산 로직
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = allNotices.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(allNotices.length / itemsPerPage);
+  useEffect(() => {
+    loadBoardData(currentPage);
+  }, [currentPage]);
 
   return (
     <BasicLayout>
-    <UserSupportComponent 
-      title="공지사항" 
-      description="G-Origin Mall의 새로운 소식들과 유용한 정보들을 확인하세요."
-    >
-      <div className="border-t border-gray-800">
-        <table className="w-full text-[13px] border-collapse">
-          <thead>
-            <tr className="bg-[#F9F9FB] border-b border-gray-100 text-gray-600 font-normal">
-              <th className="py-3 w-16 font-normal text-center">번호</th>
-              <th className="py-3 text-left px-4 font-normal">제목</th>
-              <th className="py-3 w-24 font-normal text-center">작성자</th>
-              <th className="py-3 w-28 font-normal text-center">작성일</th>
-              <th className="py-3 w-20 font-normal text-center">조회수</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((item) => (
-              <tr 
-                key={item.id} 
-                className={`border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors ${item.isPin ? 'bg-[#FFFEEB]/50' : ''}`}
-                onClick={() => navigate(`/board/read/${item.id}`)} // 상세페이지 이동
-              >
-                <td className="py-4 text-center text-gray-400">
-                  {item.isPin ? <span className="text-[#1D3C28] font-bold">공지</span> : item.id}
-                </td>
-                <td className="py-4 px-4 text-left text-gray-800 font-medium">
-                  <div className="flex items-center gap-2">
-                    {item.title}
-                    {item.isPin && <span className="bg-[#1D3C28] text-white text-[9px] px-1 rounded-sm">HOT</span>}
-                  </div>
-                </td>
-                <td className="py-4 text-center text-gray-500">{item.writer}</td>
-                <td className="py-4 text-center text-gray-400 font-light">{item.date}</td>
-                <td className="py-4 text-center text-gray-400">{item.views}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* 3. 하단 페이지네이션 UI */}
-        <div className="flex justify-center items-center gap-1 mt-12">
-          <button 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-400 text-xs hover:bg-gray-50 disabled:opacity-30"
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </button>
-          
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-            <button
-              key={pageNum}
-              onClick={() => setCurrentPage(pageNum)}
-              className={`w-8 h-8 flex items-center justify-center text-xs font-bold transition-all ${
-                currentPage === pageNum 
-                  ? 'bg-[#333] text-white' 
-                  : 'border border-gray-100 text-gray-400 hover:bg-gray-50'
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
-
-          <button 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-400 text-xs hover:bg-gray-50 disabled:opacity-30"
-            disabled={currentPage === totalPages}
-          >
-            &gt;
+      <div className="max-w-6xl mx-auto py-10 px-4">
+        {/* 게시판 헤더 */}
+        <div className="mb-8 border-b-2 border-[#1D3C28] pb-4 flex justify-between items-end">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">자유게시판</h1>
+            <p className="text-gray-500 mt-2 text-sm">지오리진 몰의 다양한 소식을 공유하세요.</p>
+          </div>
+          <button className="bg-[#1D3C28] text-white px-6 py-2 rounded-sm text-sm hover:bg-[#2d5a3c] transition-colors">
+            글쓰기
           </button>
         </div>
+
+        {/* 게시판 리스트 테이블 */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 text-gray-400 uppercase text-xs">
+                <th className="py-4 px-2 w-16 font-medium">No.</th>
+                <th className="py-4 px-4 text-left font-medium">제목</th>
+                <th className="py-4 px-4 w-32 font-medium">작성자</th>
+                <th className="py-4 px-4 w-28 font-medium">날짜</th>
+                <th className="py-4 px-4 w-20 font-medium">조회</th>
+              </tr>
+            </thead>
+            <tbody>
+              {posts.length > 0 ? (
+                posts.map((post) => (
+                  <tr 
+                    key={post.postId} // id 대신 postId 사용 [cite: 2026-03-30]
+                    className="border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
+                    <td className="py-5 text-center text-gray-400">{post.postId}</td>
+                    <td className="py-5 px-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-800 font-medium">{post.title}</span>
+                        {/* 답변이 있는 경우 작은 아이콘 표시 (DTO 활용) */}
+                        {post.answerContent && !post.isDeleted && (
+                          <span className="bg-gray-100 text-[10px] px-1.5 py-0.5 rounded text-gray-500">답변완료</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-5 px-4 text-center text-gray-600">{post.writerName}</td> 
+                    <td className="py-5 px-4 text-center text-gray-400 font-light">
+                      {/* LocalDateTime 포맷팅 [cite: 2026-03-30] */}
+                      {post.createdAt ? post.createdAt.split('T')[0] : '-'}
+                    </td>
+                    <td className="py-5 px-4 text-center text-gray-400">{post.viewCount}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="py-20 text-center text-gray-300">게시글이 존재하지 않습니다.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 하단 페이지네이션 */}
+        <div className="mt-10">
+          <PaginationComponent 
+            currentPage={currentPage}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </div>
       </div>
-    </UserSupportComponent>
     </BasicLayout>
   );
 };
