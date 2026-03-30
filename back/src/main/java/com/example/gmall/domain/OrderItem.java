@@ -47,5 +47,20 @@ public class OrderItem {
 
     @Column(name = "subtotal", nullable = false)
     private Integer subtotal; // price × quantity
+
+    // 0=정상, 1=취소
+    @Builder.Default
+    @Column(name = "status", nullable = false, columnDefinition = "TINYINT DEFAULT 0")
+    private Byte status = 0;
+
+    // ── 개별 취소 ────────────────────────────────────────────────
+    public void cancel() {
+        this.status = 1;
+    }
+
+    // ── 취소 여부 확인 ───────────────────────────────────────────
+    public boolean isCancelled() {
+        return this.status == 1;
+    }
 }
  

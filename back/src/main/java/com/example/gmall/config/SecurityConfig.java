@@ -32,7 +32,8 @@ public class SecurityConfig {
             		org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             // 2. 모든 경로에 대해 인증 없이 접근 허용
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() 
+            		.requestMatchers("/api/orders/**").authenticated()
+            		.anyRequest().permitAll() 
             )
             
             // 3. 기본 로그인 폼 비활성화

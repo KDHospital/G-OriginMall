@@ -1,6 +1,10 @@
 package com.example.gmall.service.impl;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -37,40 +41,21 @@ public class OrderServiceImpl implements OrderService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
-    // 주문 생성
+    // 주문 생성 (판매자별 분리)
     @Override
-    public OrderResponseDTO createOrder(Long memberId, OrderRequestDTO dto) {
+    public List<OrderResponseDTO> createOrder(Long memberId, OrderRequestDTO dto) {
 
         // 회원 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        // 첫 번째 상품으로 판매자 조회
-        // 장바구니/바로구매 모두 동일 판매자 상품만 한 주문으로 묶임
-        Product firstProduct = productRepository.findById(
-                dto.getOrderItems().get(0).getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
-        Member seller = firstProduct.getSeller();
+        // 묶음 주문 식별자 생성 (같은 장바구니에서 나온 주문 묶음)
+        String orderGroupId = UUID.randomUUID().toString();
 
-        // 총 금액 계산
-        int totalPrice = 0;
+        // 판매자별로 상품 그룹핑
+        Map<Long, List<OrderRequestDTO.OrderItemRequestDTO>> groupBySeller =
+            new LinkedHashMap<>();
 
-        // 주문 생성
-        Orders orders = Orders.builder()
-                .member(member)
-                .seller(seller)
-                .totalPrice(0) // 나중에 업데이트
-                .receiverName(dto.getReceiverName())
-                .receiverTel(dto.getReceiverTel())
-                .zipcode(dto.getZipcode())
-                .address(dto.getAddress())
-                .addressDetail(dto.getAddressDetail())
-                .paymentMethod(dto.getPaymentMethod())
-                .build();
-
-        ordersRepository.save(orders);
-
-        // 주문 상품 저장 (스냅샷)
         for (OrderRequestDTO.OrderItemRequestDTO itemDto : dto.getOrderItems()) {
             Product product = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
@@ -81,50 +66,89 @@ public class OrderServiceImpl implements OrderService {
                     product.getPname() + "의 재고가 부족합니다. (현재 재고: " + product.getStock() + ")");
             }
 
-            // 재고 차감
-            product.decreaseStock(itemDto.getQuantity());
-
-            // 주문 상품 스냅샷 저장
-            int subtotal = product.getPrice() * itemDto.getQuantity();
-            totalPrice += subtotal;
-
-            OrderItem orderItem = OrderItem.builder()
-                    .orders(orders)
-                    .product(product)
-                    .productName(product.getPname())   // 스냅샷
-                    .price(product.getPrice())          // 스냅샷
-                    .quantity(itemDto.getQuantity())
-                    .subtotal(subtotal)
-                    .build();
-
-            orderItemRepository.save(orderItem);
+            Long sellerId = product.getSeller().getId();
+            groupBySeller.computeIfAbsent(sellerId, k -> new ArrayList<>()).add(itemDto);
         }
 
-        // 배송비 합산 (판매자별 1회)
-        int deliveryFee = firstProduct.getDeliveryFee();
-        totalPrice += deliveryFee;
+        // 판매자별 주문 생성
+        List<OrderResponseDTO> result = new ArrayList<>();
 
-        // 총 금액 업데이트
-        orders.updateStatus((byte) 0); // 결제전 상태
+        for (Map.Entry<Long, List<OrderRequestDTO.OrderItemRequestDTO>> entry : groupBySeller.entrySet()) {
+            Long sellerId = entry.getKey();
+            List<OrderRequestDTO.OrderItemRequestDTO> sellerItems = entry.getValue();
 
-        // totalPrice 업데이트를 위한 메서드 필요 
-        orders.updateTotalPrice(totalPrice);
+            // 판매자 조회
+            Member seller = memberRepository.findById(sellerId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 판매자입니다."));
 
-        // 주문 상태 이력 저장
-        OrderStatusHistory history = OrderStatusHistory.builder()
-                .orders(orders)
-                .seller(seller)
-                .fromStatus((byte) -1) // 최초 생성
-                .toStatus((byte) 0)    // 결제전
-                .memo("주문 생성")
-                .build();
+            // 주문 생성 (totalPrice는 나중에 업데이트)
+            Orders orders = Orders.builder()
+                    .member(member)
+                    .seller(seller)
+                    .orderGroupId(orderGroupId)
+                    .totalPrice(0)
+                    .receiverName(dto.getReceiverName())
+                    .receiverTel(dto.getReceiverTel())
+                    .zipcode(dto.getZipcode())
+                    .address(dto.getAddress())
+                    .addressDetail(dto.getAddressDetail())
+                    .paymentMethod(dto.getPaymentMethod())
+                    .build();
 
-        orderStatusHistoryRepository.save(history);
+            ordersRepository.save(orders);
 
-        log.info("주문 생성 완료 - orderId: {}, memberId: {}, totalPrice: {}",
-                orders.getOrderId(), memberId, totalPrice);
+            // 주문 상품 저장 및 총 금액 계산
+            int totalPrice = 0;
 
-        return new OrderResponseDTO(orders);
+            for (OrderRequestDTO.OrderItemRequestDTO itemDto : sellerItems) {
+                Product product = productRepository.findById(itemDto.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+
+                // 재고 차감
+                product.decreaseStock(itemDto.getQuantity());
+
+                // 스냅샷 저장
+                int subtotal = product.getPrice() * itemDto.getQuantity();
+                totalPrice += subtotal;
+
+                OrderItem orderItem = OrderItem.builder()
+                        .orders(orders)
+                        .product(product)
+                        .productName(product.getPname())
+                        .price(product.getPrice())
+                        .quantity(itemDto.getQuantity())
+                        .subtotal(subtotal)
+                        .build();
+
+                orderItemRepository.save(orderItem);
+            }
+
+            // 배송비 합산 (판매자당 1회)
+            Product firstProduct = productRepository.findById(
+                    sellerItems.get(0).getProductId()).orElseThrow();
+            totalPrice += firstProduct.getDeliveryFee();
+
+            // 총 금액 업데이트
+            orders.updateTotalPrice(totalPrice);
+
+            // 주문 상태 이력 저장
+            OrderStatusHistory history = OrderStatusHistory.builder()
+                    .orders(orders)
+                    .seller(seller)
+                    .fromStatus((byte) -1)
+                    .toStatus((byte) 0)
+                    .memo("주문 생성")
+                    .build();
+
+            orderStatusHistoryRepository.save(history);
+
+            log.info("주문 생성 완료 - orderId: {}, sellerId: {}, totalPrice: {}",
+                    orders.getOrderId(), sellerId, totalPrice);
+
+            result.add(new OrderResponseDTO(orders));
+        }
+
+        return result;
     }
 
     // 주문 목록 조회
@@ -145,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
         return new OrderResponseDTO(orders);
     }
 
-    // 주문 취소
+    // 주문 전체 취소
     @Override
     public void cancelOrder(Long memberId, Long orderId) {
         Orders orders = getOrderOfMember(memberId, orderId);
@@ -155,24 +179,79 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
         }
 
-        // 재고 복구
-        orders.getOrderItems().forEach(item ->
-            item.getProduct().restoreStock(item.getQuantity())
-        );
+        // 정상 상태인 OrderItem만 재고 복구
+        orders.getOrderItems().stream()
+                .filter(item -> !item.isCancelled())
+                .forEach(item -> {
+                    item.getProduct().restoreStock(item.getQuantity());
+                    item.cancel();
+                });
 
         // 주문 상태 이력 저장
         OrderStatusHistory history = OrderStatusHistory.builder()
                 .orders(orders)
                 .seller(orders.getSeller())
                 .fromStatus(orders.getStatus())
-                .toStatus((byte) 4) // 취소/환불
-                .memo("주문 취소")
+                .toStatus((byte) 4)
+                .memo("주문 전체 취소")
                 .build();
 
         orderStatusHistoryRepository.save(history);
 
         // 주문 상태 변경
         orders.updateStatus((byte) 4);
+
+        log.info("주문 전체 취소 완료 - orderId: {}", orderId);
+    }
+
+    // 주문 상품 개별 취소
+    @Override
+    public void cancelOrderItem(Long memberId, Long orderId, Long orderItemId) {
+        Orders orders = getOrderOfMember(memberId, orderId);
+
+        // 배송중, 배송완료는 취소 불가
+        if (orders.getStatus() >= 2) {
+            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        }
+
+        // 해당 OrderItem 조회
+        OrderItem orderItem = orders.getOrderItems().stream()
+                .filter(item -> item.getOrderItemId().equals(orderItemId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문 상품입니다."));
+
+        // 이미 취소된 상품인지 확인
+        if (orderItem.isCancelled()) {
+            throw new IllegalStateException("이미 취소된 상품입니다.");
+        }
+
+        // 재고 복구 및 취소 처리
+        orderItem.getProduct().restoreStock(orderItem.getQuantity());
+        orderItem.cancel();
+
+        // 총 금액 업데이트 (취소된 상품 금액 차감)
+        orders.updateTotalPrice(orders.getTotalPrice() - orderItem.getSubtotal());
+
+        // 모든 상품이 취소됐으면 주문 전체 취소 처리
+        boolean allCancelled = orders.getOrderItems().stream()
+                .allMatch(OrderItem::isCancelled);
+        if (allCancelled) {
+            orders.updateStatus((byte) 4);
+        }
+
+        // 주문 상태 이력 저장
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus(allCancelled ? (byte) 4 : orders.getStatus())
+                .memo("상품 개별 취소: " + orderItem.getProductName())
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+
+        log.info("주문 상품 개별 취소 완료 - orderId: {}, orderItemId: {}, productName: {}",
+                orderId, orderItemId, orderItem.getProductName());
     }
 
     // 공통: 본인 주문인지 검증

@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Orders {
 
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
@@ -41,6 +41,11 @@ public class Orders {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     private Member seller;
+
+    // 같은 장바구니에서 나온 주문 묶음 식별자
+    // 판매자별로 주문이 분리되어도 동일한 UUID로 묶음
+    @Column(name = "order_group_id", length = 36, nullable = false)
+    private String orderGroupId;
 
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
@@ -89,18 +94,17 @@ public class Orders {
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistory> statusHistories = new ArrayList<>();
 
-    // ── 상태 변경 메서드 ──────────────────────────────────────────────────
-    // 주문 상태 변경 (준비중→배송중→완료 / 취소)
+    // ── 상태 변경 ────────────────────────────────────────────────
     public void updateStatus(Byte status) {
         this.status = status;
     }
-    
-    // -- 주문의 총 금액 계산
+
+    // ── 총 금액 업데이트 ─────────────────────────────────────────
     public void updateTotalPrice(Integer totalPrice) {
-    	this.totalPrice = totalPrice;
+        this.totalPrice = totalPrice;
     }
 
-    // ── 결제 연동 후 사용 (토스 API 후순위) ──────────────────────────────
+    // ── 결제 정보 업데이트 (토스 후순위) ─────────────────────────
     public void updatePayment(String paymentKey, String paymentMethod, LocalDateTime paidAt) {
         this.paymentKey = paymentKey;
         this.paymentMethod = paymentMethod;

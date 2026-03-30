@@ -11,8 +11,10 @@ import java.util.stream.Collectors;
 public class OrderResponseDTO {
 
     private Long orderId;
+    private String orderGroupId; // ← 추가
     private Long memberId;
     private Long sellerId;
+    private String sellerName;   // ← 추가
     private Integer totalPrice;
     private Byte status;
     private String statusLabel;
@@ -35,8 +37,12 @@ public class OrderResponseDTO {
 
     public OrderResponseDTO(Orders orders) {
         this.orderId = orders.getOrderId();
+        this.orderGroupId = orders.getOrderGroupId();
         this.memberId = orders.getMember().getId();
         this.sellerId = orders.getSeller().getId();
+        this.sellerName = orders.getSeller().getSettlementName() != null
+                ? orders.getSeller().getSettlementName()
+                : orders.getSeller().getMname();
         this.totalPrice = orders.getTotalPrice();
         this.status = orders.getStatus();
         this.statusLabel = switch (orders.getStatus()) {

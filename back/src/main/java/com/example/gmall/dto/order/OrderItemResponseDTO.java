@@ -10,8 +10,10 @@ public class OrderItemResponseDTO {
     private Long productId;
     private String productName;
     private Integer price;
-    private int quantity;
+    private Integer quantity;
     private Integer subtotal;
+    private Byte status;        // 0=정상, 1=취소
+    private String statusLabel; // 정상, 취소
 
     public OrderItemResponseDTO(OrderItem orderItem) {
         this.orderItemId = orderItem.getOrderItemId();
@@ -20,5 +22,7 @@ public class OrderItemResponseDTO {
         this.price = orderItem.getPrice();
         this.quantity = orderItem.getQuantity();
         this.subtotal = orderItem.getSubtotal();
+        this.status = orderItem.getStatus();
+        this.statusLabel = orderItem.isCancelled() ? "취소" : "정상";
     }
 }
