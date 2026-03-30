@@ -15,23 +15,25 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "category")
 @Getter
-@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Category {
  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer categoryId;
  
-    @Column(name = "name", length = 50, nullable = false)
-    private String name;
+    @Column(name = "category_name", length = 50, nullable = false)
+    private String categoryName;
  
     // 자기 참조 (2depth 구조 - NULL이면 최상위 카테고리)
     @ManyToOne(fetch = FetchType.LAZY)
