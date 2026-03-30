@@ -1,4 +1,25 @@
-const ProductGallery = () => {
+import { useState } from "react"
+
+const ProductGallery = ({product}) => {
+
+    if (!product) return null;
+
+    // 메인 이미지 초기값: thumbnailImageUrl, 없으면 imageUrls 첫 번째
+    const initialImage = product.thumbnailImageUrl || product.imageUrls?.[0] || '';
+    const [mainImage, setMainImage] = useState(initialImage);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    // 썸네일 목록: thumbnailImageUrl + imageUrls 합치기 (중복 제거)
+    const allImages = [
+        ...(product.thumbnailImageUrl ? [product.thumbnailImageUrl] : []),
+        ...(product.imageUrls || []).filter(url => url !== product.thumbnailImageUrl)
+    ];
+
+    const handleThumbnailClick = (url, index) => {
+        setMainImage(url);
+        setSelectedIndex(index);
+    };
+
     return(
         <div className="space-y-6">
             {/* Left: Gallery */}
