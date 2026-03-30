@@ -14,7 +14,7 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
-    // 비밀글 체크박스 처리 로직 수정 [cite: 2026-03-30]
+    // 비밀글 체크박스 처리 로직 수정
     if (name === "isSecret") {
       setFormData({
         ...formData,
