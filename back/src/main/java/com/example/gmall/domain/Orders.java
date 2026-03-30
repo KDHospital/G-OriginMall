@@ -94,6 +94,11 @@ public class Orders {
     public void updateStatus(Byte status) {
         this.status = status;
     }
+    
+    // -- 주문의 총 금액 계산
+    public void updateTotalPrice(Integer totalPrice) {
+    	this.totalPrice = totalPrice;
+    }
 
     // ── 결제 연동 후 사용 (토스 API 후순위) ──────────────────────────────
     public void updatePayment(String paymentKey, String paymentMethod, LocalDateTime paidAt) {
