@@ -22,12 +22,6 @@ export default function SellerProductNewPage() {
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
 
-  // ── 카테고리 상태 ──────────────────────
-  // TODO: API 연동 후 교체
-  // useEffect(() => {
-  //   axiosInstance.get("/categories")
-  //     .then((res) => setCategories(res.data))
-  // }, []);
   const [categories, setCategories] = useState([]);
   const [selectedParentId, setSelectedParentId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
@@ -35,6 +29,7 @@ export default function SellerProductNewPage() {
   const parentCategories = categories.filter((c) => c.parentId === null);
   const childCategories = categories.filter((c) => c.parentId === selectedParentId);
 
+  // -- 카테고리 상태 --
   useEffect(()=>{
     axiosInstance.get("/categories")
       .then((res) => setCategories(res.data))
