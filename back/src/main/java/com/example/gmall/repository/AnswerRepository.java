@@ -8,15 +8,15 @@ import com.example.gmall.domain.Answer;
 import com.example.gmall.domain.Member;
 import com.example.gmall.domain.Post;
 
-public interface AnswerRepository extends JpaRepository<Answer, Long>{
+public interface AnswerRepository extends JpaRepository<Answer, Long> {
 	
-	//틀정 게시글에 달린 답변 조회(상세페이지용)
-	Page<Answer> findByPost(Post post, Pageable pageable);
+    // 1. 특정 게시글에 달린 '삭제되지 않은' 답변 조회
+    Page<Answer> findByPostAndIsDeletedFalse(Post post, Pageable pageable);
 
-	//관리자가 작성한 답변들 페이징(관리자 답변 관리용)
-	Page<Answer> findByMember(Member member, Pageable pageable);
+    // 2. 관리자가 작성한 '삭제되지 않은' 답변들 페이징
+    Page<Answer> findByMemberAndIsDeletedFalse(Member member, Pageable pageable);
 	
-	//답변 존재 여부 확인(와이어프레임 목록의 '답변완료' 배지 표시용)
-	boolean existsByPost(Post post);
-	
+    // 3. 답변 존재 여부 확인 (삭제된 답변은 제외하고 체크)
+    // 이 메서드가 true여야 목록에서 '답변완료' 배지 노출
+    boolean existsByPostAndIsDeletedFalse(Post post);
 }

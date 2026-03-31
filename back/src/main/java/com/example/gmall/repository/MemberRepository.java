@@ -8,7 +8,8 @@ import com.example.gmall.domain.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-
+	
+	//===[중복 확인 센션] 가입 시 실시간 유효성 검사용===
      // * 아이디(이메일) 중복 확인
     //  * 사용: 일반/판매자 회원가입 시 loginId 중복 검사
     // * API : POST /api/member/check-id
@@ -29,7 +30,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
  
     
     
-    
+  //===[조회 센션] 인증 및 정보 수정용===
     // * loginId(이메일)로 회원 조회
     // * 사용: 로그인, 이메일 인증 완료 처리
      
@@ -41,11 +42,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
      
     Optional<Member> findByEmail(String email);
  
-   
+    
+    
+    //===[보안 센션] 로그인 및 권한 체크용===
      // 활성 회원만 조회 (탈퇴 제외)
      // 사용: 로그인 시 탈퇴 회원 접근 차단
     
     Optional<Member> findByLoginIdAndIsDeletedFalse(String loginId);
+    
  
    
 }

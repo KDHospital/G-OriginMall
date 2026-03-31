@@ -47,13 +47,31 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
  
-    //추가  이름 변경이 필요한 경우
-    public void updateName(String name) {
-    	this.name = name;
-    }
+
     
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDate.now();
     }
+    
+	 // --- 비즈니스 로직 메서드 (Setter 대신 사용) ---
+	
+	 // 1. 게시판 이름 변경 (유효성 검사 추가)
+	 public void updateName(String name) {
+	     if (name == null || name.trim().isEmpty()) {
+	         throw new IllegalArgumentException("게시판 이름은 비어있을 수 없습니다.");
+	     }
+	     this.name = name;
+	 }
+	
+	// 2. 게시물 추가 (Post 엔티티 수정 후 에러 사라짐)
+	 public void addPost(Post post) {
+	     this.posts.add(post);
+	     if (post.getBoard() != this) {
+	         post.updateBoard(this); 
+	     }
+	 
+	 }
+	 
+    
 }

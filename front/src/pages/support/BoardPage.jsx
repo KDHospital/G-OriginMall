@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import BasicLayout from '../../layouts/BasicLayout';
 import UserSupportComponent from '../../components/support/UserSupportComponent';
 import PaginationComponent from '../../components/support/PaginationComponent';
-// fetchBoardList를 fetchNotice로 수정 [cite: 2026-03-30]
 import { fetchNotice } from '../../api/boardApi'; 
 
 const BoardPage = () => {

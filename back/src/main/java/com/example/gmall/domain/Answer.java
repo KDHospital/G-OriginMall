@@ -65,17 +65,28 @@ public class Answer {
         this.updatedAt = LocalDateTime.now();
     }
     
+
+    
  // --- 비즈니스 로직 메서드 (Setter 대신 사용) ---
-    
-    //답변 내용 수정
-    public void updateContent(String contnet) {
-    	this.content = content;
-    }
-    
-    //삭제 처리
-    public void markAsDeleted() {
-    	this.isDeleted = true;
-    }
+
+	 // 1. 답변 내용 수정 (매개변수 오타 수정)
+	 public void updateContent(String content) {
+	     if (content == null || content.trim().isEmpty()) {
+	         throw new IllegalArgumentException("답변 내용은 비어있을 수 없습니다.");
+	     }
+	     this.content = content;
+	 }
+	
+	 // 2. 삭제 처리 
+	 public void markAsDeleted() {
+	     this.isDeleted = true;
+	 }
+	
+	 // 3. 연관관계 편의 메서드 (Post 연관 설정)
+	 // Post 엔티티에서 addAnswer 호출 시 내부적으로 사용
+	 public void updatePost(Post post) {
+	     this.post = post;
+	 }
     
     
 }
