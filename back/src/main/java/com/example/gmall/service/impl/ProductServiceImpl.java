@@ -45,11 +45,18 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageRepository productImageRepository;
     
     //웹-상품 목록 조회
-	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int page, int size){
+	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int minPrice, int maxPrice, String sort, int page, int size){
 		log.info("ProductServiceImpl 파일 내부의 getProducts 접근");
-		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"createdAt"));
-		return productRepository.findActiveProducts(categoryId, pageable)
-				.map(ProductListResponseDTO::new);
+	    // sort 값에 따라 정렬 기준 결정
+	    Sort sorting = switch (sort) {
+	        case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
+	        case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
+	        default          -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
+	    };
+
+	    Pageable pageable = PageRequest.of(page, size, sorting);
+	    return productRepository.findActiveProducts(categoryId, minPrice, maxPrice, pageable)
+	            .map(ProductListResponseDTO::new);
 	}
 	//웹-상품 상세 조회
 	@Override
@@ -74,6 +81,7 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 등록
 	@Override
+	@Transactional
     public ProductResponseDTO register(Long sellerId, ProductRequestDTO dto) {
 		
 		

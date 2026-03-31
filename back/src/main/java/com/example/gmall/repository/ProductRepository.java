@@ -19,4 +19,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	//상세 조회
 	@Query("SELECT p FROM Product p JOIN FETCH p.category WHERE p.productId = :productId")
     Optional<Product> findByProductIdWithCategory(@Param("productId") Long productId);
+	
+	//전체 상품 목록, 가격필터
+	@Query("SELECT p FROM Product p JOIN FETCH p.category " +
+		       "WHERE p.soldStatus = 0 " +
+		       "AND (:categoryId IS NULL OR p.category.categoryId = :categoryId) " +
+		       "AND p.price >= :minPrice " +
+		       "AND p.price <= :maxPrice")
+		Page<Product> findActiveProducts(
+		    @Param("categoryId") Integer categoryId,
+		    @Param("minPrice") Integer minPrice,
+		    @Param("maxPrice") Integer maxPrice,
+		    Pageable pageable
+		);
+	
 }

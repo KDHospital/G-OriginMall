@@ -32,4 +32,9 @@ public class CategoryController {
             @PathVariable Integer parentId) {
         return ResponseEntity.ok(categoryService.getChildren(parentId));
     }
+    
+    @GetMapping("/menu")
+    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
 }
