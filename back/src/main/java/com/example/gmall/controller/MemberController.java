@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -83,7 +84,77 @@ public class MemberController {
 		String loginId = authentication.getName();
 		log.info(authentication.toString());
 	    
-		MemberDTO dto = memberService.getMemberId(loginId);
+		MemberDTO dto = memberService.getMemberId(Long.parseLong(loginId));
 		return ResponseEntity.ok(dto);
 	}
+	
+	@PutMapping("/modify")
+	public ResponseEntity<?> modifyMember(@RequestBody MemberDTO memberDTO){
+		log.info("회원 수정 요청 {}", memberDTO);
+		try {
+			memberService.modifyMember(memberDTO);
+			
+			return ResponseEntity.ok(Map.of("result","success"));
+			
+		} catch (Exception e) {
+			log.error("수정 실패: ",e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("message",e.getMessage()));
+		}
+	}
+		
+		@PostMapping("/find-id")
+		public ResponseEntity<?> findId(@RequestBody Map<String, String> request){
+		try {
+			String mname = request.get("mname");
+			String tel = request.get("tel");
+			
+			String foundId = memberService.findLoginId(mname, tel);
+			
+			return ResponseEntity.ok(Map.of("loginId",foundId));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(Map.of("message",e.getMessage()));
+		}
+		
+	}
+		@PostMapping("/reset-password")
+		public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request){
+			try {
+				String loginId = request.get("loginId");
+				String nmpwd = request.get("nmpwd");
+				
+				memberService.resetPassword(loginId, nmpwd);
+				return ResponseEntity.ok(Map.of("result","success"));
+				
+			} catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("message",e.getMessage()));
+			}
+		}
+		
+		@PostMapping("/withdraw")
+		public ResponseEntity<?> withdraw(@RequestBody Map<String, String> request) {
+			
+				String memberId = request.get("id");
+				String mpwd = request.get("mpwd");
+				
+				log.info("회원 탈퇴 요청 - ID:{}", memberId);
+				try {
+					memberService.withdraw(memberId, mpwd);
+					
+					return ResponseEntity.ok(Map.of(
+							"result","success",
+							"message","탈퇴 처리가 완료되었습니다"
+							));
+				
+			} catch (IllegalArgumentException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("message",e.getMessage()));
+			}catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(Map.of("message","서버에 오류가 발생했습니다."));
+			}
+		}
+		
 }

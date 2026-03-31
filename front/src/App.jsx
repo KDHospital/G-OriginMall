@@ -13,6 +13,8 @@ import ProductDetailPage from './pages/products/ProductDetailPage';
 
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
+import FindIdPage from './pages/member/FindIdPage';
+import FindPwdPage from './pages/member/FindPwdPage';
 
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
@@ -47,6 +49,8 @@ function App() {
         <Route path='/member/login' element={<JoinPage />} />
         <Route path='/mypage' element={<Mypapge />} />
         <Route path='/modifypage' element={<ModifyPage />} />
+        <Route path='/findid' element={<FindIdPage />} />
+        <Route path='/findpwd' element={<FindPwdPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
         

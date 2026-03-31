@@ -42,9 +42,10 @@ const LoginComponent = () => {
             alert("로그인에 성공했습니다.")
             navigate("/")
         })
-        .catch( (err) => {
-            console.error(err)
-            alert("로그인 실패: 아이디나 비밀번호를 확인하세요")
+        .catch( err => {
+           const errorMsg = err.response?.data?.message || "아이디 또는 비밀번호를 확인해주세요."
+           alert(errorMsg)
+           console.error("로그인 에러:",errorMsg)
         })
     }
 
@@ -86,7 +87,19 @@ const LoginComponent = () => {
                 onClick={() =>navigate("/signup")}>
                     회원가입 하러가기
                 </span>
-
+            </div>
+            <div className="flex justify-center items-center gap-4 mt-4 text-sm text-gray-400">
+             <span
+                className="text-gray-600 font-bold cursor-pointer hover:underline"
+                onClick={() => navigate("/findid")}>
+                    아이디 찾기
+                </span>
+                <span className="text-gray-300">|</span>
+                <span
+                className="text-gray-600 font-bold cursor-pointer hover:underline"
+                onClick={() => navigate("/findpwd")}>
+                     비밀번호 찾기
+                </span>
             </div>
         </form>
         </div>

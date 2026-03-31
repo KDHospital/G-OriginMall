@@ -5,6 +5,7 @@ import axiosInstance from "../../api/axios";
 
 
 const initState ={
+    id:0,
     loginId:'',
     mname:'',
     tel:'',
@@ -13,6 +14,7 @@ const initState ={
     mpwd:'',
     reMpwd:''
 }
+
  const formatPhoneNumber = (value) => {
         if (!value) return "";
         const num = value.replace(/[^0-9]/g, '');
@@ -30,8 +32,10 @@ const ModifyComponent = () =>{
         getMemberInfo()
         .then( (res) => {
            const memberData = res.data || res
+           console.log("불러온 정보:",memberData)
             setForm({
                 ...initState,
+                id:memberData.id,
                 loginId: memberData.loginId || "",
                 mname: memberData.mname || '',
                 tel: formatPhoneNumber(memberData.tel || ''),
@@ -66,13 +70,25 @@ const ModifyComponent = () =>{
         if(form.mpwd && form.mpwd !== form.reMpwd) {
             return alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.")
         }
+        const memberId = Number(form.id)
+        if (!memberId || isNaN(memberId)){
+            return alert("회원 번호(ID)가 유효하지 않습니다. 다시 로그인 해주세요")
+        }
 
         const sendData = {
-            ...form,
-            tel: form.tel.replace(/-/g,'')
+            id:memberId,
+            loginId: String(form.loginId),
+            mname:form.mname,
+            currentMpwd:form.currentMpwd,
+            tel:form.tel.replace(/-/g,''),
+            gender: Number(form.gender)
         }
-        delete sendData.reMpwd
-
+        
+       
+        if(form.mpwd && form.mpwd.trim() !==""){
+            sendData.mpwd = form.mpwd
+        }
+        console.log("최종 전송 데이터 객체:",sendData)
         updateMemberInfo(sendData)
         .then( ()=> {
             alert("회원 정보가 성공적으로 수정되었습니다. 보안을 위해 다시 로그인해주세요.")
@@ -81,7 +97,7 @@ const ModifyComponent = () =>{
             navigate("/member/login")
         })
         .catch( (err) => {
-            console.error(err)
+            console.error("수정 에러 상세:",err.response?.data)
             const errorMsg = err.response?.data?.message || "수정에 실패했습니다. 현재 비밀번호를 다시 확인해주세요."
             alert(errorMsg)
         })
