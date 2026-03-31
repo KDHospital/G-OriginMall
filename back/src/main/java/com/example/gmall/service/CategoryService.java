@@ -11,4 +11,7 @@ public interface CategoryService {
 
     // 하위 카테고리 목록
     List<CategoryResponseDTO> getChildren(Integer parentId);
+    
+    //프론트 카테고리 목록
+    List<CategoryResponseDTO> getAllCategories();
 }

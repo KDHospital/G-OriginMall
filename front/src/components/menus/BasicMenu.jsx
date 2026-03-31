@@ -1,12 +1,19 @@
+import { useState,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import axiosInstance from "../../api/axios";
+import { getCategories } from "../../api/productsApi";
 
 const BasicMenu =() => {
 
 const navigate = useNavigate()
-
 const isLoggedIn = !!localStorage.getItem("member")
+const [categories,setCategories] = useState([])
+const [isProductMenuOpen, setIsProductMenuOpen] = useState(false)
+
+useEffect(()=>{
+    getCategories().then(res=> setCategories(res.data)).catch(err=>console.error("카테고리 로드 실패",err))
+},[])
 
 const handleLogout= () => {
     localStorage.removeItem("member")
@@ -16,80 +23,107 @@ const handleLogout= () => {
     window.location.reload()
 }
 
-    const menuItem = [
-        {
-            name: "상품",
-            path:"/products"
-        },
-        {
-            name: "기획전",
-            path:"/"
-        },
-        {
-            name: "고객센터",
-            path:"/"
-        },
-        {
-            name: "입점신청",
-            path:"/"
-        },
-    ]
-
-    return(
+    return (
         <div className="sticky top-0 z-50 bg-background-light/80 backdrop-blur-md border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
-                    {/* Logo 영역 */}
-                    <Link to="/" className="flex-shrink-0 flex items-center gap-3 h-20" >
-                        <img alt="G-Origin Mall Logo" className="h-full w-auto" data-alt="G-Origin Mall professional logo featuring green and gold elements" src={logo} />
+                    {/* 로고 */}
+                    <Link to="/" className="flex-shrink-0 flex items-center gap-3 h-20">
+                        <img alt="G-Origin Mall Logo" className="h-full w-auto" src={logo} />
                     </Link>
-                    {/* 메뉴 영역 */}
+
+                    {/* 메뉴 */}
                     <nav className="hidden md:flex">
                         <ul className="flex items-center space-x-8">
-                            {menuItem.map((item)=>(
+
+                            {/* 상품 메뉴 — 호버 드롭다운 */}
+                            <li
+                                className="relative"
+                                onMouseEnter={() => setIsProductMenuOpen(true)}
+                                onMouseLeave={() => setIsProductMenuOpen(false)}
+                            >
+                                <Link
+                                    to="/products"
+                                    className="text-sm font-semibold hover:text-primary transition-colors"
+                                >
+                                    상품
+                                </Link>
+
+                                {/* 드롭다운 */}
+                                {isProductMenuOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
+                                        {/* 전체 상품 */}
+                                        <Link
+                                            to="/products"
+                                            className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
+                                        >
+                                            전체 상품
+                                        </Link>
+                                        <hr className="my-1 border-slate-100" />
+                                        {/* 1뎁스 카테고리 목록 */}
+                                        {categories.map(cat => (
+                                            
+                                            <Link
+                                            key={cat.categoryId}
+                                            to={`/products?categoryId=${cat.categoryId}`}
+                                            className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
+                                            >
+                                                {cat.categoryName}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </li>
+
+                            {/* 나머지 메뉴 */}
+                            {[
+                                { name: "기획전", path: "/" },
+                                { name: "고객센터", path: "/" },
+                                { name: "입점신청", path: "/" },
+                            ].map(item => (
                                 <li key={item.name} className="text-sm font-semibold hover:text-primary transition-colors">
                                     <Link to={item.path}>{item.name}</Link>
                                 </li>
                             ))}
                         </ul>
                     </nav>
-                    
+
+                    {/* 우측 영역 — 검색/장바구니/로그인 (기존 코드 그대로) */}
                     <div className="flex items-center gap-4">
-                        {/* 검색창 */}
                         <div className="hidden lg:flex items-center bg-slate-100 rounded-full px-4 py-1.5">
                             <span className="material-symbols-outlined text-slate-400 text-lg leading-none">search</span>
-                            <input className="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-400" 
-                            placeholder="검색어를 입력해주세요" 
-                            type="text" />
+                            <input
+                                className="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-400"
+                                placeholder="검색어를 입력해주세요"
+                                type="text"
+                            />
                         </div>
-                        {/* 장바구니 */}
-                        <Link to={"/cart"} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full relative">
+                        <Link to="/cart" className="p-2 hover:bg-slate-100 rounded-full relative">
                             <span className="material-symbols-outlined">shopping_cart</span>
                             <span className="absolute top-1 right-1 bg-secondary text-[10px] font-bold px-1 rounded-full text-white">3</span>
                         </Link>
-                        {/* 로그인 */}
-                        {isLoggedIn ?(
-                           <>
-                           <Link
-                           to="/mypage"
-                           className="hidden sm:flex items-center gap-2 text-sm font-bold bg-slate-100 text-slate-700 px-5 py-2 rounded-full hover:bg-slate-200 transition-colors"
-                           >
-                            <span className="material-symbols-outlined text-lg">account_circle</span>
-                            마이페이지
-                           </Link>
-                           <button
-                            onClick={handleLogout}
-                            className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
-                       <span className="material-symbols-outlined text-lg">logout</span>
-                       로그아웃</button></>) : ( <>
-                        <Link to={"/member/login"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
-                            <span className="material-symbols-outlined text-lg">person</span>
-                            로그인
-                        </Link>
-                       <Link to={"/signup"} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
-                            <span className="material-symbols-outlined text-lg">person</span>
-                            회원가입
-                        </Link></>
+                        {isLoggedIn ? (
+                            <>
+                                <Link to="/mypage" className="hidden sm:flex items-center gap-2 text-sm font-bold bg-slate-100 text-slate-700 px-5 py-2 rounded-full hover:bg-slate-200 transition-colors">
+                                    <span className="material-symbols-outlined text-lg">account_circle</span>
+                                    마이페이지
+                                </Link>
+                                <button onClick={handleLogout} className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                                    <span className="material-symbols-outlined text-lg">logout</span>
+                                    로그아웃
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/member/login" className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                                    <span className="material-symbols-outlined text-lg">person</span>
+                                    로그인
+                                </Link>
+                                <Link to="/signup" className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                                    <span className="material-symbols-outlined text-lg">person</span>
+                                    회원가입
+                                </Link>
+                            </>
                         )}
                     </div>
                 </div>

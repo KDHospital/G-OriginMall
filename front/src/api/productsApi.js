@@ -10,3 +10,7 @@ export const getProducts = (params) => {
 export const getProductDetail = (productId) => {
   return axiosInstance.get(`/products/${productId}`);
 };
+
+export const getCategories = () => {
+    return axiosInstance.get('/categories/menu');
+};

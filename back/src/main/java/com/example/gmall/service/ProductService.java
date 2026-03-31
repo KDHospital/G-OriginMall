@@ -10,7 +10,7 @@ import com.example.gmall.dto.product.ProductResponseDTO;
 
 public interface ProductService {
 	//웹-상품 목록 조회
-	Page<ProductListResponseDTO> getProducts(Integer categoryId, int page, int size);
+	Page<ProductListResponseDTO> getProducts(Integer categoryId, int minPrice, int maxPrice, String sort, int page, int size);
 	//어드민-상품 등록
 	
 	
