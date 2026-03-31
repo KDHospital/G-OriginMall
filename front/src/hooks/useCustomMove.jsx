@@ -19,6 +19,13 @@ const useCustomMove = () => {
     // 2. 기본 쿼리 스트링 생성
     const queryDefault = createSearchParams({page,size,...(categoryId&&{categoryId})}).toString()
 
+    //가격 필터 변수 선언
+    const minPrice = getNum(queryParams.get('minPrice'),0)
+    const maxPrice = getNum(queryParams.get('maxPrice'),200000)
+
+    //정렬 필터 추가
+    const sort = queryParams.get('sort')||'latest' //기본값, 최신순
+
     const moveToList = (pageParam) => {
         let queryStr ="";
 
@@ -51,7 +58,9 @@ const useCustomMove = () => {
         const queryStr = createSearchParams({
             page: 1,
             size: 12,
-            ...(catId && { categoryId: catId })
+            ...(catId && { categoryId: catId }),
+            minPrice,
+            maxPrice,
         }).toString()
         
         navigate({
@@ -59,6 +68,30 @@ const useCustomMove = () => {
             search: queryStr
         })
     }
-    return {moveToList,moveToRead,moveToCategory,page,size,refresh,categoryId}
+    const moveToPrice = (min,max) => {
+        const queryStr = createSearchParams({
+            page:1,
+            size:12,
+            ...(categoryId&&{categoryId}),
+            minPrice:min,
+            maxPrice:max,
+        }).toString()
+        navigate({
+            pathname: `/products`,
+            search: queryStr            
+        })
+    }
+
+    const moveToSort = (sortValue) => {
+        const queryStr = createSearchParams({
+            page: 1,
+            size,
+            ...(categoryId && { categoryId }),
+            sort: sortValue,
+        }).toString()
+        navigate({ pathname: `/products`, search: queryStr })
+    }
+
+    return {moveToList,moveToRead,moveToCategory,moveToPrice,moveToSort,page,size,refresh,categoryId,minPrice,maxPrice,sort}
 }
 export default useCustomMove

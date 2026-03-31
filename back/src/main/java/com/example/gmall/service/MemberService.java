@@ -18,6 +18,13 @@ public interface MemberService {
 	
 	MemberDTO getMemberLoginId(String loginId);
 	
-	MemberDTO getMemberId(String MemberId);
+	MemberDTO getMemberId(Long MemberId);
+	
+	void modifyMember(MemberDTO memberDTO);
 
+	public String findLoginId(String mname, String tel);
+	
+	void resetPassword(String loginId, String nmpwd);
+	
+	void withdraw(String memberId, String mpwd);
 }

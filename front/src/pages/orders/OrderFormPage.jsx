@@ -1,34 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
+import axiosInstance from "../../api/axios";
 
-// ─────────────────────────────────────────
-// Mock 데이터 (API 연동 후 제거)
-// ─────────────────────────────────────────
 
-// 배송지 mock (API 연동 후 axios로 교체)
-const MOCK_ADDRESSES = [
-  {
-    addressId: 1,
-    recipientName: "홍길동",
-    recipientPhone: "010-0000-0000",
-    zipcode: "10000",
-    address: "경기도 김포시 OO동 OO아파트 OO호",
-    addressDetail: "",
-    isDefault: true,
-    memo: "",
-  },
-  {
-    addressId: 2,
-    recipientName: "홍길동 (회사)",
-    recipientPhone: "010-0000-0000",
-    zipcode: "04000",
-    address: "서울특별시 OO구 OO로 OO빌딩 OO층",
-    addressDetail: "",
-    isDefault: false,
-    memo: "",
-  },
-];
 
 // 상품 상세 → 바로 구매 진입 시 사용할 mock
 // 실제로는 ProductDetailPage에서 navigate state로 전달받음
@@ -111,6 +86,10 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
     addressDetail: "",
   });
 
+  useEffect(() => {
+    setAddresses(initialAddresses);
+  }, [initialAddresses]);
+
   const handleNewAddressChange = (e) => {
     setNewAddress((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -139,30 +118,25 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
         alert("받는 분, 연락처, 주소는 필수 입력 항목입니다.");
         return;
       }
-      // TODO: API 연동 후 아래 주석 해제
-      // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-      // axiosInstance.post(`/members/addresses?memberId=${memberId}`, newAddress)
-      // ── JWT 적용 후 교체 (토큰에서 memberId 자동 추출) ───────────────
-      // axiosInstance.post("/members/addresses", newAddress)
-      // ──────────────────────────────────────────────────────────────
-      //   .then((res) => {
-      //     setAddresses((prev) => [...prev, res.data]);
-      //     onSelect(res.data.addressId); // 새로 추가한 배송지 자동 선택
-      //     setShowNewForm(false);
-      //     setNewAddress({ recipientName: "", recipientPhone: "", zipcode: "", address: "", addressDetail: "" });
-      //   });
+      
+      axiosInstance.post("/members/addresses", {
+          recipientName: newAddress.recipientName,
+          recipientPhone: newAddress.recipientPhone,
+          zipcode: newAddress.zipcode,
+          address: newAddress.address,
+          addressDetail: newAddress.addressDetail,
+          isDefault: false,
+          memo: "",
+      })
+      .then((res) => {
+          setAddresses((prev) => [...prev, res.data]);
+          onSelect(res.data.addressId);
+          setShowNewForm(false);
+          setNewAddress({ recipientName: "", recipientPhone: "", zipcode: "", address: "", addressDetail: "" });
+      })
+      .catch((err) => console.error("배송지 추가 실패:", err));
 
-      // API 연동 전 임시 로컬 처리
-      const tempAddress = {
-        addressId: Date.now(), // 임시 ID (API 연동 후 제거)
-        ...newAddress,
-        isDefault: false,
-        memo: "",
-      };
-      setAddresses((prev) => [...prev, tempAddress]);
-      onSelect(tempAddress.addressId); // 새로 추가한 배송지 자동 선택
-      setShowNewForm(false);
-      setNewAddress({ recipientName: "", recipientPhone: "", zipcode: "", address: "", addressDetail: "" });
+      
     }
   };
 
@@ -195,32 +169,42 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
 
       {/* 기존 배송지 목록 */}
       <div className="space-y-2 mb-4">
-        {addresses.map((addr) => (
-          <label
-            key={addr.addressId}
-            className={`flex items-start gap-3 p-3 border rounded cursor-pointer transition-colors
-              ${selectedAddressId === addr.addressId ? "border-gray-800 bg-gray-50" : "border-gray-200 hover:bg-gray-50"}`}
-          >
-            <input
-              type="radio"
-              name="address"
-              value={addr.addressId}
-              checked={selectedAddressId === addr.addressId}
-              onChange={() => onSelect(addr.addressId)}
-              className="mt-0.5 accent-gray-700"
-            />
-            <div className="text-sm">
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-medium text-gray-800">{addr.recipientName}</span>
-                {addr.isDefault && (
-                  <span className="text-xs px-1.5 py-0.5 bg-gray-800 text-white rounded">기본</span>
-                )}
+        {addresses.length === 0 ? (
+          // ── 배송지 없을 때 안내 문구 추가 ──────────────────────────
+          <div className="flex flex-col items-center justify-center py-6 text-center border border-dashed border-gray-200 rounded">
+            <p className="text-sm text-gray-400">등록된 배송지가 없습니다.</p>
+            <p className="text-xs text-gray-300 mt-1">
+              위의 <span className="text-gray-500 font-medium">+ 새 배송지 추가</span> 버튼을 눌러 배송지를 등록해주세요.
+            </p>
+          </div>
+        ) : (
+          addresses.map((addr) => (
+            <label
+              key={addr.addressId}
+              className={`flex items-start gap-3 p-3 border rounded cursor-pointer transition-colors
+                ${selectedAddressId === addr.addressId ? "border-gray-800 bg-gray-50" : "border-gray-200 hover:bg-gray-50"}`}
+            >
+              <input
+                type="radio"
+                name="address"
+                value={addr.addressId}
+                checked={selectedAddressId === addr.addressId}
+                onChange={() => onSelect(addr.addressId)}
+                className="mt-0.5 accent-gray-700"
+              />
+              <div className="text-sm">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="font-medium text-gray-800">{addr.recipientName}</span>
+                  {addr.isDefault && (
+                    <span className="text-xs px-1.5 py-0.5 bg-gray-800 text-white rounded">기본</span>
+                  )}
+                </div>
+                <p className="text-gray-500 text-xs">{addr.address} {addr.addressDetail}</p>
+                <p className="text-gray-400 text-xs mt-0.5">{addr.recipientPhone}</p>
               </div>
-              <p className="text-gray-500 text-xs">{addr.address} {addr.addressDetail}</p>
-              <p className="text-gray-400 text-xs mt-0.5">{addr.recipientPhone}</p>
-            </div>
-          </label>
-        ))}
+            </label>
+          ))
+        )}
       </div>
 
       {/* 새 배송지 직접 입력 폼 */}
@@ -504,23 +488,19 @@ export default function OrderFormPage() {
   // 전달받은 데이터가 있으면 사용, 없으면 mock fallback (개발 편의용)
   const [orderItems] = useState(passedItems ?? MOCK_DIRECT_ITEM);
 
-  // ── 배송지 데이터 ──────────────────────
-  // TODO: API 연동 후 아래 useState를 axios 호출로 교체
-  // useEffect(() => {
-  //   // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-  //   // axiosInstance.get(`/members/addresses?memberId=${memberId}`)
-  //   // ── JWT 적용 후 교체 (토큰에서 memberId 자동 추출) ───────────────
-  //   // axiosInstance.get("/members/addresses")
-  //   // ──────────────────────────────────────────────────────────────
-  //     .then((res) => {
-  //       setAddresses(res.data);
-  //       const def = res.data.find((a) => a.isDefault);
-  //       if (def) setSelectedAddressId(def.addressId);
-  //     });
-  // }, []);
-  const [addresses] = useState(MOCK_ADDRESSES);
-  const defaultAddress = MOCK_ADDRESSES.find((a) => a.isDefault);
-  const [selectedAddressId, setSelectedAddressId] = useState(defaultAddress?.addressId ?? null);
+  // -- 배송지 데이터 불러오기 --
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  useEffect(() => {
+      axiosInstance.get("/members/addresses")
+          .then((res) => {
+              setAddresses(res.data);
+              const def = res.data.find((a) => a.isDefault);
+              if (def) setSelectedAddressId(def.addressId);
+          })
+          .catch((err) => console.error("배송지 로드 실패:", err));
+  }, []);
 
   const [deliveryMemo, setDeliveryMemo] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("toss");

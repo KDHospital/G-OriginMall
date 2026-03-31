@@ -7,6 +7,7 @@ import ProducstListHeader from "./ProducstListHeader"
 import ProductCard from "./ProductCard"
 import Pagination from "./Pagination"
 import useCustomMove from "../../hooks/useCustomMove"
+import ProductSortSelect from "./ProductSortSelect"
 
 
 const ProductListComponents = () => {
@@ -29,7 +30,7 @@ const ProductListComponents = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const {page,size,refresh,moveToList,moveToRead} = useCustomMove()
+    const {page,size,refresh,sort,moveToList,moveToRead} = useCustomMove()
     const [serverData, setServerData] = useState(initState)
 
     useEffect(()=>{
@@ -38,7 +39,7 @@ const ProductListComponents = () => {
                 setLoading(true)
     
             // 1. 현재 페이지와 사이즈로 데이터 요청 (Spring Boot는 0페이지부터 시작하므로 page-1)
-                const response = await getProducts({ page: page - 1, size: 12, categoryId: categoryId });
+                const response = await getProducts({ page: page - 1, size: 12, categoryId: categoryId ?? undefined, sort, });
                 console.log("백엔드 전체응답:", response.data)
                 const data = response.data
                 const totalPage = data.totalPages
@@ -69,7 +70,7 @@ const ProductListComponents = () => {
             }
         }
         fetchProducts()
-    },[page,size,refresh,categoryId])
+    },[page,size,refresh,categoryId,sort])
 
     if(loading) return <div>로딩 중...........</div>
     if (error) return <div>{error}</div>
@@ -85,11 +86,15 @@ const ProductListComponents = () => {
                 {/* Product Canvas */}
                 <section className="flex-1">
                     {/* Title & Sort */}
-                    <ProducstListHeader title={"타이틀입니다"} desc={"설명 설명 설명 설명 설명 설명 설명 설명 설명"}  />
+                    <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                        <ProducstListHeader title={"타이틀입니다"} desc={"설명 설명 설명 설명 설명 설명 설명 설명 설명"}  />
+                        {/* 필터 */}
+                        <ProductSortSelect />
+                    </header>
                     {/* Product Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
                         {product.map((product) => (
-                            <div key={product.productId} onClick={()=>moveToRead(product.productId)}>
+                            <div key={product.productId} product={product} onClick={()=>moveToRead(product.productId)}>
                                 <ProductCard item={product} />
                             </div>
                         ))}

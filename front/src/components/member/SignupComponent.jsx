@@ -58,6 +58,7 @@ const SignupComponent = () =>{
 
     const finalData = {
         ...sendDate,
+        tel:sendDate.tel.replace(/-/g,""),
         verificationCode: vCode,
         emailVerified : true
     }
@@ -65,12 +66,14 @@ const SignupComponent = () =>{
   userSignup( finalData)
     .then(() => {
         alert("회원가입이 완료되었습니다.")
-        navigate("/login")
+        navigate("/member/login")
     })
     .catch( (err) => {
         const msg = err.response?.data || "가입 실패: 정보를 다시 확인해주세요"
         alert(msg)
     })
+
+    
   }
   //연락처 전용 자동 하이픈 핸들러
   const handleTelChange = (e) => {

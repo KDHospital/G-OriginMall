@@ -41,12 +41,14 @@ public class EmailServiceImpl  implements EmailService{
 		
 		String savedCode = redisTemplate.opsForValue().get("EMAIL_CODE:"+email);
 		
+		log.info("[검증요청] 이메일: {}, 입력코드: {}, 저장코드: {}", email, code, savedCode);
+		
 		if(savedCode == null) {
 			log.warn("인증 코드 만료 또는 존재하지 않음:{}",email);
 			return Boolean.TRUE.equals(redisTemplate.hasKey("EMAIL_VERIFIED:" + email));
 		}
 		
-		if(savedCode.equals(code)) {
+		if(savedCode.trim().equals(code.trim())) {
 			//인증 성공시 Redis에서 코드 삭제(재사용 방지)
 			redisTemplate.delete("EMAIL_CODE:"+email);
 			redisTemplate.opsForValue().set("EMAIL_VERIFIED:" + email, "TRUE", 5, TimeUnit.MINUTES);

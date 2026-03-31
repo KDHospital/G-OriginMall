@@ -20,6 +20,8 @@ import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.repository.ProductImageRepository;
 import com.example.gmall.repository.ProductRepository;
 import com.example.gmall.service.ProductService;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +36,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
 	private final ProductRepository productRepository;
@@ -43,17 +45,28 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageRepository productImageRepository;
     
     //웹-상품 목록 조회
-	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int page, int size){
+	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int minPrice, int maxPrice, String sort, int page, int size){
 		log.info("ProductServiceImpl 파일 내부의 getProducts 접근");
-		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"createdAt"));
-		return productRepository.findActiveProducts(categoryId, pageable)
-				.map(ProductListResponseDTO::new);
+	    // sort 값에 따라 정렬 기준 결정
+	    Sort sorting = switch (sort) {
+	        case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
+	        case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
+	        default          -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
+	    };
+
+	    Pageable pageable = PageRequest.of(page, size, sorting);
+	    return productRepository.findActiveProducts(categoryId, minPrice, maxPrice, pageable)
+	            .map(ProductListResponseDTO::new);
 	}
 	//웹-상품 상세 조회
-    public ProductDetailResponseDTO getProduct(Long productId) {
-        Product product = findProductOrThrow(productId);
-        return new ProductDetailResponseDTO(product);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public ProductDetailResponseDTO getProduct(Long productId) {
+	    // 1. 데이터 가져오기
+	    Product product = productRepository.findByProductIdWithCategory(productId)
+	            .orElseThrow(() -> new EntityNotFoundException("해당 상품을 찾을 수 없습니다. ID: " + productId));
+	    return new ProductDetailResponseDTO(product);
+	}
     
     
     
@@ -68,6 +81,7 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 등록
 	@Override
+	@Transactional
     public ProductResponseDTO register(Long sellerId, ProductRequestDTO dto) {
 		
 		
