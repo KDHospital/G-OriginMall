@@ -112,4 +112,5 @@ public class Member {
     public void changeTel(String tel) {this.tel = tel;}
     public void changePassword(String mpwd) {this.mpwd = mpwd;}
     public void changeGender(Byte gender) {this.gender =  gender;}
+    public void changeDeleteStatus(boolean isDeleted) {this.isDeleted = isDeleted;}
 }

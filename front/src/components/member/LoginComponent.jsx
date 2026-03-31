@@ -42,9 +42,10 @@ const LoginComponent = () => {
             alert("로그인에 성공했습니다.")
             navigate("/")
         })
-        .catch( (err) => {
-            console.error(err)
-            alert("로그인 실패: 아이디나 비밀번호를 확인하세요")
+        .catch( err => {
+           const errorMsg = err.response?.data?.message || "아이디 또는 비밀번호를 확인해주세요."
+           alert(errorMsg)
+           console.error("로그인 에러:",errorMsg)
         })
     }
 

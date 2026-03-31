@@ -68,3 +68,8 @@ export const findMemberId = (data) => {
 export const resetPassword = (data) => {
     return axiosInstance.post(`/member/reset-password`,data)
 }
+
+//회원 탈퇴
+export const withdrawMember = (data) => {
+    return axiosInstance.post("/member/withdraw",data)
+}

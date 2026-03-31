@@ -25,4 +25,6 @@ public interface MemberService {
 	public String findLoginId(String mname, String tel);
 	
 	void resetPassword(String loginId, String nmpwd);
+	
+	void withdraw(String memberId, String mpwd);
 }

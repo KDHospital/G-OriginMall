@@ -67,14 +67,16 @@ public class MemberServiceImpl implements MemberService {
  }
  	
  	@Override
- 	@Transactional
  	public String login(MemberLoginDTO loginDTO) {
  		
  		//아이디로 회원 조회
  		Member member = memberRepository.findByLoginId(loginDTO.getLoginId())
  				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
  	
- 	
+ 		//탈퇴 여부 확인
+ 		if(member.isDeleted()) {
+ 			throw new IllegalArgumentException("탈퇴 처리된 계정입니다. 고객센터에 문의하세요");
+ 		}
  	// 비비밀번호 일치 확인
  	 	if(!passwordEncoder.matches(loginDTO.getMpwd(), member.getMpwd())) {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -176,6 +178,22 @@ public class MemberServiceImpl implements MemberService {
  	
  	memberRepository.save(member);
  	
+ 	
+ 	}
+ 	@Override
+ 	public void withdraw(String memberId, String mpwd) {
+ 		Long id = Long.parseLong(memberId);
+ 		
+ 		Member  member = memberRepository.findById(id)
+ 				.orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+ 	
+ 		if(!passwordEncoder.matches(mpwd, member.getMpwd())) {
+ 			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");	
+ 		}
+ 		
+ 		member.changeDeleteStatus(true);
+ 		
+ 		log.info("회원 탈퇴 완료: ID {}", id);
  	
  	}
  	

@@ -133,4 +133,28 @@ public class MemberController {
 			}
 		}
 		
+		@PostMapping("/withdraw")
+		public ResponseEntity<?> withdraw(@RequestBody Map<String, String> request) {
+			
+				String memberId = request.get("id");
+				String mpwd = request.get("mpwd");
+				
+				log.info("회원 탈퇴 요청 - ID:{}", memberId);
+				try {
+					memberService.withdraw(memberId, mpwd);
+					
+					return ResponseEntity.ok(Map.of(
+							"result","success",
+							"message","탈퇴 처리가 완료되었습니다"
+							));
+				
+			} catch (IllegalArgumentException e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body(Map.of("message",e.getMessage()));
+			}catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body(Map.of("message","서버에 오류가 발생했습니다."));
+			}
+		}
+		
 }
