@@ -106,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
  	}
  	
  	@Override
- 	public MemberDTO getMemberId(String memberId) {
+ 	public MemberDTO getMemberId(Long memberId) {
  		Member member = memberRepository.findById(memberId)
  				.orElseThrow( () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
  		

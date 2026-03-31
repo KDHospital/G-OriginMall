@@ -84,7 +84,7 @@ public class MemberController {
 		String loginId = authentication.getName();
 		log.info(authentication.toString());
 	    
-		MemberDTO dto = memberService.getMemberId(loginId);
+		MemberDTO dto = memberService.getMemberId(Long.parseLong(loginId));
 		return ResponseEntity.ok(dto);
 	}
 	

@@ -18,7 +18,7 @@ public interface MemberService {
 	
 	MemberDTO getMemberLoginId(String loginId);
 	
-	MemberDTO getMemberId(String MemberId);
+	MemberDTO getMemberId(Long MemberId);
 	
 	void modifyMember(MemberDTO memberDTO);
 
