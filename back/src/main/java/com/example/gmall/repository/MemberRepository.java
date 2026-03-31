@@ -1,5 +1,7 @@
 package com.example.gmall.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -54,6 +56,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     
     //회원 아이디찾기
     Optional<Member> findByMnameAndTel(String mname, String tel);
+    
+    //탈퇴 여부가 true이고 탈퇴 날짜가 특정 시점(1년 전)보다 이전인 회원 찾기
+    List<Member> findByIsDeletedTrueAndWithdrawAtBefore(LocalDateTime threshold);
+    
+    
  
    
 }
