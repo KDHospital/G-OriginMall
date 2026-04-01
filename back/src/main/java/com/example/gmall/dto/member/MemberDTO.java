@@ -17,5 +17,6 @@ public class MemberDTO {
 	private String mname;
 	private String tel;
 	private Byte gender;
+	private Byte role;
 
 }
