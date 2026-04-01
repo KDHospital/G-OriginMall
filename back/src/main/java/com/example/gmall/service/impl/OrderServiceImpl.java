@@ -1,12 +1,21 @@
 package com.example.gmall.service.impl;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.net.http.HttpRequest;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +49,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderStatusHistoryRepository orderStatusHistoryRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
+    
+    @Value("${toss.secret-key}")
+    private String tossSecretKey;
 
     // 주문 생성 (판매자별 분리)
     @Override
@@ -262,6 +274,68 @@ public class OrderServiceImpl implements OrderService {
             throw new SecurityException("본인의 주문만 조회할 수 있습니다.");
         }
         return orders;
+    }
+    
+    // 토스페이먼츠 API 연동
+    @Override
+    public void confirmPayment(Long memberId, Long orderId, String tossOrderId, String paymentKey, Long amount) {
+        Orders orders = getOrderOfMember(memberId, orderId);
+
+        // 금액 위변조 검증 — 토스에서 받은 amount와 실제 주문 금액 비교
+        if (orders.getTotalPrice().longValue()  != amount) {
+            throw new IllegalStateException("결제 금액이 주문 금액과 일치하지 않습니다.");
+        }
+
+        // 토스 최종 승인 API 호출
+        try {
+            String authorizations = Base64.getEncoder()
+                .encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+            HttpClient client = HttpClient.newHttpClient();
+
+            String requestBody = String.format(
+        	    "{\"paymentKey\":\"%s\",\"orderId\":\"%s\",\"amount\":%d}",
+        	    paymentKey, tossOrderId, amount   // ← tossOrderId = "ORDER_10" 형태
+        	);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.tosspayments.com/v1/payments/confirm"))
+                .header("Authorization", "Basic " + authorizations)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                log.error("토스 승인 실패 응답: {}", response.body());
+                throw new IllegalStateException("결제 승인에 실패했습니다.");
+            }
+            
+            // 승인 성공 후 tossOrderId 저장
+            orders.updateTossOrderId(tossOrderId);
+
+        } catch (IOException | InterruptedException e) {
+            log.error("토스 승인 API 호출 오류", e);
+            throw new IllegalStateException("결제 승인 중 오류가 발생했습니다.");
+        }
+
+        // 결제 정보 업데이트
+        orders.updatePayment(paymentKey, "CARD", LocalDateTime.now());
+
+        // 주문 상태 변경: 0(결제대기) → 1(결제완료)
+        OrderStatusHistory history = OrderStatusHistory.builder()
+            .orders(orders)
+            .seller(orders.getSeller())
+            .fromStatus(orders.getStatus())
+            .toStatus((byte) 1)
+            .memo("토스페이먼츠 결제 승인 완료")
+            .build();
+
+        orderStatusHistoryRepository.save(history);
+        orders.updateStatus((byte) 1);
+
+        log.info("결제 승인 완료 - orderId: {}, paymentKey: {}", orderId, paymentKey);
     }
 	
 }
