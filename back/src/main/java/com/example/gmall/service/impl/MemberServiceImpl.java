@@ -105,6 +105,7 @@ public class MemberServiceImpl implements MemberService {
  				.mname(member.getMname())
  				.tel(member.getTel())
  				.gender(member.getGender())
+ 				.role(member.getRole())
  				.build();
  	}
  	
