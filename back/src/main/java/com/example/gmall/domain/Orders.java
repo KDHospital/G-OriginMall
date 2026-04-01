@@ -93,6 +93,9 @@ public class Orders {
     @Builder.Default
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderStatusHistory> statusHistories = new ArrayList<>();
+    
+    @Column(name = "toss_order_id", unique = true)
+    private String tossOrderId;
 
     // ── 상태 변경 ────────────────────────────────────────────────
     public void updateStatus(Byte status) {
@@ -109,6 +112,10 @@ public class Orders {
         this.paymentKey = paymentKey;
         this.paymentMethod = paymentMethod;
         this.paidAt = paidAt;
+    }
+    
+    public void updateTossOrderId(String tossOrderId) {
+        this.tossOrderId = tossOrderId;
     }
 
     @PrePersist

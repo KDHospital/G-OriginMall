@@ -17,6 +17,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +26,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "post")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Post {
  
     @Id
@@ -44,13 +48,16 @@ public class Post {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
  
+    @Builder.Default
     @Column(name = "is_public", columnDefinition = "BOOLEAN DEFAULT 1")
     private boolean isPublic = true;
  
+    @Builder.Default
     @Column(name = "view_count", columnDefinition = "INT DEFAULT 0")
     private Integer viewCount = 0;
  
     // 0=ACTIVE, 1=DELETED (소프트 삭제)
+    @Builder.Default
     @Column(name = "is_deleted", columnDefinition = "BOOLEAN DEFAULT 0")
     private boolean isDeleted = false;
  
@@ -60,6 +67,7 @@ public class Post {
     @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT NOW()")
     private LocalDateTime updatedAt;
  
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
  
@@ -73,4 +81,57 @@ public class Post {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+    
+    
+ // 추가  --- 비즈니스 메서드 (Setter 대신 사용) ---
+    
+	 // 1. [상태 관리] 소프트 삭제 처리
+	 // 'Setter' 대신 '삭제 상태 변경'이라는 명확한 이름을 사용합니다.
+	 public void changeDeleteStatus(boolean isDeleted) {
+	     this.isDeleted = isDeleted;
+	     // 필요한 경우 삭제 시점에 updatedAt을 강제로 갱신하는 로직을 넣을 수 있음
+	 }
+	
+	 // 2. [답변 관리] 답변 추가 및 양방향 연결
+	 // List<Answer> 구조에 맞춰 답변 객체를 안전하게 추가
+	 public void addAnswer(Answer answer) {
+	     if (this.answers == null) {
+	         this.answers = new ArrayList<>();
+	     }
+	     this.answers.add(answer);
+	     
+	     // 양방향 관계 설정
+	     if (answer.getPost() != this) {
+	         answer.updatePost(this); // Answer 엔티티에도 updatePost 메서드가 필요
+	     }
+	 }
+	 
+	
+	 // 3. [조회수 관리] 조회수 증가 로직
+	 // 외부에서 viewCount를 마음대로 수정하지 못하게 하고, 1씩만 올리도록 제한
+	 public void incrementViewCount() {
+	     if (this.viewCount == null) {
+	         this.viewCount = 0;
+	     }
+	     this.viewCount++;
+	 }
+	 
+	
+	 // 4. [수정 관리] 게시글 내용 업데이트
+	 // 제목, 본문, 공개 여부를 한 번에 수정하는 통합 메서드
+	 public void updatePost(String title, String content, boolean isPublic) {
+	     this.title = title;
+	     this.content = content;
+	     this.isPublic = isPublic;
+	     // @PreUpdate에 의해 updatedAt은 자동으로 갱신됩니다.
+	 }
+	 
+	 
+	 public void updateMember(Member member) {
+		    this.member = member;
+	 }
+	 
+	 public void updateBoard(Board board) {
+		    this.board = board;
+		}
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
-import { getProducts } from "../../api/productsApi"
+import { getProducts, getCategories } from "../../api/productsApi"
 import ProductNavBar from "./ProductNavBar"
 import ProductSideNavBar from "./ProductSideNavBar"
 import ProducstListHeader from "./ProducstListHeader"
@@ -32,6 +32,38 @@ const ProductListComponents = () => {
 
     const {page,size,refresh,sort,moveToList,moveToRead} = useCustomMove()
     const [serverData, setServerData] = useState(initState)
+
+    const [categories, setCategories] = useState([])   // 전체 카테고리 트리
+    const [parentCategory, setParentCategory] = useState(null) // 현재 1뎁스
+
+
+        useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await getCategories()
+                setCategories(res.data)
+            } catch (err) {
+                console.error('카테고리 로드 실패', err)
+            }
+        }
+        fetchCategories()
+    }, [])
+
+    // 현재 선택된 categoryId로 1뎁스 찾기
+    useEffect(() => {
+        if (!categoryId) {
+            //카테고리가 없으면 null, 전체상품
+            setParentCategory(null)
+            return
+        }
+        if (categories.length === 0) return
+
+        // 선택된 카테고리가 속한 1뎁스 찾기
+        const parent = categories.find(cat =>
+            cat.children?.some(child => String(child.categoryId) === String(categoryId))
+        ) || categories.find(cat => String(cat.categoryId) === String(categoryId))
+        setParentCategory(parent || null) //null값으로 바꿔줌
+    }, [categoryId, categories])
 
     useEffect(()=>{
         const fetchProducts = async () => {
@@ -77,7 +109,7 @@ const ProductListComponents = () => {
     return(
         <div className="pt-24 pb-16 max-w-screen-2xl mx-auto px-6">
             {/* navigation bar */}
-            <ProductNavBar />
+            <ProductNavBar product={product} />
             <div className="flex flex-col md:flex-row gap-12">
                 {/* side nav bar */}
                 <aside className="w-full md:w-64 shrink-0">
@@ -87,7 +119,7 @@ const ProductListComponents = () => {
                 <section className="flex-1">
                     {/* Title & Sort */}
                     <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                        <ProducstListHeader title={"타이틀입니다"} desc={"설명 설명 설명 설명 설명 설명 설명 설명 설명"}  />
+                        <ProducstListHeader title={parentCategory?.categoryName || '전체 상품'} desc={"김포 특산물을 신선하게 만나보세요!"}  />
                         {/* 필터 */}
                         <ProductSortSelect />
                     </header>
