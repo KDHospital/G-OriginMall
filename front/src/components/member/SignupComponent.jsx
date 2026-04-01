@@ -68,9 +68,15 @@ const SignupComponent = () =>{
         alert("회원가입이 완료되었습니다.")
         navigate("/member/login")
     })
-    .catch( (err) => {
-        const msg = err.response?.data || "가입 실패: 정보를 다시 확인해주세요"
-        alert(msg)
+    .catch( err => {
+        const data = err.response?.data
+        if(data?.errors){
+            alert(data.errors[0].defaultMessage)
+        }else if(data?.message) {
+            alert(data.message)
+        }else {
+            alert("회원가입 중 오류가 발생했습니다.")
+        }
     })
 
     

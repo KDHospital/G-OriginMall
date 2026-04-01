@@ -123,4 +123,10 @@ public class Member {
     		this.withdrawAt = null;
     	}
     }
+    public void updateBusinessVerify(boolean status) {
+    	this.businessVerified = status;
+    }
+    public void rejectBusinessVerify() {
+    	this.businessVerified = false;
+    }
 }

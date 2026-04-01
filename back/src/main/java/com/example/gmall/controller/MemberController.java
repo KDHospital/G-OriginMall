@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
@@ -155,6 +156,17 @@ public class MemberController {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body(Map.of("message","서버에 오류가 발생했습니다."));
 			}
+		}
+		@PostMapping("/register-seller")
+		public ResponseEntity<?> registerSeller(@Valid @RequestBody SellerSignupDTO dto) {
+		    log.info("판매자 가입 신청 시작: " + dto.getLoginId());
+		    
+		    memberService.registerSeller(dto);
+		    
+		    return ResponseEntity.ok(Map.of(
+		        "result", "success", 
+		        "message", "판매자 가입 신청이 완료되었습니다. 관리자 승인을 기다려주세요."
+		    ));
 		}
 		
 }
