@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import com.example.gmall.domain.Member;
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.repository.MemberRepository;
+import com.example.gmall.service.BusinessVerificationService;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
 import com.example.gmall.util.JWTUtil;
@@ -26,6 +28,7 @@ public class MemberServiceImpl implements MemberService {
 	private final EmailService emailService;
 	private final JWTUtil jwtUtil;
 	private final PasswordEncoder passwordEncoder;
+	private final BusinessVerificationService businessService;
 	@Override
 	public void checkLoginId(String logId) {
 	if(	memberRepository.existsByLoginId(logId)) {
@@ -196,7 +199,66 @@ public class MemberServiceImpl implements MemberService {
  		log.info("회원 탈퇴 완료: ID {}", id);
  	
  	}
+public void registerSeller(SellerSignupDTO dto) {
+        
+       
+        if (!businessService.isRealBusiness(dto.getBusinessNo())) {
+            throw new IllegalArgumentException("유효하지 않거나 폐업된 사업자 번호입니다.");
+        }
+
+       
+        if (memberRepository.findByLoginId(dto.getLoginId()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
+
+        
+        Member seller = Member.builder()
+                .loginId(dto.getLoginId())
+                .mpwd(passwordEncoder.encode(dto.getMpwd()))
+                .mname(dto.getMname())
+                .tel(dto.getTel())
+                .email(dto.getLoginId())
+                .gender(dto.getGender())
+                .role((byte) 1)             
+                .businessNo(dto.getBusinessNo())
+                .taxInvoice(dto.getTaxInvoice())
+                .isVerified(dto.getIsVerified())
+                .settlementName(dto.getSettlementName())
+                .settlementBank(dto.getSettlementBank())
+                .bankAccount(dto.getBankAccount())
+                .businessVerified(false)    
+                .build();
+
+        memberRepository.save(seller);
+    }
+
+
+ 	@Override
+ 	public void approveSeller(Long memberId) {
+ 		Member member = memberRepository.findById(memberId)
+ 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+ 		
+ 		if (member.getRole() != 1) {
+ 			throw new IllegalStateException("판매자 권한을 가진 회원만 승인할 수 있습니다.");
+ 		}
+ 		
+ 		member.updateBusinessVerify(true);
+ 		log.info("판매자 승인 완료: {}", member.getLoginId());
+ 	}
  	
+ 	@Override
+ 	public void rejectSeller(long memberId) {
+ 		Member member = memberRepository.findById(memberId)
+ 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+ 		
+ 		if(member.getRole() != 1) {
+ 			throw new IllegalStateException("판매자 계정만 거절 처리할 수 있습니다.");
+ 		}
+ 			member.rejectBusinessVerify();
+ 			
+ 			log.info("판매자 입점 거절 완료: {}",member.getLoginId());
+ 		
+ 	}
  	
  	
 
