@@ -28,6 +28,10 @@ public class ProductDetailResponseDTO {
     private List<String> imageUrls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    private String sellerName;       // 판매자명
+    private String sellerBusinessNo; // 사업자번호 (노출 여부 팀이랑 상의)
+    private boolean sellerVerified;  // 김포시 인증 판매자 여부
 
     public ProductDetailResponseDTO(Product p) {
         this.productId         = p.getProductId();
@@ -49,5 +53,9 @@ public class ProductDetailResponseDTO {
                                     .collect(Collectors.toList());
         this.createdAt         = p.getCreatedAt();
         this.updatedAt         = p.getUpdatedAt();
+        //판매자 정보
+        this.sellerName       = p.getSeller().getMname();
+        this.sellerVerified   = p.getSeller().isVerified();
+        this.sellerBusinessNo = p.getSeller().getBusinessNo();
     }
 }
