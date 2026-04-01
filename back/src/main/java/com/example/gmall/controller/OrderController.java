@@ -16,7 +16,9 @@ import com.example.gmall.dto.order.OrderRequestDTO;
 import com.example.gmall.dto.order.OrderResponseDTO;
 import com.example.gmall.service.OrderService;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @RestController
 @RequestMapping("/api")
@@ -84,4 +86,32 @@ public class OrderController {
         orderService.cancelOrderItem(memberId, orderId, orderItemId);
         return ResponseEntity.noContent().build();
     }
+    
+    // 결제 승인 DTO
+    @Getter
+    @Setter
+    public static class ConfirmRequestDTO {
+        private String tossOrderId;   // ORDER_10 형태
+        private String paymentKey;
+        private Long amount;
+    }
+
+    @PostMapping("/orders/{orderId}/confirm")
+    public ResponseEntity<Void> confirmPayment(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody ConfirmRequestDTO requestDTO,
+            Authentication authentication
+    ) {
+        Long memberId = (Long) authentication.getPrincipal();
+        orderService.confirmPayment(
+            memberId,
+            orderId,
+            requestDTO.getTossOrderId(),  // 추가
+            requestDTO.getPaymentKey(),
+            requestDTO.getAmount()
+        );
+        return ResponseEntity.noContent().build();
+    }
+    
+    
 }

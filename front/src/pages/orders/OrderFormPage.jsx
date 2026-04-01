@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
 import axiosInstance from "../../api/axios";
+import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 
 
 
@@ -32,6 +33,11 @@ const DELIVERY_MEMO_OPTIONS = [
   "직접 받겠습니다",
   "직접 입력",
 ];
+// ─────────────────────────────────────────
+// toss client key
+// ─────────────────────────────────────────
+const TOSS_CLIENT_KEY = "test_ck_GePWvyJnrKOJawzLpP2OrgLzN97E";
+
 
 // ─────────────────────────────────────────
 // 유틸
@@ -75,7 +81,7 @@ function StepIndicator({ current = 2 }) {
 // ─────────────────────────────────────────
 // 배송지 선택 섹션
 // ─────────────────────────────────────────
-function AddressSection({ addresses: initialAddresses, selectedAddressId, onSelect }) {
+function AddressSection({ addresses: initialAddresses, selectedAddressId, onSelect, onAddAddress }) {
   const [addresses, setAddresses] = useState(initialAddresses);
   const [showNewForm, setShowNewForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
@@ -85,6 +91,9 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
     address: "",
     addressDetail: "",
   });
+
+  // address, AddressSection/addresses state 일치 시키기
+  
 
   useEffect(() => {
     setAddresses(initialAddresses);
@@ -129,8 +138,10 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
           memo: "",
       })
       .then((res) => {
-          setAddresses((prev) => [...prev, res.data]);
-          onSelect(res.data.addressId);
+          const newAddr = res.data;
+          onAddAddress(newAddr);                        // 1. 부모 state 먼저 업데이트
+          setAddresses((prev) => [...prev, newAddr]);   // 2. 내부 state 업데이트
+          onSelect(newAddr.addressId);                  // 3. 자동 선택
           setShowNewForm(false);
           setNewAddress({ recipientName: "", recipientPhone: "", zipcode: "", address: "", addressDetail: "" });
       })
@@ -195,7 +206,7 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
               <div className="text-sm">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="font-medium text-gray-800">{addr.recipientName}</span>
-                  {addr.isDefault && (
+                  {addr.default && (
                     <span className="text-xs px-1.5 py-0.5 bg-gray-800 text-white rounded">기본</span>
                   )}
                 </div>
@@ -496,11 +507,15 @@ export default function OrderFormPage() {
       axiosInstance.get("/members/addresses")
           .then((res) => {
               setAddresses(res.data);
-              const def = res.data.find((a) => a.isDefault);
+              const def = res.data.find((a) => a.default);
               if (def) setSelectedAddressId(def.addressId);
           })
           .catch((err) => console.error("배송지 로드 실패:", err));
   }, []);
+
+  const handleAddAddress = (newAddr) => {
+    setAddresses((prev) => [...prev, newAddr]);
+}
 
   const [deliveryMemo, setDeliveryMemo] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("toss");
@@ -509,36 +524,64 @@ export default function OrderFormPage() {
   const requiredAgreed = TERMS.filter((t) => t.required).every((t) => agreed[t.id]);
   const canSubmit = selectedAddressId !== null && paymentMethod !== "" && requiredAgreed;
 
-  const handleSubmit = () => {
-    // TODO: API 연동 후 주문 생성 API 호출
-    // const selectedAddress = addresses.find((a) => a.addressId === selectedAddressId);
-    // const orderData = {
-    //   orderItems: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-    //   receiverName: selectedAddress.recipientName,
-    //   receiverTel: selectedAddress.recipientPhone,
-    //   zipcode: selectedAddress.zipcode,
-    //   address: selectedAddress.address,
-    //   addressDetail: selectedAddress.addressDetail,
-    //   deliveryMemo,
-    //   paymentMethod,
-    // };
-    // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-    // axiosInstance.post(`/orders?memberId=${memberId}`, orderData)
-    // ── JWT 적용 후 교체 (토큰에서 memberId 자동 추출) ───────────────
-    // axiosInstance.post("/orders", orderData)
-    // ──────────────────────────────────────────────────────────────
-    //   .then((res) => {
-    //     // 장바구니에서 진입한 경우 장바구니 비우기
-    //     if (source === "cart") {
-    //       // ── JWT 적용 전 (현재) ──────────────────────────────────
-    //       // axiosInstance.delete(`/cart?memberId=${memberId}`)
-    //       // ── JWT 적용 후 교체 ─────────────────────────────────────
-    //       // axiosInstance.delete("/cart")
-    //       // ──────────────────────────────────────────────────────
-    //     }
-    //     navigate("/orders/complete", { state: { orderId: res.data.orderId } });
-    //   });
-    alert(`결제 페이지로 이동합니다. (진입경로: ${source ?? "직접접근"})`);
+  const handleSubmit = async () => {
+    const selectedAddress = addresses.find((a) => a.addressId === selectedAddressId);
+    if(!selectedAddress) {
+      alert("배송지를 선택하거나 추가해주세요.");
+      return;
+    }
+
+
+    const orderData = {
+      orderItems: orderItems.map((i) => ({
+        productId: i.productId,
+        quantity: i.quantity,
+      })),
+      receiverName: selectedAddress.recipientName,
+      receiverTel: selectedAddress.recipientPhone,
+      zipcode: selectedAddress.zipcode,
+      address: selectedAddress.address,
+      addressDetail: selectedAddress.addressDetail,
+      deliveryMemo,
+      paymentMethod,
+    };
+
+    try {
+      // 1. 주문 생성
+      const res = await axiosInstance.post("/orders", orderData);
+      const createdOrders = res.data; // List<OrderResponseDTO>
+      const orderId = createdOrders[0]?.orderId;
+      const totalAmount = createdOrders.reduce((sum, o) => sum + o.totalPrice, 0);
+
+      // 2. 토스 SDK 초기화
+      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
+      const payment = tossPayments.payment({ customerKey: "anonymous" });
+
+      // 3. 토스 결제창 호출
+      await payment.requestPayment({
+        method: "CARD",
+        amount: {
+          currency: "KRW",
+          value: totalAmount,
+        },
+        orderId: `ORDER_${orderId}_${Date.now()}`,           // 토스 orderId = 우리 ORDER_orderId
+        orderName: orderItems[0]?.pname +
+          (orderItems.length > 1 ? ` 외 ${orderItems.length - 1}건` : ""),
+        successUrl: `${window.location.origin}/orders/success?source=${source ?? "direct"}`,
+        failUrl: `${window.location.origin}/orders/fail`,
+        customerEmail: "",                  // 선택값
+        customerName: selectedAddress.recipientName,
+      });
+
+    } catch (err) {
+      // 사용자가 결제창 닫은 경우도 여기로 들어옴
+      if (err.code === "USER_CANCEL") {
+        alert("결제가 취소되었습니다.");
+        return;
+      }
+      console.error("결제 오류:", err);
+      alert("결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -555,6 +598,7 @@ export default function OrderFormPage() {
                 addresses={addresses}
                 selectedAddressId={selectedAddressId}
                 onSelect={setSelectedAddressId}
+                onAddAddress={handleAddAddress}
               />
               <DeliveryMemoSection value={deliveryMemo} onChange={setDeliveryMemo} />
               <PaymentSection selected={paymentMethod} onChange={setPaymentMethod} />
