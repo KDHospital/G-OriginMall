@@ -17,8 +17,32 @@ const SignupComponent = () =>{
   const [isVerified,setIsVerified] = useState(false)
   const [pwdError, setPwdError] = useState(false)
   const navigate = useNavigate() 
+  const [isSending, setIsSending] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(180);
+
+useEffect(() => {
+    let timer;
+    if (isCodeSent && !isVerified && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+      setIsCodeSent(false);
+      setTimeLeft(180);
+    }
+    return () => clearInterval(timer);
+  }, [isCodeSent, isVerified, timeLeft]);
+
+  
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
     useEffect( () => {
+
         if(form.mpwdConfirm && form.mpwd !== form.mpwdConfirm){
             setPwdError(true)
         } else{
@@ -35,10 +59,19 @@ const SignupComponent = () =>{
   //이메일 인증코드 발송
   const handleSendCode = () => {
     if(!form.loginId) return alert("이메일을 입력해주세요")
-    sendEmailCode(form.loginId).then( ()=>{
+       
+        setIsSending(true)
+        sendEmailCode(form.loginId).then( ()=>{
         setIsCodeSent(true)
+        setTimeLeft(180);
         alert("인증코드가 전송되었습니다")
-    }).catch( ()=> alert("발송 실패"))
+    }).catch( (err)=> {
+        const msg = err.response?.data?.message || "발송 실패!"
+        alert(msg)
+    })
+    .finally(()=>{
+        setIsSending(false)
+    })
   }
 
   //인증코드 확인
@@ -66,7 +99,7 @@ const SignupComponent = () =>{
   userSignup( finalData)
     .then(() => {
         alert("회원가입이 완료되었습니다.")
-        navigate("/member/login")
+        navigate("/login")
     })
     .catch( err => {
         const data = err.response?.data
