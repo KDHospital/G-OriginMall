@@ -33,27 +33,25 @@ const handleLogout= () => {
                     </Link>
 
                     {/* 메뉴 */}
-                    <nav className="hidden md:flex h-full">
+                    <nav className="hidden md:flex">
                         <ul className="flex items-center space-x-8">
 
                             {/* 상품 메뉴 — 호버 드롭다운 */}
                             <li
-                                className="relative "
+                                className="relative"
                                 onMouseEnter={() => setIsProductMenuOpen(true)}
                                 onMouseLeave={() => setIsProductMenuOpen(false)}
-                            >   
-                                <div className="h-full flex items-center">
-                                    <Link
-                                        to="/products"
-                                        className="text-sm font-semibold hover:text-primary transition-colors"
-                                    >
-                                        상품
-                                    </Link>
-                                </div>
+                            >
+                                <Link
+                                    to="/products"
+                                    className="text-sm font-semibold hover:text-primary transition-colors"
+                                >
+                                    상품
+                                </Link>
 
                                 {/* 드롭다운 */}
                                 {isProductMenuOpen && (
-                                    <div className="absolute left-0 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
+                                    <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
                                         {/* 전체 상품 */}
                                         <Link
                                             to="/products"

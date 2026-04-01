@@ -1,24 +1,10 @@
-const ProductDetailTabs = ({ activeTab, onTabChange }) => {
-    const tabs = [
-        { key: 'info',   label: '상품 정보' },
-        { key: 'seller', label: '판매자 정보' },
-    ]
-
-    return (
+const ProductDetailTabs = () => {
+    return(
         <div className="flex border-b border-outline-variant overflow-x-auto no-scrollbar">
-            {tabs.map(tab => (
-                <button
-                    key={tab.key}
-                    onClick={() => onTabChange(tab.key)}
-                    className={`px-8 py-4 border-b-2 font-bold whitespace-nowrap transition-colors
-                        ${activeTab === tab.key
-                            ? 'border-primary text-primary'
-                            : 'border-transparent text-on-surface-variant hover:text-primary'
-                        }`}
-                >
-                    {tab.label}
-                </button>
-            ))}
+            {/* Mid Section: Tabs */}
+            <button className="px-8 py-4 border-b-2 border-primary text-primary font-bold whitespace-nowrap">Product Details</button>
+            <button className="px-8 py-4 text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap">Q&amp;A</button>
+            <button className="px-8 py-4 text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap">Reviews (1,245)</button>
         </div>
     )
 }
