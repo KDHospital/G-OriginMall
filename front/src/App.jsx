@@ -58,7 +58,7 @@ function App() {
 
         {/* 회원(구매자) - 유재영 담당 */}
         <Route path='/signup' element={<UserSignupPage />} />
-        <Route path='/member/login' element={<JoinPage />} />
+        <Route path='/login' element={<JoinPage />} />
         <Route path='/mypage' element={<Mypapge />} />
         <Route path='/modifypage' element={<ModifyPage />} />
         <Route path='/findid' element={<FindIdPage />} />

@@ -2,6 +2,7 @@ package com.example.gmall.service;
 
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 
 public interface MemberService {
@@ -27,4 +28,10 @@ public interface MemberService {
 	void resetPassword(String loginId, String nmpwd);
 	
 	void withdraw(String memberId, String mpwd);
+	
+	void registerSeller(SellerSignupDTO dto);
+	
+	void approveSeller(Long memberId);
+	
+	void rejectSeller(long memberId);
 }
