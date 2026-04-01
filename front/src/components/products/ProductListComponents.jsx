@@ -51,15 +51,18 @@ const ProductListComponents = () => {
 
     // 현재 선택된 categoryId로 1뎁스 찾기
     useEffect(() => {
-        if (!categoryId || categories.length === 0) {
-            setParentCategory(categories[0] || null) // 기본: 첫 번째 1뎁스
+        if (!categoryId) {
+            //카테고리가 없으면 null, 전체상품
+            setParentCategory(null)
             return
         }
+        if (categories.length === 0) return
+
         // 선택된 카테고리가 속한 1뎁스 찾기
         const parent = categories.find(cat =>
             cat.children?.some(child => String(child.categoryId) === String(categoryId))
         ) || categories.find(cat => String(cat.categoryId) === String(categoryId))
-        setParentCategory(parent || categories[0])
+        setParentCategory(parent || null) //null값으로 바꿔줌
     }, [categoryId, categories])
 
     useEffect(()=>{
