@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
 import axiosInstance from "../../api/axios";
+import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 
 
 
@@ -32,6 +33,11 @@ const DELIVERY_MEMO_OPTIONS = [
   "직접 받겠습니다",
   "직접 입력",
 ];
+// ─────────────────────────────────────────
+// toss client key
+// ─────────────────────────────────────────
+const TOSS_CLIENT_KEY = "test_ck_GePWvyJnrKOJawzLpP2OrgLzN97E";
+
 
 // ─────────────────────────────────────────
 // 유틸
@@ -509,36 +515,59 @@ export default function OrderFormPage() {
   const requiredAgreed = TERMS.filter((t) => t.required).every((t) => agreed[t.id]);
   const canSubmit = selectedAddressId !== null && paymentMethod !== "" && requiredAgreed;
 
-  const handleSubmit = () => {
-    // TODO: API 연동 후 주문 생성 API 호출
-    // const selectedAddress = addresses.find((a) => a.addressId === selectedAddressId);
-    // const orderData = {
-    //   orderItems: orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-    //   receiverName: selectedAddress.recipientName,
-    //   receiverTel: selectedAddress.recipientPhone,
-    //   zipcode: selectedAddress.zipcode,
-    //   address: selectedAddress.address,
-    //   addressDetail: selectedAddress.addressDetail,
-    //   deliveryMemo,
-    //   paymentMethod,
-    // };
-    // ── JWT 적용 전 (현재) ──────────────────────────────────────────
-    // axiosInstance.post(`/orders?memberId=${memberId}`, orderData)
-    // ── JWT 적용 후 교체 (토큰에서 memberId 자동 추출) ───────────────
-    // axiosInstance.post("/orders", orderData)
-    // ──────────────────────────────────────────────────────────────
-    //   .then((res) => {
-    //     // 장바구니에서 진입한 경우 장바구니 비우기
-    //     if (source === "cart") {
-    //       // ── JWT 적용 전 (현재) ──────────────────────────────────
-    //       // axiosInstance.delete(`/cart?memberId=${memberId}`)
-    //       // ── JWT 적용 후 교체 ─────────────────────────────────────
-    //       // axiosInstance.delete("/cart")
-    //       // ──────────────────────────────────────────────────────
-    //     }
-    //     navigate("/orders/complete", { state: { orderId: res.data.orderId } });
-    //   });
-    alert(`결제 페이지로 이동합니다. (진입경로: ${source ?? "직접접근"})`);
+  const handleSubmit = async () => {
+    const selectedAddress = addresses.find((a) => a.addressId === selectedAddressId);
+
+    const orderData = {
+      orderItems: orderItems.map((i) => ({
+        productId: i.productId,
+        quantity: i.quantity,
+      })),
+      receiverName: selectedAddress.recipientName,
+      receiverTel: selectedAddress.recipientPhone,
+      zipcode: selectedAddress.zipcode,
+      address: selectedAddress.address,
+      addressDetail: selectedAddress.addressDetail,
+      deliveryMemo,
+      paymentMethod,
+    };
+
+    try {
+      // 1. 주문 생성
+      const res = await axiosInstance.post("/orders", orderData);
+      const createdOrders = res.data; // List<OrderResponseDTO>
+      const orderId = createdOrders[0]?.orderId;
+      const totalAmount = createdOrders.reduce((sum, o) => sum + o.totalPrice, 0);
+
+      // 2. 토스 SDK 초기화
+      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
+      const payment = tossPayments.payment({ customerKey: "anonymous" });
+
+      // 3. 토스 결제창 호출
+      await payment.requestPayment({
+        method: "CARD",
+        amount: {
+          currency: "KRW",
+          value: totalAmount,
+        },
+        orderId: `ORDER_${orderId}_${Date.now()}`,           // 토스 orderId = 우리 ORDER_orderId
+        orderName: orderItems[0]?.pname +
+          (orderItems.length > 1 ? ` 외 ${orderItems.length - 1}건` : ""),
+        successUrl: `${window.location.origin}/orders/success?source=${source ?? "direct"}`,
+        failUrl: `${window.location.origin}/orders/fail`,
+        customerEmail: "",                  // 선택값
+        customerName: selectedAddress.recipientName,
+      });
+
+    } catch (err) {
+      // 사용자가 결제창 닫은 경우도 여기로 들어옴
+      if (err.code === "USER_CANCEL") {
+        alert("결제가 취소되었습니다.");
+        return;
+      }
+      console.error("결제 오류:", err);
+      alert("결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (

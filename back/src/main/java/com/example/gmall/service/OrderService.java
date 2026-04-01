@@ -21,5 +21,8 @@ public interface OrderService {
 
     // 주문 상품 개별 취소
     void cancelOrderItem(Long memberId, Long orderId, Long orderItemId);
+    
+    // TossPayment API 연동
+    void confirmPayment(Long memberId, Long orderId, String tossOrderId, String paymentKey, Long amount);
 	
 }

@@ -10,6 +10,8 @@ import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 import OrderFormPage from './pages/orders/OrderFormPage';
 import ProductListPage from './pages/products/ProductListPage';
 import ProductDetailPage from './pages/products/ProductDetailPage';
+import OrderSuccessPage from './pages/orders/OrderSuccessPage';
+import OrderFailPage from './pages/orders/OrderFailPage';
 
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
@@ -63,6 +65,8 @@ function App() {
 
         {/* 주문 - 김슬기 담당 */}
         <Route path="/orders/new" element={<OrderFormPage />} />
+        <Route path="/orders/success" element={<OrderSuccessPage />} />
+        <Route path="/orders/fail"    element={<OrderFailPage />} />
         {/* <Route path="/orders" element={<OrderPage />} /> */}
 
         {/* 어드민 */}
