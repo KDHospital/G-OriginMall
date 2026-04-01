@@ -80,7 +80,7 @@ const handleLogout= () => {
                             {/* 나머지 메뉴 */}
                             {[
                                 { name: "기획전", path: "/" },
-                                { name: "고객센터", path: "/" },
+                                { name: "고객센터", path: "/board" },
                                 { name: "입점신청", path: "/" },
                             ].map(item => (
                                 <li key={item.name} className="text-sm font-semibold hover:text-primary transition-colors">
