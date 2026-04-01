@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axiosInstance from "../../api/axios";
 
 
 const ProductInfo = ({product}) => {
@@ -24,6 +25,25 @@ const ProductInfo = ({product}) => {
         alert('구매 페이지로 이동합니다');
         // 추후 navigate('/orders/new') 연결 예정
     };
+
+    //장바구니 담기
+    const handleAddToCart = async()=>{
+        try {
+            await axiosInstance.post("/cart",{
+                productId:product.productId,
+                quantity: quantity,
+            })
+            alert(`${product.pname} ${quantity}개를 장바구니에 담았습니다.`)
+        } catch (err) {
+            console.error(err)
+            //401:로그인이 안 된 경우 / 그 외 서버오류 시
+            if (err.response?.status === 401) {
+                alert("로그인이 필요합니다.")
+            }else {
+                alert("장바구니 담기에 실패했습니다.")
+            }
+        }
+    }
 
     return(
         <div className="space-y-8">
@@ -65,14 +85,18 @@ const ProductInfo = ({product}) => {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
                     <button onClick={handleBuyNow} className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
-                        Buy Now
+                        구매하기
                     </button>
-                    <button className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
-                        Add to Cart
+                    <button
+                    onClick={handleAddToCart}
+                    disabled={product.soldStatus !== 0}
+                    className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
+                        장바구니
                     </button>
-                    <button className="w-16 h-16 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:text-error hover:border-error transition-all">
-                        <span className="material-symbols-outlined">favorite</span>
-                    </button>
+                    {/* 품절 안내 */}
+                    {product.soldStatus === 2 && (
+                        <p className="text-center text-error font-bold">현재 품절된 상품입니다.</p>
+                    )}
                 </div>
             </div>
             <div className="pt-6 flex gap-8 items-center border-t border-outline-variant/30">

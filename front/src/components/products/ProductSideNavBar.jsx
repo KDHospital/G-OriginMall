@@ -25,15 +25,18 @@ const ProductSideNavBar = () => {
 
     // 현재 선택된 categoryId로 1뎁스 찾기
     useEffect(() => {
-        if (!categoryId || categories.length === 0) {
-            setParentCategory(categories[0] || null) // 기본: 첫 번째 1뎁스
+        if (!categoryId) {
+            //카테고리가 없으면 null,전체 상품
+            setParentCategory(null)
             return
         }
+        if (categories.length===0) return
+
         // 선택된 카테고리가 속한 1뎁스 찾기
         const parent = categories.find(cat =>
             cat.children?.some(child => String(child.categoryId) === String(categoryId))
         ) || categories.find(cat => String(cat.categoryId) === String(categoryId))
-        setParentCategory(parent || categories[0])
+        setParentCategory(parent || null)
     }, [categoryId, categories])
 
     // 슬라이더 조작 끝났을 때만 API 요청 (드래그 중엔 요청 안 보냄)
@@ -43,9 +46,44 @@ const ProductSideNavBar = () => {
     const handlePriceCommit = (e) => {
         moveToPrice(0, Number(e.target.value))
     }
+    //카테고리 이름에 맞는 아이콘 배정
+    const getIconName = (child) => {
+        switch (child.categoryName) {
+            //1. 농산물
+            case '곡물': 
+                return "wheat"
+            case '과일':
+                return "nutrition"
+            case '버섯':
+                return "allergy"
+            //2. 수산물
+            case '냉장': 
+                return "snowflake"
+            case '건조':
+                return "microwave"
+            //3. 축산물
+            case '육류': 
+                return "yakitori"
+            case '원유':
+                return "water_full"
+            case '유가공품': 
+                return "grocery"
+            case '양봉':
+                return "hive"                
+            case '알':
+                return "egg"                
+            //4. 가공품
+            case '약용식품': 
+                return "admin_meds"
+            case '장류':
+                return "breakfast_dining"                
+            case '가루':
+                return "cannabis"                    
 
-    // 아이콘 매핑 (카테고리명 또는 순서로 아이콘 지정)
-    const iconMap = ['grain', 'eco', 'psychology', 'spa', 'tsunami', 'stars']
+            default:
+            return "category"; // 기본 아이콘
+        }
+    }
 
     const children = parentCategory?.children || []
 
@@ -72,7 +110,7 @@ const ProductSideNavBar = () => {
                                 }`}
                         >
                             <span className="material-symbols-outlined text-xl">
-                                {iconMap[index] || 'category'}
+                                {getIconName(child)}
                             </span>
                             <span className="font-manrope">{child.categoryName}</span>
                         </button>
