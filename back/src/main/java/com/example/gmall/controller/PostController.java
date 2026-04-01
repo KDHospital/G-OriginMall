@@ -25,7 +25,7 @@ public class PostController {
     private final PostService postService;
 
     // 1. [공지사항] 목록 조회
-    @GetMapping("/notice")
+    @GetMapping("")
     public ResponseEntity<Page<PostListResponseDTO>> getNoticeList(Pageable pageable) {
         return ResponseEntity.ok(postService.getNoticeList(pageable));
     }
@@ -39,6 +39,7 @@ public class PostController {
     // 3. [고객문의] 신규 등록
     @PostMapping("/inquiry")
     public ResponseEntity<Long> registerInquiry(@RequestBody PostDetailResponseDTO dto) {
+        // 이제 서비스 내부에서 시큐리티 세션을 참조하므로 DTO만 넘겨도 됩니다.
         return ResponseEntity.ok(postService.register(dto));
     }
     
@@ -50,7 +51,8 @@ public class PostController {
 
     // 5. [관리자] 답변 등록 (새로 추가)
     @PostMapping("/{id}/answer")
-    public ResponseEntity<String> addAnswer(@PathVariable("id") Long id, @RequestBody String answerContent) {
+    public ResponseEntity<String> addAnswer(
+    		@PathVariable("id") Long id, @RequestBody String answerContent) {
         postService.addAnswer(id, answerContent);
         return ResponseEntity.ok("답변이 성공적으로 등록되었습니다.");
     }

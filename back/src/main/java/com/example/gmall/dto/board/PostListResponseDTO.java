@@ -18,20 +18,19 @@ public class PostListResponseDTO {
 
     private Long postId;
     private String title;
-    private String writerName;
+    private String mname;
     private LocalDateTime createdAt;
     private Integer viewCount;
     private boolean isPublic;
     private boolean hasAnswer;
 
     // --- [핵심] Entity를 DTO로 변환하는 생성자 ---
-    // 이 생성자가 있으면 서비스 계층에서 Setter 없이도 깔끔하게 변환이 가능합니다.
     public PostListResponseDTO(Post post) {
         this.postId = post.getPostId();
         this.title = post.getTitle();
         
         // 작성자 이름 (Member 엔티티와 연동)
-        this.writerName = (post.getMember() != null) ? post.getMember().getMname() : "익명";
+        this.mname = (post.getMember() != null) ? post.getMember().getMname() : "익명";
         
         this.createdAt = post.getCreatedAt();
         this.viewCount = (post.getViewCount() != null) ? post.getViewCount() : 0;

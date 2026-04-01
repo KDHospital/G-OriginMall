@@ -130,4 +130,6 @@ public class Member {
     public void rejectBusinessVerify() {
     	this.businessVerified = false;
     }
+    
+    
 }
