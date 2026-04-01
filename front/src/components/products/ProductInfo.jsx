@@ -1,8 +1,11 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
+import { useNavigate } from "react-router-dom";
 
 
 const ProductInfo = ({product}) => {
+    const navigate = useNavigate();
+
     if (!product) return null;
     console.log("프로덕트 인포의 프로덕트:", product);
     // 수량 변경 코드
@@ -22,22 +25,22 @@ const ProductInfo = ({product}) => {
 
     // Buy Now
     const handleBuyNow = () => {
-         navigate("/orders/form", {
+         navigate("/orders/new", {
             state: {
             source: "direct",
             orderItems: [
                 {
                 cartItemId: null,
                 productId: product.productId,
-                sellerId: product.seller.id,
-                sellerName: product.seller.name,
+                sellerId: product.sellerId,
+                sellerName: product.sellerName,
                 pname: product.pname,
                 listPrice: product.listPrice,
                 discountPrice: product.discountPrice,
                 price: product.price,
                 deliveryFee: product.deliveryFee,
-                quantity: selectedQuantity,  // 수량 선택 state
-                itemSubtotal: product.price * selectedQuantity,
+                quantity: quantity,  // 수량 선택 state
+                itemSubtotal: product.price * quantity,
                 thumbnailImageUrl: product.thumbnailImageUrl,
                 }
             ]
