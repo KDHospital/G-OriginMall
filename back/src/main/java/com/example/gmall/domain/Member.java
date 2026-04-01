@@ -73,6 +73,9 @@ public class Member {
     @Column(name = "is_verified", columnDefinition = "BOOLEAN DEFAULT 0")
     private boolean isVerified = false; // 특산물 인증 여부 (판매자)
  
+    @Column(name = "withdraw_at")
+    private LocalDateTime withdrawAt;
+    
     @Column(name = "settlement_name", length = 50)
     private String settlementName;
  
@@ -107,5 +110,18 @@ public class Member {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+    
+    public void changeName(String mname) {this.mname = mname;}
+    public void changeTel(String tel) {this.tel = tel;}
+    public void changePassword(String mpwd) {this.mpwd = mpwd;}
+    public void changeGender(Byte gender) {this.gender =  gender;}
+    public void changeDeleteStatus(boolean isDeleted) {
+    	this.isDeleted = isDeleted;
+    	if(isDeleted) {
+    		this.withdrawAt = LocalDateTime.now();
+    	}else {
+    		this.withdrawAt = null;
+    	}
     }
 }

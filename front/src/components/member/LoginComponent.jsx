@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 
 const initState = {
     loginId:'',
@@ -17,6 +18,12 @@ const LoginComponent = () => {
         setLoginParam({...loginParam})
     }
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        handleClickLogin()
+
+    }
+
     const handleClickLogin = () => {
         if(!loginParam.loginId || !loginParam.mpwd) {
             return alert("아이디와 비밀번호 모두 입력해주세요")
@@ -28,12 +35,17 @@ const LoginComponent = () => {
 
             localStorage.setItem("member",JSON.stringify(data))
 
+            if(data.accessToken){
+                axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`
+            }
+
             alert("로그인에 성공했습니다.")
             navigate("/")
         })
-        .catch( (err) => {
-            console.error(err)
-            alert("로그인 실패: 아이디나 비밀번호를 확인하세요")
+        .catch( err => {
+           const errorMsg = err.response?.data?.message || "아이디 또는 비밀번호를 확인해주세요."
+           alert(errorMsg)
+           console.error("로그인 에러:",errorMsg)
         })
     }
 
@@ -41,7 +53,7 @@ const LoginComponent = () => {
         <div className="max-w-md mx-auto border-2 border-green-200 mt-20 p-8 bg-white shadow-lg rounded-lg">
             <div className="text-3xl mb-8 font-extrabold text-green-600 text-center">로그인</div>
         
-        <div className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
                 <label className="font-bold mb-1 block text-gray-700">아이디(이메일)</label>
             <input 
@@ -64,8 +76,9 @@ const LoginComponent = () => {
             </div>
 
             <button
+            type="submit"
             className="w-full bg-green-600 text-wrap p-4 rounded font-extrabold text-xl shadow-md hover:bg-green-700 transition-all"
-            onClick={handleClickLogin}>로그인</button>
+            >로그인</button>
 
             <div className="text-center text-sm text-gray-500 mt-4">
                 계정이 없으신가요?{" "}
@@ -74,9 +87,21 @@ const LoginComponent = () => {
                 onClick={() =>navigate("/signup")}>
                     회원가입 하러가기
                 </span>
-
             </div>
-        </div>
+            <div className="flex justify-center items-center gap-4 mt-4 text-sm text-gray-400">
+             <span
+                className="text-gray-600 font-bold cursor-pointer hover:underline"
+                onClick={() => navigate("/findid")}>
+                    아이디 찾기
+                </span>
+                <span className="text-gray-300">|</span>
+                <span
+                className="text-gray-600 font-bold cursor-pointer hover:underline"
+                onClick={() => navigate("/findpwd")}>
+                     비밀번호 찾기
+                </span>
+            </div>
+        </form>
         </div>
     )
 

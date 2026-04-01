@@ -97,7 +97,7 @@ public class Product {
         this.soldStatus = soldStatus;
     }
 
-    // ── 재고 차감 (주문 생성 시) ──────────────────────────────────────
+    // ── 재고 차감 (주문 생성 시 재고 차감) ──────────────────────────────────────
     public void decreaseStock(Integer quantity) {
         if (this.stock < quantity) {
             throw new IllegalStateException("재고가 부족합니다.");
@@ -129,5 +129,10 @@ public class Product {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+    
+    // -- 재고 차감에 대한 로직(주문 취소시 복구)
+    public void restoreStock(Integer quantity) {
+    	this.stock += quantity;
     }
 }

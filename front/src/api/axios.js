@@ -19,6 +19,7 @@ axiosInstance.interceptors.request.use(
         const token = member?.data?.accessToken;    // response.data.accessToken
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            
         }
         return config;
     },
