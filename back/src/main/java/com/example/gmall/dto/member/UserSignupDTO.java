@@ -14,7 +14,7 @@ public class UserSignupDTO {
 
 	@NotBlank(message = "아이디(이메일)를 입력해주새요.")
 	@Email(message = "올바른 이메일 형식이 아닙니다.")
-	@Size(max = 50,message = "이메일은 50자 이하로 입력해주세요")
+	@Size(max = 30,message = "이메일은 30자 이하로 입력해주세요")
 	private String loginId;
 	
 	@NotBlank(message = "비밀번호를 입력해주세요")

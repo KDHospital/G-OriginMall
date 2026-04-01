@@ -17,13 +17,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 			+"AND (:categoryId IS NULL OR p.category.categoryId = :categoryId)")
 	Page<Product> findActiveProducts(@Param("categoryId") Integer categoryId,Pageable pageable);
 	//상세 조회
-	@Query("SELECT p FROM Product p JOIN FETCH p.category WHERE p.productId = :productId")
-    Optional<Product> findByProductIdWithCategory(@Param("productId") Long productId);
+	@Query("SELECT p FROM Product p " +
+		       "JOIN FETCH p.category " +
+		       "JOIN FETCH p.seller " +
+		       "WHERE p.productId = :productId")
+		Optional<Product> findByProductIdWithCategory(@Param("productId") Long productId);
 	
 	//전체 상품 목록, 가격필터
-	@Query("SELECT p FROM Product p JOIN FETCH p.category " +
+	@Query("SELECT p FROM Product p JOIN FETCH p.category c " +
 		       "WHERE p.soldStatus = 0 " +
-		       "AND (:categoryId IS NULL OR p.category.categoryId = :categoryId) " +
+		       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 		       "AND p.price >= :minPrice " +
 		       "AND p.price <= :maxPrice")
 		Page<Product> findActiveProducts(

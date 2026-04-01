@@ -33,25 +33,27 @@ const handleLogout= () => {
                     </Link>
 
                     {/* 메뉴 */}
-                    <nav className="hidden md:flex">
+                    <nav className="hidden md:flex h-full">
                         <ul className="flex items-center space-x-8">
 
                             {/* 상품 메뉴 — 호버 드롭다운 */}
                             <li
-                                className="relative"
+                                className="relative "
                                 onMouseEnter={() => setIsProductMenuOpen(true)}
                                 onMouseLeave={() => setIsProductMenuOpen(false)}
-                            >
-                                <Link
-                                    to="/products"
-                                    className="text-sm font-semibold hover:text-primary transition-colors"
-                                >
-                                    상품
-                                </Link>
+                            >   
+                                <div className="h-full flex items-center">
+                                    <Link
+                                        to="/products"
+                                        className="text-sm font-semibold hover:text-primary transition-colors"
+                                    >
+                                        상품
+                                    </Link>
+                                </div>
 
                                 {/* 드롭다운 */}
                                 {isProductMenuOpen && (
-                                    <div className="absolute top-full left-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
+                                    <div className="absolute left-0 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
                                         {/* 전체 상품 */}
                                         <Link
                                             to="/products"
@@ -78,7 +80,7 @@ const handleLogout= () => {
                             {/* 나머지 메뉴 */}
                             {[
                                 { name: "기획전", path: "/" },
-                                { name: "고객센터", path: "/" },
+                                { name: "고객센터", path: "/board" },
                                 { name: "입점신청", path: "/" },
                             ].map(item => (
                                 <li key={item.name} className="text-sm font-semibold hover:text-primary transition-colors">
@@ -115,7 +117,7 @@ const handleLogout= () => {
                             </>
                         ) : (
                             <>
-                                <Link to="/member/login" className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
+                                <Link to="/login" className="hidden sm:flex items-center gap-2 text-sm font-bold bg-primary text-white px-5 py-2 rounded-full hover:bg-accent transition-colors">
                                     <span className="material-symbols-outlined text-lg">person</span>
                                     로그인
                                 </Link>
