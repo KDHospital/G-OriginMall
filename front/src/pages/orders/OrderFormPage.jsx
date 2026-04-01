@@ -81,7 +81,7 @@ function StepIndicator({ current = 2 }) {
 // ─────────────────────────────────────────
 // 배송지 선택 섹션
 // ─────────────────────────────────────────
-function AddressSection({ addresses: initialAddresses, selectedAddressId, onSelect }) {
+function AddressSection({ addresses: initialAddresses, selectedAddressId, onSelect, onAddAddress }) {
   const [addresses, setAddresses] = useState(initialAddresses);
   const [showNewForm, setShowNewForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
@@ -91,6 +91,9 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
     address: "",
     addressDetail: "",
   });
+
+  // address, AddressSection/addresses state 일치 시키기
+  
 
   useEffect(() => {
     setAddresses(initialAddresses);
@@ -135,8 +138,10 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
           memo: "",
       })
       .then((res) => {
-          setAddresses((prev) => [...prev, res.data]);
-          onSelect(res.data.addressId);
+          const newAddr = res.data;
+          onAddAddress(newAddr);                        // 1. 부모 state 먼저 업데이트
+          setAddresses((prev) => [...prev, newAddr]);   // 2. 내부 state 업데이트
+          onSelect(newAddr.addressId);                  // 3. 자동 선택
           setShowNewForm(false);
           setNewAddress({ recipientName: "", recipientPhone: "", zipcode: "", address: "", addressDetail: "" });
       })
@@ -201,7 +206,7 @@ function AddressSection({ addresses: initialAddresses, selectedAddressId, onSele
               <div className="text-sm">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="font-medium text-gray-800">{addr.recipientName}</span>
-                  {addr.isDefault && (
+                  {addr.default && (
                     <span className="text-xs px-1.5 py-0.5 bg-gray-800 text-white rounded">기본</span>
                   )}
                 </div>
@@ -502,11 +507,15 @@ export default function OrderFormPage() {
       axiosInstance.get("/members/addresses")
           .then((res) => {
               setAddresses(res.data);
-              const def = res.data.find((a) => a.isDefault);
+              const def = res.data.find((a) => a.default);
               if (def) setSelectedAddressId(def.addressId);
           })
           .catch((err) => console.error("배송지 로드 실패:", err));
   }, []);
+
+  const handleAddAddress = (newAddr) => {
+    setAddresses((prev) => [...prev, newAddr]);
+}
 
   const [deliveryMemo, setDeliveryMemo] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("toss");
@@ -517,6 +526,11 @@ export default function OrderFormPage() {
 
   const handleSubmit = async () => {
     const selectedAddress = addresses.find((a) => a.addressId === selectedAddressId);
+    if(!selectedAddress) {
+      alert("배송지를 선택하거나 추가해주세요.");
+      return;
+    }
+
 
     const orderData = {
       orderItems: orderItems.map((i) => ({
@@ -584,6 +598,7 @@ export default function OrderFormPage() {
                 addresses={addresses}
                 selectedAddressId={selectedAddressId}
                 onSelect={setSelectedAddressId}
+                onAddAddress={handleAddAddress}
               />
               <DeliveryMemoSection value={deliveryMemo} onChange={setDeliveryMemo} />
               <PaymentSection selected={paymentMethod} onChange={setPaymentMethod} />

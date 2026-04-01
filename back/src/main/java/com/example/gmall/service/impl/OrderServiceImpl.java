@@ -311,6 +311,9 @@ public class OrderServiceImpl implements OrderService {
                 log.error("토스 승인 실패 응답: {}", response.body());
                 throw new IllegalStateException("결제 승인에 실패했습니다.");
             }
+            
+            // 승인 성공 후 tossOrderId 저장
+            orders.updateTossOrderId(tossOrderId);
 
         } catch (IOException | InterruptedException e) {
             log.error("토스 승인 API 호출 오류", e);
