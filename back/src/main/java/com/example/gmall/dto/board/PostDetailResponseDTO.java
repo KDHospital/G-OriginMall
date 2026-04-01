@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 public class PostDetailResponseDTO {
 
     private Long postId;
+    private Integer boardId;
     private String title;
     private String content;
     private String MName;
@@ -26,12 +27,13 @@ public class PostDetailResponseDTO {
     private Integer viewCount;
     private boolean isPublic;
     
-    // 상세 페이지이므로 답변 리스트를 포함합니다.
+    // 상세 페이지이므로 답변 리스트를 포함
     private List<AnswerResponseDTO> answers;
 
     // --- [핵심] Entity를 DTO로 변환하는 생성자 ---
     public PostDetailResponseDTO(Post post) {
         this.postId = post.getPostId();
+        this.boardId = (post.getBoard() != null) ? post.getBoard().getBoardId() : null;
         this.title = post.getTitle();
         this.content = post.getContent();
         

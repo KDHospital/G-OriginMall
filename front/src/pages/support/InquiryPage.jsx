@@ -19,7 +19,9 @@ const InquiryPage = () => {
     try {
       const data = await fetchInquiries(pageNumber - 1, itemsPerPage);
 
-      const serverData = data.dtoList || data;
+      const serverData = data.content || []; 
+      setInquiries(serverData);
+      setTotalItems(data.totalElements || 0); 
 
       if (serverData && serverData.length > 0) {
         setInquiries(serverData);
@@ -28,6 +30,7 @@ const InquiryPage = () => {
 
         setInquiries([]);
       }
+
     } catch (error) {
       console.error("데이터 로드 실패:", error);
       // 에러 발생 시 사용자 경험을 위해 빈 목록 처리
@@ -40,13 +43,15 @@ const InquiryPage = () => {
     setOpenIdx(null); 
   }, [currentPage]);
 
-  const handleRowClick = (idx, isSecret) => {
-    if (isSecret) {
+  const handleRowClick = (idx, idx) => {
+    if (item.isPublic === false || item.isPublic === 0) {
       alert("비밀글은 작성자만 확인할 수 있습니다.");
       return;
     }
     setOpenIdx(openIdx === idx ? null : idx);
   };
+
+ 
 
   return (
     <BasicLayout>
@@ -80,14 +85,14 @@ const InquiryPage = () => {
               <tbody>
                 {inquiries.length > 0 ? (
                   inquiries.map((item, idx) => {
-                    // 답변 완료 조건: 답변 내용이 있고, 삭제되지 않았을 때 [cite: 2026-03-30]
-                    const isAnswered = item.answerContent && !item.isDeleted;
+                    // 답변 완료 조건: 답변 내용이 있고, 삭제되지 않았을 때
+                    const isAnswered = item.answers && item.answers.length > 0;
 
                     return (
                       <React.Fragment key={item.postId}>
                         <tr 
                           className={`border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${openIdx === idx ? 'bg-[#F9F9FB]' : ''}`}
-                          onClick={() => handleRowClick(idx, !item.isPublic)}
+                          onClick={() => handleRowClick(item, idx)}
                         >
                           <td className="py-5 text-center text-gray-400 font-light">{item.postId}</td>
                           <td className="py-5 text-center px-2">
@@ -98,9 +103,10 @@ const InquiryPage = () => {
                             </span>
                           </td>
                           <td className="py-5 px-6 text-left text-gray-700 truncate font-medium">
-                            {!item.isPublic ? `🔒 비밀글입니다.` : item.title}
+                            {(!item.isPublic === false || item.isPublic === 0)
+                            ? `🔒 비밀글입니다.` : item.title}
                           </td>
-                          <td className="py-5 text-center text-gray-500">{item.writerName}</td>
+                          <td className="py-5 text-center text-gray-500">{item.mname || item.MName}</td>
                           <td className="py-5 text-center text-gray-400 font-light">
                             {item.createdAt ? item.createdAt.split('T')[0] : '-'}
                           </td>

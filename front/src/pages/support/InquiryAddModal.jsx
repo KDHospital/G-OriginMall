@@ -38,8 +38,9 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
       // 서버에 전송 전 데이터 구조 최종 확인
       const sendData = {
         ...formData,
+        boardId: 2,
+        memberId: 2,
         viewCount: 0,   
-        hasAnswer: false
       };
 
       await addInquiry(sendData); 

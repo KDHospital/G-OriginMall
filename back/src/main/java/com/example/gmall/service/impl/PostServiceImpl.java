@@ -31,14 +31,13 @@ public class PostServiceImpl implements PostService {
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    // 1. [사용자] 게시글 등록 (보드와 멤버 연관관계 필수!)
+    // 1. [사용자] 게시글 등록 (보드와 멤버 연관관계 필수)
     @Override
     public Long register(PostDetailResponseDTO dto) {
         log.info("Registering inquiry: " + dto.getTitle());
 
-        // 기획상 게시판(Board)과 작성자(Member)가 먼저 DB에 있어야 합니다.
-        // 여기서는 예시로 1번 게시판(Q&A), 1번 멤버(현재 사용자)를 찾는다고 가정합니다.
-        Board board = boardRepository.findById(1) // 게시판 ID는 상황에 맞게 조정
+        // 기획상 게시판(Board)과 작성자(Member)가 먼저 DB에 있어야 함
+        Board board = boardRepository.findById(dto.getBoardId())
                 .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
         Member member = memberRepository.findById(1L) // 멤버 ID는 세션 등에서 가져옴
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
@@ -50,7 +49,7 @@ public class PostServiceImpl implements PostService {
                 .isPublic(dto.isPublic())
                 .build();
 
-        // [중요] 우리가 만든 연관관계 편의 메서드 사용!
+        // [중요] 우리가 만든 연관관계 편의 메서드 사용
         board.addPost(post); 
         post.updateMember(member); // Post 엔티티에 updateMember 메서드 추가 필요
 
@@ -104,11 +103,11 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public Page<PostListResponseDTO> getInquiryList(Pageable pageable) {
-        // 1. 먼저 Q&A 게시판 객체를 가져옴 (보통 ID 2번 가정)
+        // 1. 먼저 Q&A 게시판 객체를 가져옴
         Board board = boardRepository.findById(2)
                 .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
 
-        // 2. 작성하신 1번 메서드 호출!
+        // 2. 작성하신 1번 메서드 호출
         return postRepository.findByBoardAndIsDeletedFalse(board, pageable)
                 .map(PostListResponseDTO::new);
     }
@@ -116,11 +115,11 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public Page<PostListResponseDTO> getNoticeList(Pageable pageable) {
-        // 1. 공지사항 게시판 객체를 가져옵니다 (ID 1번 가정)
+        // 1. 공지사항 게시판 객체를 가져옴
         Board board = boardRepository.findById(1)
                 .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
 
-        // 2. 작성하신 1번 메서드 호출!
+        // 2. 작성하신 1번 메서드 호출
         return postRepository.findByBoardAndIsDeletedFalse(board, pageable)
                 .map(PostListResponseDTO::new);
     }
