@@ -48,7 +48,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getPost(id));
     }
 
-    // 5. [관리자] 답변 등록 (새로 추가!)
+    // 5. [관리자] 답변 등록 (새로 추가)
     @PostMapping("/{id}/answer")
     public ResponseEntity<String> addAnswer(@PathVariable("id") Long id, @RequestBody String answerContent) {
         postService.addAnswer(id, answerContent);

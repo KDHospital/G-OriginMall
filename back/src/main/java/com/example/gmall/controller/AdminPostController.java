@@ -1,10 +1,18 @@
 package com.example.gmall.controller;
 
-import com.example.gmall.dto.board.PostDetailResponseDTO;
-import com.example.gmall.service.PostService;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.gmall.service.PostService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/admin/board") // 관리자 전용 경로
@@ -14,13 +22,14 @@ public class AdminPostController {
     private final PostService postService;
 
     // [관리자] 문의사항 답변 등록/수정
-    // PUT 방식을 사용하여 기존 게시글에 답변 필드만 업데이트합니다.
+    // PUT 방식을 사용하여 기존 게시글에 답변 필드만 업데이트
     @PutMapping("/inquiry/{id}/answer")
     public ResponseEntity<Void> addAnswer(
             @PathVariable("id") Long id, 
-            @RequestBody String answerContent) {
+            @RequestBody Map<String, String> requestBody) {
         
-        postService.addAnswer(id, answerContent);
+        String answerContent = requestBody.get("answerContent");
+    	postService.addAnswer(id, answerContent);
         return ResponseEntity.ok().build();
     }
 

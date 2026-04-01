@@ -12,7 +12,7 @@ const BoardPage = () => {
 
   const loadBoardData = async (page) => {
     try {
-      // fetchNotice 함수 호출 [cite: 2026-03-30]
+      // fetchNotice 함수 호출
       const response = await fetchNotice(page - 1, itemsPerPage);
       setPosts(response.dtoList || []);
       setTotalItems(response.totalElements || 0);
