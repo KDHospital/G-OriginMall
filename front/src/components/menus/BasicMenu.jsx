@@ -49,17 +49,24 @@ const BasicMenu = () => {
                 onMouseLeave={() => setIsProductMenuOpen(false)}
               >
                 <div className="h-full flex items-center">
-                  <Link
-                    to="/products"
+                  <div
                     className="text-sm font-semibold hover:text-primary transition-colors"
                   >
                     상품
-                  </Link>
+                  </div>
                 </div>
 
                 {/* 드롭다운 */}
                 {isProductMenuOpen && (
                   <div className="absolute left-0 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
+                    {/* 금빛나루 전용관 */}
+                    <Link
+                      to="/products/certified"
+                      className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
+                    >
+                      금빛나루 전용관
+                    </Link>
+                    <hr className="my-1 border-slate-100" />                    
                     {/* 전체 상품 */}
                     <Link
                       to="/products"
@@ -67,6 +74,7 @@ const BasicMenu = () => {
                     >
                       전체 상품
                     </Link>
+                    
                     <hr className="my-1 border-slate-100" />
                     {/* 1뎁스 카테고리 목록 */}
                     {categories.map(cat => (
@@ -79,6 +87,7 @@ const BasicMenu = () => {
                         {cat.categoryName}
                       </Link>
                     ))}
+
                   </div>
                 )}
               </li>
