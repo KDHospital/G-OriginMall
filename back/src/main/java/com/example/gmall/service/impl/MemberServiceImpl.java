@@ -1,5 +1,6 @@
 package com.example.gmall.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.gmall.domain.Member;
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.SellerDTO;
 import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.repository.MemberRepository;
@@ -265,6 +267,22 @@ public void registerSeller(SellerSignupDTO dto) {
  	    emailService.sendSellerStatusNotice(email, name, false);
  	}
  	
+ 	@Override
+ 	public List<SellerDTO> getPendingSellerList() {
+ 		
+ 		return memberRepository.findAllByRoleAndBusinessVerified((byte) 1, false)
+ 				.stream()
+ 				.map(seller -> SellerDTO.builder()
+ 						.id(seller.getId())
+ 						.loginId(seller.getLoginId())
+ 						.mname(seller.getMname())
+ 						.businessNo(seller.getBusinessNo())
+ 						.tel(seller.getTel())
+ 						.createdAt(seller.getCreatedAt())
+ 						.build())
+ 				.toList();
  	
+ 	
+ 	}
 
 }

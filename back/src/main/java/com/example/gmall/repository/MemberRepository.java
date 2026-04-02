@@ -63,7 +63,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //탈퇴 여부가 true이고 탈퇴 날짜가 특정 시점(1년 전)보다 이전인 회원 찾기
     List<Member> findByIsDeletedTrueAndWithdrawAtBefore(LocalDateTime threshold);
     
-    
+    List<Member> findAllByRoleAndBusinessVerified(Byte role, boolean businessVerified);
  
    
 }
