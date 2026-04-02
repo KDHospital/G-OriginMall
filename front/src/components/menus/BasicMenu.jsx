@@ -21,12 +21,18 @@ const BasicMenu = () => {
     getCategories().then(res => setCategories(res.data)).catch(err => console.error("카테고리 로드 실패", err))
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem("member")
-
-    delete axiosInstance.defaults.headers.common["Authorization"]
-    navigate("/")
-    window.location.reload()
+  const handleLogout = async () => {
+    try {
+     await axiosInstance.post("/member/logout")
+    } catch (err) {
+      console.error("로그아웃 요청 중 오류 발생", err)
+    } finally{
+      localStorage.removeItem("member")
+      window.location.href = "/"
+    }
+    
+   
+    
   }
 
   return (

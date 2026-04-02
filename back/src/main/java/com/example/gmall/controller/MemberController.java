@@ -21,6 +21,7 @@ import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +81,18 @@ public class MemberController {
 		}
 	}
 	
+	//로그아웃
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response) {
+		Cookie cookie = new Cookie("accessToken", null);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		
+		response.addCookie(cookie);
+		return ResponseEntity.ok("로그아웃 성공");
+	}
+	//마이페이지
 	@GetMapping("/me")
 	public ResponseEntity<MemberDTO> getMemberInfo(Authentication authentication){
 		if (authentication == null) {
