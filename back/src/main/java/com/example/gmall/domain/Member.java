@@ -2,7 +2,9 @@ package com.example.gmall.domain;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -129,5 +131,18 @@ public class Member {
     }
     public void rejectBusinessVerify() {
     	this.businessVerified = false;
+    }
+    public Map<String, Object> getClaims() {
+       
+        Map<String, Object> dataMap = new HashMap<>(); 
+
+        dataMap.put("loginId", this.loginId);
+        dataMap.put("mname", this.mname);
+        dataMap.put("role", this.role);
+        dataMap.put("memberId", this.id);
+      
+        dataMap.put("businessVerified", this.businessVerified); 
+        
+        return dataMap;
     }
 }

@@ -32,7 +32,13 @@ const LoginComponent = () => {
         login(loginParam)
         .then( (data) => {
             console.log("로그인 성공:", data)
-
+            const memberObj = {
+        role: data.role,
+        mname: data.mname,
+        memberId: data.memberId,
+        result: data.result
+    }
+    
             localStorage.setItem("member",JSON.stringify(data))
 
             if(data.accessToken){
@@ -40,7 +46,7 @@ const LoginComponent = () => {
             }
 
             alert("로그인에 성공했습니다.")
-            navigate("/")
+            window.location.href = "/"
         })
         .catch( err => {
            const errorMsg = err.response?.data?.message || "아이디 또는 비밀번호를 확인해주세요."

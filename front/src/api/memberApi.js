@@ -43,7 +43,7 @@ export const userSignup = (payload) =>
 
 //로그인
 export const login = (loginParam) =>
-    axiosInstance.post("/member/login",loginParam)
+    axiosInstance.post("/member/login",loginParam).then(res => res.data)
 
 //아이디 중복 체크
 export const checkLoginId = (loginId) =>

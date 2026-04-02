@@ -11,7 +11,7 @@ const BasicMenu = () => {
 
   // localStorage 받아오기
   const member = JSON.parse(localStorage.getItem("member") || "null");
-  const role = member?.data?.member?.role ?? null;
+  const role = member?.role ?? null;
   // role >> 0 = 구매자, 1 = 판매자, 2 = 관리자
 
   const [categories, setCategories] = useState([])

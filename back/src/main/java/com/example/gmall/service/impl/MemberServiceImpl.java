@@ -1,5 +1,7 @@
 package com.example.gmall.service.impl;
 
+import java.util.Map;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
 import com.example.gmall.util.JWTUtil;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -70,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
  }
  	
  	@Override
- 	public String login(MemberLoginDTO loginDTO) {
+ 	public Map<String, Object> login(MemberLoginDTO loginDTO, HttpServletResponse response) {
  		
  		//아이디로 회원 조회
  		Member member = memberRepository.findByLoginId(loginDTO.getLoginId())
@@ -84,15 +88,20 @@ public class MemberServiceImpl implements MemberService {
  	 	if(!passwordEncoder.matches(loginDTO.getMpwd(), member.getMpwd())) {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
  	 	}
+ 	 	Map<String, Object> claims = member.getClaims();
+ 	 	String accessToken = jwtUtil.generateToken(claims, 60);
  	 	
- 	 	java.util.Map<String, Object> claims = java.util.Map.of(
- 	 			"loginId",member.getLoginId(),
- 	 			"memberId",member.getId(),
- 	 			"role",member.getRole()
- 	 			);
- 	// 인증 성공 시 JWT 토큰 생성 및 반환
- 	  return jwtUtil.generateToken(claims, 60);
- 	
+ 	 	Cookie cookie = new Cookie("accessToken", accessToken);
+ 	 	cookie.setHttpOnly(true);
+ 	 	cookie.setPath("/");
+ 	 	cookie.setMaxAge(60*60);
+ 	 	cookie.setSecure(true);
+ 	 	
+ 	 	response.addCookie(cookie);
+ 	 	
+ 	 	claims.put("result", "success");
+ 	 	
+ 	 	return claims;
  	}
  	@Override
  	public MemberDTO getMemberLoginId(String loginId) {
@@ -232,33 +241,28 @@ public void registerSeller(SellerSignupDTO dto) {
 
         memberRepository.save(seller);
     }
-
-
+ 	
  	@Override
  	public void approveSeller(Long memberId) {
  		Member member = memberRepository.findById(memberId)
- 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
- 		
- 		if (member.getRole() != 1) {
- 			throw new IllegalStateException("판매자 권한을 가진 회원만 승인할 수 있습니다.");
- 		}
+ 				.orElseThrow(()-> new IllegalArgumentException("존재하지 않는 회원입니다."));
  		
  		member.updateBusinessVerify(true);
- 		log.info("판매자 승인 완료: {}", member.getLoginId());
+ 		
+ 		emailService.sendSellerStatusNotice(member.getEmail(), member.getMname(), true);
  	}
  	
  	@Override
- 	public void rejectSeller(long memberId) {
+ 	public void rejectSeller(Long memberId) {
  		Member member = memberRepository.findById(memberId)
- 				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+ 	            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
  		
- 		if(member.getRole() != 1) {
- 			throw new IllegalStateException("판매자 계정만 거절 처리할 수 있습니다.");
- 		}
- 			member.rejectBusinessVerify();
- 			
- 			log.info("판매자 입점 거절 완료: {}",member.getLoginId());
- 		
+ 		String email = member.getEmail();
+ 	    String name = member.getMname();
+ 	    
+ 	    memberRepository.delete(member);
+ 	    
+ 	    emailService.sendSellerStatusNotice(email, name, false);
  	}
  	
  	
