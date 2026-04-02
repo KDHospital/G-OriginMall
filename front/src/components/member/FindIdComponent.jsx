@@ -46,7 +46,7 @@ const FindIdComponent = () =>{
                     <input 
                     name="mname"
                     className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="성합을 입력하세요"
+                    placeholder="성함을 입력하세요"
                     value={info.mname}
                     onChange={handleChange}/>
                     </div>
@@ -74,7 +74,7 @@ const FindIdComponent = () =>{
             </div>
             <button 
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl font-bold transition-all"
-            onClick={() => navigate("/member/login")}
+            onClick={() => navigate("/login")}
             >로그인하러 가기
              </button>
              <button 

@@ -44,7 +44,7 @@ const FindPwdComponent= () => {
             resetPassword({loginId:info.loginId , nmpwd: info.nmpwd})
             .then(()=> {
                 alert("비밀번호가 변경되었습니다. 다시 로그인해주세요")
-                navigate("/member/login")
+                navigate("/login")
             })
             .catch(err => alert(err.response?.data?.message || "변경실패"))
     }

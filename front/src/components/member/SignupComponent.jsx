@@ -17,8 +17,32 @@ const SignupComponent = () =>{
   const [isVerified,setIsVerified] = useState(false)
   const [pwdError, setPwdError] = useState(false)
   const navigate = useNavigate() 
+  const [isSending, setIsSending] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(180);
+
+useEffect(() => {
+    let timer;
+    if (isCodeSent && !isVerified && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      alert("인증 시간이 만료되었습니다. 다시 시도해주세요.");
+      setIsCodeSent(false);
+      setTimeLeft(180);
+    }
+    return () => clearInterval(timer);
+  }, [isCodeSent, isVerified, timeLeft]);
+
+  
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
     useEffect( () => {
+
         if(form.mpwdConfirm && form.mpwd !== form.mpwdConfirm){
             setPwdError(true)
         } else{
@@ -35,10 +59,19 @@ const SignupComponent = () =>{
   //이메일 인증코드 발송
   const handleSendCode = () => {
     if(!form.loginId) return alert("이메일을 입력해주세요")
-    sendEmailCode(form.loginId).then( ()=>{
+       
+        setIsSending(true)
+        sendEmailCode(form.loginId).then( ()=>{
         setIsCodeSent(true)
+        setTimeLeft(180);
         alert("인증코드가 전송되었습니다")
-    }).catch( ()=> alert("발송 실패"))
+    }).catch( (err)=> {
+        const msg = err.response?.data?.message || "발송 실패!"
+        alert(msg)
+    })
+    .finally(()=>{
+        setIsSending(false)
+    })
   }
 
   //인증코드 확인
@@ -66,7 +99,7 @@ const SignupComponent = () =>{
   userSignup( finalData)
     .then(() => {
         alert("회원가입이 완료되었습니다.")
-        navigate("/member/login")
+        navigate("/login")
     })
     .catch( err => {
         const data = err.response?.data
@@ -111,29 +144,54 @@ const SignupComponent = () =>{
                         name="loginId"
                         value={form.loginId}
                         onChange={handleChange}
-                        disabled={isVerified}
+                        disabled={isVerified || isSending}
                         placeholder="example@email.com"/>
-                        <button className="bg-gray-200 px-4 rounded text-sm font-bold hover:bg-gray-300 transition"
+                        <button className={`px-4 rounded text-sm font-bold transition ${
+                            (isVerified || isSending)
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                        }`}
                         onClick={handleSendCode}
-                        disabled={isVerified}>{isCodeSent ? "재전송" : "인증받기"}</button>
+                        disabled={isVerified || isSending}>
+                            {isSending ? (
+                                <span className="flex items-center gap-1">
+                                    발송중...
+                                </span>
+                            ) : isCodeSent ? (
+                                "재전송"
+                            ): (
+                                "인증받기"
+                            )}
+                        </button>
                     </div>
             {isCodeSent && !isVerified && (
-                <div className="flex gap-2 mt-2">
+                <div className="mt-2"> 
+                    <div className="flex gap-2 relative">
+                        <div className="flex-1 relative">
                     <input
                     className="flex-1 p-3 border border-gray-300 rounded"
                    placeholder="인증코드 6자리 입력"
                    value={vCode}
                    onChange={ (e)=> setVCode(e.target.value)}  />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500">
+                        {formatTime(timeLeft)}
+                    </span>
+                   </div>
                    
                    <button
                    className="bg-green-500 text-white px-6 rounded font-bold hover:bg-green-600"
                    onClick={handleVerifyCode}>
+                    
                         확인
                    </button>
+                </div>
+                    <p className="text-xs text-gray-400 mt-1 ml-1">* 3분 이내에 코드를 입력해주세요.</p>
                 </div>
             )}
             {isVerified && <p className="text-green-600 text-sm mt-1">인증완료</p>}
             </div>
+
+            
 
             <div className="flex flex-col">
                 <div className="flex flex-col">
