@@ -46,7 +46,7 @@ const ModifyComponent = () =>{
         .catch( (err) =>{
             console.error(err)
             alert("회원정보를 불러오지 못했습니다. 다시 로그인 해주세요")
-            navigate("/member/login")
+            navigate("/login")
         })
     },[navigate])
 
@@ -94,7 +94,7 @@ const ModifyComponent = () =>{
             alert("회원 정보가 성공적으로 수정되었습니다. 보안을 위해 다시 로그인해주세요.")
             localStorage.removeItem("member")
             delete axiosInstance.defaults.headers.common["Authorization"]
-            navigate("/member/login")
+            navigate("/login")
         })
         .catch( (err) => {
             console.error("수정 에러 상세:",err.response?.data)

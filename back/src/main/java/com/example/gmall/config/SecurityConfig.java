@@ -33,7 +33,7 @@ public class SecurityConfig {
             		org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             // 2. 모든 경로에 대해 인증 없이 접근 허용
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/api/orders/**").authenticated()
+            		.requestMatchers("/api/member/me", "/api/members/addresses/**","/api/orders/**").authenticated()
             		.anyRequest().permitAll() 
             )
             

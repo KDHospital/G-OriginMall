@@ -1,9 +1,13 @@
 package com.example.gmall.service;
 
+import java.util.Map;
+
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface MemberService {
 	
@@ -15,7 +19,7 @@ public interface MemberService {
 	void signup(UserSignupDTO signupDto);
 	
 	//로그인
-	String login(MemberLoginDTO loginDTO);
+	Map<String, Object> login(MemberLoginDTO loginDTO,HttpServletResponse response);
 	
 	MemberDTO getMemberLoginId(String loginId);
 	
@@ -33,5 +37,5 @@ public interface MemberService {
 	
 	void approveSeller(Long memberId);
 	
-	void rejectSeller(long memberId);
+	void rejectSeller(Long memberId);
 }

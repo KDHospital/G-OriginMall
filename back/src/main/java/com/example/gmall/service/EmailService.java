@@ -13,4 +13,6 @@ public interface EmailService {
 	// @param email 인증 요청 이메일
 	// @param code 사용자가 입력한 6자리 코드
 	boolean verifyCode(String email, String code);
+	
+	void sendSellerStatusNotice(String email, String mname, boolean isApprovde);
 }

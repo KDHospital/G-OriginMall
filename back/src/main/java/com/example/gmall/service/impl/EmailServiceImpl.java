@@ -3,9 +3,11 @@ package com.example.gmall.service.impl;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.naming.factory.SendMailFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.example.gmall.service.EmailService;
@@ -75,5 +77,28 @@ public class EmailServiceImpl  implements EmailService{
 		throw new RuntimeException("메일 발송 중 오류가 발생했습니다.");
 	}
 	}
+	
+	@Override
+	@Async
+	public void sendSellerStatusNotice(String email, String mname, boolean isApprovde) {
+		
+		String subject = isApprovde
+				?"[G-OriginMall] 판매자 입점 신청이 승인되었습니다."
+				:"[G-OriginMall] 판매자 입점 신청 거절 안내";
+		String content = isApprovde
+				? "안녕하세요,"+ mname + "님! 귀하의 입점 신청이 정상적으로 승인되었습니다. 지금부터 상품 등록이 가능합니다."
+				: "안녕하세요,"+ mname + "님. 안타깝게도 귀하의 입점 신청이 거절되었습니다. 자세한 사유는 고객센터로 문의 바랍니다.";
+		sendMail(email, subject, content);
+	}
+	private void sendMail(String to, String subject, String content) {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(to);
+		message.setSubject(subject);
+		message.setText(content);
+		
+		mailSender.send(message);
+		log.info("메일 발송 완료: {}",to);
+	}
+			
 
 }

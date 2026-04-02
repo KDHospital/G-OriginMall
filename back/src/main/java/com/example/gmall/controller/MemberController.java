@@ -3,6 +3,7 @@ package com.example.gmall.controller;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,8 @@ import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.MemberService;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,24 +71,38 @@ public class MemberController {
 	
 	//로그인
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, Object>> login(@RequestBody @Valid MemberLoginDTO loginDTO){
-		String accessToken = memberService.login(loginDTO);
+	public ResponseEntity<?> login(@RequestBody @Valid MemberLoginDTO loginDTO, HttpServletResponse response){
 		
-		MemberDTO memberDTO = memberService.getMemberLoginId(loginDTO.getLoginId());
-		
-		return ResponseEntity.ok(Map.of("accessToken",accessToken,"member",memberDTO));
+		try {
+			Map<String, Object> loginResponse = memberService.login(loginDTO, response);
+			return ResponseEntity.ok(loginResponse);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+		}
 	}
 	
+	//로그아웃
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response) {
+		Cookie cookie = new Cookie("accessToken", null);
+		cookie.setMaxAge(0);
+		cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		
+		response.addCookie(cookie);
+		return ResponseEntity.ok("로그아웃 성공");
+	}
+	//마이페이지
 	@GetMapping("/me")
 	public ResponseEntity<MemberDTO> getMemberInfo(Authentication authentication){
 		if (authentication == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	    }
 		
-		String loginId = authentication.getName();
-		log.info(authentication.toString());
+		Long memberId = (Long) authentication.getPrincipal();
+		log.info("인증된 회원 PK: {}",memberId);
 	    
-		MemberDTO dto = memberService.getMemberId(Long.parseLong(loginId));
+		MemberDTO dto = memberService.getMemberId(memberId);
 		return ResponseEntity.ok(dto);
 	}
 	
@@ -164,9 +181,9 @@ public class MemberController {
 		    memberService.registerSeller(dto);
 		    
 		    return ResponseEntity.ok(Map.of(
-		        "result", "success", 
 		        "message", "판매자 가입 신청이 완료되었습니다. 관리자 승인을 기다려주세요."
 		    ));
 		}
+		
 		
 }
