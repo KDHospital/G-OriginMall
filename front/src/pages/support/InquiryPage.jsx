@@ -22,7 +22,7 @@ const InquiryPage = () => {
     try {
       const parsedData = JSON.parse(data);
       // memberId 또는 id 중 존재하는 값을 반환
-      return parsedData.memberId || parsedData.id; 
+      return parsedData.loginId; 
     } catch (error) {
       console.error("로컬스토리지 파싱 에러:", error);
       return null;
@@ -32,19 +32,17 @@ const InquiryPage = () => {
   const currentUserId = getLoginUserId();
 
   // 데이터 로드 함수
-  const loadData = async (pageNumber) => {
-    try {
-      // boardApi의 fetchInquiries 호출
-      const data = await fetchInquiries(pageNumber - 1, itemsPerPage);
-      const serverData = data.content || []; 
-      setInquiries(serverData);
-      setTotalItems(data.totalElements || 0); 
-      setOpenIdx(null); 
-    } catch (error) {
-      console.error("데이터 로드 실패:", error);
-      setInquiries([]);
-    }
-  };
+const loadData = async (pageNumber) => {
+  try {
+    const data = await fetchInquiries(pageNumber);
+    setTotalItems(data.totalCount || 0); 
+    setInquiries(data.dtoList || []); 
+    setOpenIdx(null);
+  } catch (error) {
+    console.error("데이터 로드 실패:", error);
+    setInquiries([]);
+  }
+};
 
   useEffect(() => {
     loadData(currentPage);
@@ -55,7 +53,7 @@ const InquiryPage = () => {
     const isPrivate = item.isPublic === false || item.isPublic === 0;
     
     // 서버 응답의 member 객체 내 ID와 비교
-    const writerId = item.member?.memberId || item.memberId;
+    const writerId = item.loginId;
     const isOwner = currentUserId && String(writerId) === String(currentUserId);
 
     if (isPrivate && !isOwner) {
@@ -125,7 +123,7 @@ const InquiryPage = () => {
                           </td>
                           <td className="py-5 text-center text-gray-500">
                             {/* 작성자 이름 표시 */}
-                            {item.member?.mname || item.mname || '익명'}
+                            {item.mname || '익명'}
                           </td>
                           <td className="py-5 text-center text-gray-400 font-light">
                             {item.createdAt ? item.createdAt.split('T')[0] : '-'}

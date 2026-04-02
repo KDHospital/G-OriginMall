@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BasicLayout from '../../layouts/BasicLayout';
-import { getNoticeOne } from '../../api/boardApi'; // 상세 조회 및 삭제 API 가정
+import { getBoardOne } from '../../api/boardApi'; // 상세 조회 및 삭제 API 가정
 
 const BoardReadPage = () => {
   const { bno } = useParams(); // URL 파라미터에서 게시글 번호 추출
@@ -12,7 +12,7 @@ const BoardReadPage = () => {
   // DTO 필드명
   useEffect(() => {
     setLoading(true);
-    getNoticeOne(bno).then(data => {
+    getBoardOne(bno).then(data => {
       setPost(data);
       setLoading(false);
     }).catch(err => {

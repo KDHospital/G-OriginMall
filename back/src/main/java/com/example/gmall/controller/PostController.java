@@ -1,6 +1,5 @@
 package com.example.gmall.controller;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.gmall.dto.board.PageResponseDTO;
 import com.example.gmall.dto.board.PostDetailResponseDTO;
 import com.example.gmall.dto.board.PostListResponseDTO;
 import com.example.gmall.service.PostService;
@@ -26,13 +26,13 @@ public class PostController {
 
     // 1. [공지사항] 목록 조회
     @GetMapping("")
-    public ResponseEntity<Page<PostListResponseDTO>> getNoticeList(Pageable pageable) {
-        return ResponseEntity.ok(postService.getNoticeList(pageable));
+    public ResponseEntity<PageResponseDTO<PostListResponseDTO>> getNoticeList(Pageable pageable) {
+        return ResponseEntity.ok(postService.getBoardList(pageable));
     }
 
     // 2. [고객문의] 목록 조회
     @GetMapping("/inquiry")
-    public ResponseEntity<Page<PostListResponseDTO>> getInquiryList(Pageable pageable) {
+    public ResponseEntity<PageResponseDTO<PostListResponseDTO>> getInquiryList(Pageable pageable) {
         return ResponseEntity.ok(postService.getInquiryList(pageable));
     }
     

@@ -8,7 +8,7 @@ const host = `${API_SERVER_HOST}/api/board`;
 
 
 // [공지사항] 목록 조회
-export const fetchNotice = async (page = 0, size = 10) => {
+export const fetchBoard = async (page = 0, size = 10) => {
     const response = await axios.get(`${host}`, { params: { page, size } });
     return response.data;
 }
@@ -31,7 +31,7 @@ export const addInquiry = async (data) => {
 };
 
 //[공지사항/고객문의] 상세조회
-export const getNoticeOne = async(id) => {
+export const getBoardOne = async(id) => {
     const response = await axios.get(`${host}/${id}`);
     return response.data;
 }
