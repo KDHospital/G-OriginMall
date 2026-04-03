@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import com.example.gmall.domain.Orders;
 import com.example.gmall.domain.Product;
 import com.example.gmall.dto.order.OrderRequestDTO;
 import com.example.gmall.dto.order.OrderResponseDTO;
+import com.example.gmall.dto.order.OrderStatusHistoryResponseDTO;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.repository.OrderItemRepository;
 import com.example.gmall.repository.OrderStatusHistoryRepository;
@@ -335,6 +337,86 @@ public class OrderServiceImpl implements OrderService {
         orders.updateStatus((byte) 1);
 
         log.info("결제 승인 완료 - orderId: {}, paymentKey: {}", orderId, paymentKey);
+    }
+    
+    // 주문(결제) 이력
+    @Override
+    public List<OrderStatusHistoryResponseDTO> getOrderHistory(Long memberId, Long orderId) {
+        // 본인 주문인지 검증
+        getOrderOfMember(memberId, orderId);
+
+        return orderStatusHistoryRepository
+                .findByOrdersOrderIdOrderByCreatedAtDesc(orderId)
+                .stream()
+                .map(OrderStatusHistoryResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public Map<String, Long> getSellerOrderCount(Long sellerId) {
+        Map<String, Long> count = new HashMap<>();
+        count.put("total", ordersRepository.countBySellerId(sellerId));
+        count.put("status0", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 0));
+        count.put("status1", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 1));
+        count.put("status2", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 2));
+        count.put("status3", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 3));
+        count.put("status4", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 4));
+        return count;
+    }
+
+    @Override
+    public void updateOrderStatus(Long sellerId, Long orderId, Byte newStatus) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 본인 상점 주문인지 검증
+        if (!orders.getSeller().getId().equals(sellerId)) {
+            throw new IllegalStateException("접근 권한이 없습니다.");
+        }
+
+        // 취소(4)는 cancelOrder() 사용
+        if (newStatus == 4) {
+            throw new IllegalStateException("취소는 취소 API를 사용해주세요.");
+        }
+
+        // 배송완료(3) 이후는 변경 불가
+        if (orders.getStatus() >= 3) {
+            throw new IllegalStateException("배송완료된 주문은 상태를 변경할 수 없습니다.");
+        }
+
+        // 한 단계씩만 앞으로
+        if (newStatus != orders.getStatus() + 1) {
+            throw new IllegalStateException("순서에 맞게 상태를 변경해주세요.");
+        }
+
+        // 상태 이력 저장
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus(newStatus)
+                .memo(switch (newStatus) {
+                    case 2 -> "배송 시작";
+                    case 3 -> "배송 완료";
+                    default -> "상태 변경";
+                })
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+        orders.updateStatus(newStatus);
+
+        log.info("주문 상태 변경 - orderId: {}, {} → {}", orderId, orders.getStatus(), newStatus);
+    }
+
+    // 기존 getSellerOrders 수정
+    @Override
+    public Page<OrderResponseDTO> getSellerOrders(Long sellerId, Byte status, Pageable pageable) {
+        if (status == null) {
+            return ordersRepository.findBySellerIdOrderByCreatedAtDesc(sellerId, pageable)
+                    .map(OrderResponseDTO::new);
+        }
+        return ordersRepository.findBySellerIdAndStatusOrderByCreatedAtDesc(sellerId, status, pageable)
+                .map(OrderResponseDTO::new);
     }
 	
 }

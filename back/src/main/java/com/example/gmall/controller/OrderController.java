@@ -1,6 +1,7 @@
 package com.example.gmall.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.gmall.dto.order.OrderRequestDTO;
 import com.example.gmall.dto.order.OrderResponseDTO;
+import com.example.gmall.dto.order.OrderStatusHistoryResponseDTO;
 import com.example.gmall.service.OrderService;
 
 import lombok.Getter;
@@ -119,6 +121,42 @@ public class OrderController {
         );
         return ResponseEntity.noContent().build();
     }
+    
+	 // 주문 상태 이력 조회
+	 // GET /api/orders/{orderId}/history
+	 @GetMapping("/orders/{orderId}/history")
+	 public ResponseEntity<List<OrderStatusHistoryResponseDTO>> getOrderHistory(
+	         @PathVariable("orderId") Long orderId,
+	         Authentication authentication
+	 ) {
+	     Long memberId = (Long) authentication.getPrincipal();
+	     List<OrderStatusHistoryResponseDTO> result = orderService.getOrderHistory(memberId, orderId);
+	     return ResponseEntity.ok(result);
+	 }
+	 
+	// 판매자 주문 카운트
+	// GET /api/seller/orders/count
+	@GetMapping("/seller/orders/count")
+	public ResponseEntity<Map<String, Long>> getSellerOrderCount(
+	        Authentication authentication
+	) {
+	    Long sellerId = (Long) authentication.getPrincipal();
+	    return ResponseEntity.ok(orderService.getSellerOrderCount(sellerId));
+	}
+
+	// 기존 getSellerOrders 수정 — status 파라미터 추가
+	@GetMapping("/seller/orders")
+	public ResponseEntity<Page<OrderResponseDTO>> getSellerOrders(
+	        @RequestParam(name = "page", defaultValue = "0") int page,
+	        @RequestParam(name = "size", defaultValue = "10") int size,
+	        @RequestParam(name = "status", required = false) Byte status,
+	        Authentication authentication
+	) {
+	    Long sellerId = (Long) authentication.getPrincipal();
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<OrderResponseDTO> result = orderService.getSellerOrders(sellerId, status, pageable);
+	    return ResponseEntity.ok(result);
+	}
     
     
 }
