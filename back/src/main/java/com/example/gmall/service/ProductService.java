@@ -1,6 +1,7 @@
 package com.example.gmall.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.example.gmall.dto.product.ProductCreateRequestDTO;
 import com.example.gmall.dto.product.ProductDetailResponseDTO;
@@ -20,4 +21,7 @@ public interface ProductService {
 	
 	//웹-상품 상세 조회
     ProductDetailResponseDTO getProduct(Long productId);
+    
+    // 판매자별 상품 목록 조회 (전체 상태 포함)
+    Page<ProductResponseDTO> getSellerProducts(Long sellerId, Pageable pageable);
 }

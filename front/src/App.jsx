@@ -20,8 +20,9 @@ import Mypapge from './pages/member/MyPage';
 import FindIdPage from './pages/member/FindIdPage';
 import FindPwdPage from './pages/member/FindPwdPage';
 
-import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
+import SellerDashboardPage from './pages/seller/SellerDashboardPage';
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
+import SellerProductListPage from './pages/seller/SellerProductListPage';
 
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
@@ -100,6 +101,7 @@ function App() {
         {/* 판매자 */}
         <Route path="/seller" element={<SellerDashboardPage />} />
         <Route path="/seller/products/new" element={<SellerProductNewPage />} />
+        <Route path="/seller/products" element={<SellerProductListPage />} />
 
 
         {/* 어드민-상품등록 */}

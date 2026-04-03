@@ -11,11 +11,13 @@ import org.springframework.data.repository.query.Param;
 import com.example.gmall.domain.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+	
 	//전체 상품 목록, ACTIVE 상태만 조회
 	@Query("SELECT p FROM Product p JOIN FETCH p.category "
 			+"WHERE p.soldStatus = 0 "
 			+"AND (:categoryId IS NULL OR p.category.categoryId = :categoryId)")
 	Page<Product> findActiveProducts(@Param("categoryId") Integer categoryId,Pageable pageable);
+	
 	//상세 조회
 	@Query("SELECT p FROM Product p " +
 		       "JOIN FETCH p.category " +
@@ -35,5 +37,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		    @Param("maxPrice") Integer maxPrice,
 		    Pageable pageable
 		);
+	
+	// 판매자별 상품 목록 조회 (전체 상태 포함)
+	Page<Product> findBySellerIdOrderByProductIdDesc(Long sellerId, Pageable pageable);
 	
 }
