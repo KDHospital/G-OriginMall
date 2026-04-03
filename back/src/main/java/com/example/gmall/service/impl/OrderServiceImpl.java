@@ -16,6 +16,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -165,12 +167,9 @@ public class OrderServiceImpl implements OrderService {
 
     // 주문 목록 조회
     @Override
-    @Transactional(readOnly = true)
-    public List<OrderResponseDTO> getOrders(Long memberId) {
-        return ordersRepository.findByMemberIdOrderByCreatedAtDesc(memberId)
-                .stream()
-                .map(OrderResponseDTO::new)
-                .collect(Collectors.toList());
+    public Page<OrderResponseDTO> getOrders(Long memberId, Pageable pageable) {
+        return ordersRepository.findByMemberIdOrderByCreatedAtDesc(memberId, pageable)
+                .map(OrderResponseDTO::new);
     }
 
     // 주문 상세 조회
