@@ -20,3 +20,9 @@ export const getCategories = () => {
 export const getCertifiedProducts = (params) => {
   return axiosInstance.get('/products/certified',{params});
 }
+//웹-기획전 전용관 상품 목록 조회
+// params 예시: { page: 0, size: 12, categoryId: 1 }
+// categoryId 없으면 전체 조회, 있으면 해당 카테고리만
+export const getExhibitionProducts = (params) => {
+  return axiosInstance.get('/products/exhibition',{params});
+}

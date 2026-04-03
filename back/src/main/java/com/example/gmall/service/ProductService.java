@@ -15,7 +15,9 @@ public interface ProductService {
     ProductDetailResponseDTO getProduct(Long productId);
     //웹-금빛나루 인증 목록 조회
     Page<ProductListResponseDTO> getCertifiedProducts(Integer categoryId,int minPrice, int maxPrice, String sort, int page, int size);
-	
+	//웹-기획전 목록 조회
+    Page<ProductListResponseDTO> getExhibitionProducts(Integer categoryId,int minPrice, int maxPrice, String sort, int page, int size);
+    
 	// 상품 등록 (판매자/어드민 공용)
     ProductResponseDTO register(Long sellerId, ProductRequestDTO dto);
 

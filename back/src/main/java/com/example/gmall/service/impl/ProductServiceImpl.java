@@ -82,6 +82,21 @@ public class ProductServiceImpl implements ProductService {
                 .map(ProductListResponseDTO::new);
     }
     
+    //웹-기획전 목록 조회
+    // GET /api/products/exhibition?page=0&size=12&categoryId=1
+    // ──────────────────────────────────────────    
+    public Page<ProductListResponseDTO> getExhibitionProducts(Integer categoryId,int minPrice, int maxPrice, String sort, int page, int size) {
+    	Sort sorting = switch (sort) {
+        case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
+        case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
+        default          -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
+    	};
+    	
+    	Pageable pageable = PageRequest.of(page, size, sorting);
+        return productRepository.findExhibitionProducts(categoryId, minPrice, maxPrice, pageable)
+                .map(ProductListResponseDTO::new);    	
+    }
+    
     //공통 유틸
     private Product findProductOrThrow(Long productId) {
         return productRepository.findById(productId)

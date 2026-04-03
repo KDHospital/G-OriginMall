@@ -100,7 +100,7 @@ const BasicMenu = () => {
 
               {/* 나머지 메뉴 */}
               {[
-                { name: "기획전", path: "/" },
+                { name: "기획전", path: "/products/exhibition" },
                 { name: "고객센터", path: "/board" },
                 { name: "입점신청", path: "/" },
               ].map(item => (
