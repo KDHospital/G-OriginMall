@@ -16,6 +16,66 @@ const STATUS_STYLE = {
     4: "bg-red-100 text-red-500",
 };
 
+// ─────────────────────────────────────────
+// 배송 타임라인
+// ─────────────────────────────────────────
+const TIMELINE_STEPS = [
+    { status: 1, label: "상품준비중" },
+    { status: 2, label: "배송중" },
+    { status: 3, label: "배송완료" },
+];
+
+function OrderTimeline({ order, history }) {
+    if (order.status === 0 || order.status === 4) return null;
+
+    const getStepTime = (status) => {
+        const found = history.find((h) => h.toStatus === status);
+        return found ? found.createdAt?.replace("T", " ").slice(0, 16) : null;
+    };
+
+    return (
+        <div className="flex items-start justify-center gap-0 py-4">
+            {TIMELINE_STEPS.map((step, idx) => {
+                const isDone = order.status >= step.status;
+                const isCurrent = order.status === step.status;
+                const time = getStepTime(step.status);
+
+                return (
+                    <div key={step.status} className="flex items-center">
+                        {/* 스텝 */}
+                        <div className="flex flex-col items-center w-32">
+                            {/* 원 */}
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                                isDone
+                                    ? "bg-gray-800 border-gray-800 text-white"
+                                    : "bg-white border-gray-300 text-gray-300"
+                            }`}>
+                                {isDone ? "✓" : <span className="text-xs">{idx + 1}</span>}
+                            </div>
+                            {/* 라벨 */}
+                            <p className={`text-xs mt-1 font-medium whitespace-nowrap ${
+                                isCurrent ? "text-gray-800 font-bold" : isDone ? "text-gray-600" : "text-gray-300"
+                            }`}>
+                                {step.label}
+                            </p>
+                            {/* 시간 */}
+                            <p className="text-xs text-gray-400 mt-0.5 whitespace-nowrap">
+                                {time ?? "-"}
+                            </p>
+                        </div>
+                        {/* 연결선 */}
+                        {idx < TIMELINE_STEPS.length - 1 && (
+                            <div className={`h-px w-16 mb-6 ${
+                                order.status > step.status ? "bg-gray-800" : "bg-gray-200"
+                            }`} />
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
 function StatusBadge({ status, label }) {
     return (
         <span className={`text-xs px-2 py-1 rounded-full font-medium ${STATUS_STYLE[status] ?? "bg-gray-100 text-gray-500"}`}>
@@ -29,6 +89,7 @@ export default function MyOrderDetail() {
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [history, setHistory] = useState([]);
 
     // 주문 상세 조회
     const fetchOrder = () => {
@@ -44,6 +105,18 @@ export default function MyOrderDetail() {
 
     useEffect(() => {
         fetchOrder();
+    }, [orderId]);
+
+    // 주문 (배송) 상태 표기
+    const fetchHistory = () => {
+        axiosInstance.get(`/orders/${orderId}/history`)
+            .then((res) => setHistory(res.data))
+            .catch((err) => console.error("이력 조회 실패:", err));
+    };
+
+    useEffect(() => {
+        fetchOrder();
+        fetchHistory();
     }, [orderId]);
 
     // 주문 전체 취소
@@ -128,6 +201,11 @@ export default function MyOrderDetail() {
                                 )}
                             </div>
                         </div>
+
+                         {/* 타임라인 추가 */}
+                        <OrderTimeline order={order} history={history} />
+
+
                     </section>
 
                     {/* 주문 상품 목록 */}
@@ -158,7 +236,7 @@ export default function MyOrderDetail() {
                                                     
                                                     {order.orderItems?.[0]?.thumbnailImageUrl ? (
                                                         <img
-                                                            src={`${BASE_URL}${order.orderItems[0].thumbnailImageUrl}`}
+                                                            src={`${BASE_URL}${item.thumbnailImageUrl}`}
                                                             alt=""
                                                             className="w-full h-full object-cover"
                                                         />
