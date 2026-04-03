@@ -13,6 +13,7 @@ import ProductDetailPage from './pages/products/ProductDetailPage';
 import OrderSuccessPage from './pages/orders/OrderSuccessPage';
 import OrderFailPage from './pages/orders/OrderFailPage';
 import MyOrders from './pages/member/MyOrders';
+import MyOrderDetail from './pages/member/MyOrderDetail';
 
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
@@ -81,6 +82,7 @@ function App() {
         <Route path="/orders/success" element={<OrderSuccessPage />} />
         <Route path="/orders/fail"    element={<OrderFailPage />} />
         <Route path="/orders" element={<MyOrders />} /> 
+        <Route path="/orders/:orderId" element={<MyOrderDetail />} />
 
         {/* 게시판>공지사항 - 신시온 담당*/}
         <Route path="/board" element={<BoardPage />} />

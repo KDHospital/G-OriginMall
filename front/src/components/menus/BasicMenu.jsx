@@ -112,7 +112,6 @@ const BasicMenu = () => {
                 type="text"
               />
             </div>
-            {console.log("로그인 여부 : " + isLoggedIn + " role = " + role)}
             {/* 장바구니 — USER만 표시 */}
             {(isLoggedIn && role === 0) && (
               <Link to="/cart" className="p-2 hover:bg-slate-100 rounded-full relative">
