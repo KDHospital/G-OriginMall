@@ -46,7 +46,6 @@ public class ProductServiceImpl implements ProductService {
     
     //웹-상품 목록 조회
 	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int minPrice, int maxPrice, String sort, int page, int size){
-		log.info("ProductServiceImpl 파일 내부의 getProducts 접근");
 	    // sort 값에 따라 정렬 기준 결정
 	    Sort sorting = switch (sort) {
 	        case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
@@ -67,8 +66,21 @@ public class ProductServiceImpl implements ProductService {
 	            .orElseThrow(() -> new EntityNotFoundException("해당 상품을 찾을 수 없습니다. ID: " + productId));
 	    return new ProductDetailResponseDTO(product);
 	}
-    
-    
+	//웹-금빛나루 인증 목록 조회
+    // GET /api/products/certified?page=0&size=12&categoryId=1
+    // ──────────────────────────────────────────
+    public Page<ProductListResponseDTO> getCertifiedProducts(Integer categoryId,int minPrice, int maxPrice, String sort, int page, int size) {
+	    
+    	Sort sorting = switch (sort) {
+        case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
+        case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
+        default          -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
+    	};
+    	
+    	Pageable pageable = PageRequest.of(page, size, sorting);
+        return productRepository.findCertifiedProducts(categoryId, minPrice, maxPrice, pageable)
+                .map(ProductListResponseDTO::new);
+    }
     
     //공통 유틸
     private Product findProductOrThrow(Long productId) {
