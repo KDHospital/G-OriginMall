@@ -35,6 +35,9 @@ public interface OrderService {
     
     // 판매자 주문 관리 - 주문 집계
     Map<String, Long> getSellerOrderCount(Long sellerId);
+    
+    // 판매자 주문 관리 - 판매자 검증용
+    OrderResponseDTO getSellerOrder(Long sellerId, Long orderId);
 
 	// 판매자 주문 관리 - 기존 getSellerOrders 수정
 	Page<OrderResponseDTO> getSellerOrders(Long sellerId, Byte status, Pageable pageable);

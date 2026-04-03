@@ -24,6 +24,7 @@ import SellerDashboardPage from './pages/seller/SellerDashboardPage';
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
 import SellerProductListPage from './pages/seller/SellerProductListPage';
 import SellerOrders from './pages/seller/SellerOrders';
+import SellerOrderDetail from './pages/seller/SellerOrderDetail';
 
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
@@ -104,6 +105,7 @@ function App() {
         <Route path="/seller/products/new" element={<SellerProductNewPage />} />
         <Route path="/seller/products" element={<SellerProductListPage />} />
         <Route path="/seller/orders" element={<SellerOrders />} />
+        <Route path="/seller/orders/:orderId" element={<SellerOrderDetail />} />
 
 
         {/* 어드민-상품등록 */}

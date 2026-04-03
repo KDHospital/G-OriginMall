@@ -157,6 +157,30 @@ public class OrderController {
 	    Page<OrderResponseDTO> result = orderService.getSellerOrders(sellerId, status, pageable);
 	    return ResponseEntity.ok(result);
 	}
+	
+	// 판매자 주문 상세 조회 ( 판매자 검증 확인 )
+	// GET /api/seller/orders/{orderId}
+	@GetMapping("/seller/orders/{orderId}")
+	public ResponseEntity<OrderResponseDTO> getSellerOrder(
+	        @PathVariable("orderId") Long orderId,
+	        Authentication authentication
+	) {
+	    Long sellerId = (Long) authentication.getPrincipal();
+	    OrderResponseDTO result = orderService.getSellerOrder(sellerId, orderId);
+	    return ResponseEntity.ok(result);
+	}
     
+	// 판매자 주문 상태 변경
+	// PATCH /api/seller/orders/{orderId}/status
+	@PatchMapping("/seller/orders/{orderId}/status")
+	public ResponseEntity<Void> updateOrderStatus(
+	        @PathVariable("orderId") Long orderId,
+	        @RequestParam(name = "status") Byte status,
+	        Authentication authentication
+	) {
+	    Long sellerId = (Long) authentication.getPrincipal();
+	    orderService.updateOrderStatus(sellerId, orderId, status);
+	    return ResponseEntity.noContent().build();
+	}
     
 }

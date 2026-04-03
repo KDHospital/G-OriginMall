@@ -418,5 +418,19 @@ public class OrderServiceImpl implements OrderService {
         return ordersRepository.findBySellerIdAndStatusOrderByCreatedAtDesc(sellerId, status, pageable)
                 .map(OrderResponseDTO::new);
     }
+    
+    // 판매자 페이지 - 본인 점포 주문 검증
+    @Override
+    public OrderResponseDTO getSellerOrder(Long sellerId, Long orderId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 본인 상점 주문인지 검증
+        if (!orders.getSeller().getId().equals(sellerId)) {
+            throw new SecurityException("본인 상점의 주문만 조회할 수 있습니다.");
+        }
+
+        return new OrderResponseDTO(orders);
+    }
 	
 }
