@@ -3,6 +3,8 @@ package com.example.gmall.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -79,6 +81,20 @@ public class ProductController {
         Long sellerId = (Long) authentication.getPrincipal();
         return ResponseEntity.ok(productService.register(sellerId, dto));
     }
+    
+	 // 판매자 본인 상품 목록
+	 // GET /api/seller/products
+	 @GetMapping("/seller/products")
+	 public ResponseEntity<Page<ProductResponseDTO>> getSellerProducts(
+	         @RequestParam(name = "page", defaultValue = "0") int page,
+	         @RequestParam(name = "size", defaultValue = "10") int size,
+	         Authentication authentication
+	 ) {
+	     Long sellerId = (Long) authentication.getPrincipal();
+	     Pageable pageable = PageRequest.of(page, size);
+	     Page<ProductResponseDTO> result = productService.getSellerProducts(sellerId, pageable);
+	     return ResponseEntity.ok(result);
+	 }
 
     // 어드민 상품 등록 (기획전용)
     @PostMapping(value = "/admin/products",
@@ -94,5 +110,7 @@ public class ProductController {
     }
 	
 
+    
+    
     
 }

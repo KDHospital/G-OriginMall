@@ -30,6 +30,8 @@ public class CartItemResponseDTO {
 	
 	private Integer itemSubtotal; // price * quantity (배송비 제외 -> 동일 판매처 경우 중복 배송비 제거하기 위함)
 	
+	private String thumbnailImageUrl;
+	
 	public CartItemResponseDTO(CartItem cartItem) {
         this.cartItemId = cartItem.getCartItemId();
         this.productId = cartItem.getProduct().getProductId();
@@ -47,6 +49,7 @@ public class CartItemResponseDTO {
         this.deliveryFee = cartItem.getProduct().getDeliveryFee();
         this.quantity = cartItem.getQuantity();
         this.itemSubtotal = this.price * this.quantity; // 배송비 제외 -> 동일 판매처 경우 중복 배송비 제거하기 위함
+        this.thumbnailImageUrl = cartItem.getProduct().getThumbnailImageUrl();
     }
 	
 }

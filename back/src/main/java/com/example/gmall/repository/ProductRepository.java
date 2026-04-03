@@ -45,4 +45,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		    Pageable pageable
 		);
 	
+	// 판매자별 상품 목록 조회 (전체 상태 포함)
+	Page<Product> findBySellerIdOrderByProductIdDesc(Long sellerId, Pageable pageable);
+	
 }
