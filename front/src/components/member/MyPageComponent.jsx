@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { getMemberInfo , withdrawMember} from "../../api/memberApi"
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 
 const MyPageComponent = () => {
 
+    const location = useLocation();
 
     const [member, setMember] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -144,7 +145,13 @@ const handleWithdrawAction = () => {
 
         <nav className="space-y-1 text-sm">
             <div className="font-bold text-gray-400 mb-2 mt-4 text-xs uppercase">주문</div>
-          <Link to="/orders" className="block p-2 text-green-600 font-bold bg-green-50 rounded">
+          <Link 
+            to="/orders"
+            className={`block p-2 rounded transition-colors ${
+                location.pathname === "/orders"
+                    ? "text-green-600 font-bold bg-green-50"
+                    : "text-gray-600 hover:bg-gray-50"
+            }`}>
               주문 내역
           </Link>
           <div className="p-2 hover:bg-gray-50 rounded cursor-pointer text-gray-600">배송 조회</div>
@@ -240,7 +247,7 @@ const handleWithdrawAction = () => {
                           </td>
                           {/* 주문번호 */}
                           <td className="p-4 text-xs text-gray-500 whitespace-nowrap">
-                              ORD-{String(order.orderId).padStart(8, "0")}
+                              ORDER_{order.orderId}
                           </td>
                           {/* 상품정보 */}
                           <td className="p-4">
