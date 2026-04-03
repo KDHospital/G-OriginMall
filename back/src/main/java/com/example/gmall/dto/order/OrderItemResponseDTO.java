@@ -14,6 +14,7 @@ public class OrderItemResponseDTO {
     private Integer subtotal;
     private Byte status;        // 0=정상, 1=취소
     private String statusLabel; // 정상, 취소
+    private String thumbnailImageUrl;
 
     public OrderItemResponseDTO(OrderItem orderItem) {
         this.orderItemId = orderItem.getOrderItemId();
@@ -24,5 +25,6 @@ public class OrderItemResponseDTO {
         this.subtotal = orderItem.getSubtotal();
         this.status = orderItem.getStatus();
         this.statusLabel = orderItem.isCancelled() ? "취소" : "정상";
+        this.thumbnailImageUrl = orderItem.getProduct().getThumbnailImageUrl();
     }
 }

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
 import axiosInstance from "../../api/axios";
 import MyPageComponent from "../../components/member/MyPageComponent";
+import { BASE_URL } from "../../util/imagesUtil";
 
 // ─────────────────────────────────────────
 // 상태 배지
@@ -154,7 +155,17 @@ export default function MyOrderDetail() {
                                         <td className="p-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex-shrink-0 overflow-hidden">
-                                                    <div className="w-full h-full flex items-center justify-center text-gray-300 text-[10px]">No</div>
+                                                    
+                                                    {order.orderItems?.[0]?.thumbnailImageUrl ? (
+                                                        <img
+                                                            src={`${BASE_URL}${order.orderItems[0].thumbnailImageUrl}`}
+                                                            alt=""
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-300 text-[10px]">No</div>
+                                                    )}
+
                                                 </div>
                                                 <p className="font-medium text-gray-800 truncate max-w-[200px]">
                                                     {item.productName}

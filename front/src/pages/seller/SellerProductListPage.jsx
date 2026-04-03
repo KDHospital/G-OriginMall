@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SellerLayout from "../../layouts/SellerLayout";
 import axiosInstance from "../../api/axios";
+import { BASE_URL } from "../../util/imagesUtil";
 
 // ─────────────────────────────────────────
 // 판매 상태 배지
@@ -108,7 +109,7 @@ export default function SellerProductListPage() {
                                             <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 flex-shrink-0 overflow-hidden">
                                                 {product.thumbnailImageUrl ? (
                                                     <img
-                                                        src={`http://localhost:8080${product.thumbnailImageUrl}`}
+                                                        src={`${BASE_URL}${product.thumbnailImageUrl}`}
                                                         alt={product.pname}
                                                         className="w-full h-full object-cover"
                                                     />

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
 import axiosInstance from "../../api/axios";
 import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
+import { BASE_URL } from "../../util/imagesUtil";
 
 
 
@@ -436,7 +437,7 @@ function OrderSummaryPanel({ items, onSubmit, canSubmit }) {
             <div key={item.cartItemId ?? `${item.productId}-${idx}`} className="flex gap-3">
               <div className="w-12 h-12 bg-gray-100 rounded flex-shrink-0 border border-gray-200 overflow-hidden">
                 {item.thumbnailImageUrl ? (
-                  <img src={item.thumbnailImageUrl} alt={item.pname} className="w-full h-full object-cover" />
+                  <img src={`${BASE_URL}${item.thumbnailImageUrl}`} alt={item.pname} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">No</div>
                 )}
