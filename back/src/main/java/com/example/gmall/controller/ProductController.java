@@ -36,7 +36,7 @@ public class ProductController {
 	private final ProductService productService;
 	private final CategoryService categoryService;
 	
-    // 상품 전체/카테고리별 목록
+    // 웹-상품 전체/카테고리별 목록
     // GET /api/products?page=0&size=12&categoryId=1
     @GetMapping("/products")
     public ResponseEntity<Page<ProductListResponseDTO>> getProducts(
@@ -47,6 +47,27 @@ public class ProductController {
             @RequestParam(value = "page",defaultValue = "0")  int page,
             @RequestParam(value = "size",defaultValue = "12") int size) {
         return ResponseEntity.ok(productService.getProducts(categoryId, minPrice, maxPrice, sort, page, size));
+    }
+    
+    // 웹-상품 상세
+    // GET /api/products/{productId}
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<ProductDetailResponseDTO> getProduct(@PathVariable("productId") Long productId) {
+    	log.info("상품 상세 조회 ID: " + productId);
+    	return ResponseEntity.ok(productService.getProduct(productId));
+    }
+    
+    // 웹-금빛나루 전용관
+    // GET /api/products/certified?page=0&size=12&categoryId=1
+    @GetMapping("/products/certified")
+    public ResponseEntity<Page<ProductListResponseDTO>> getCertifiedProducts(
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "minPrice", defaultValue = "0") int minPrice,
+            @RequestParam(value = "maxPrice", defaultValue = "200000") int maxPrice,
+            @RequestParam(value = "sort",defaultValue = "latest") String sort,
+            @RequestParam(value = "page",defaultValue = "0")  int page,
+            @RequestParam(value = "size",defaultValue = "12") int size) {
+        return ResponseEntity.ok(productService.getCertifiedProducts(categoryId, minPrice, maxPrice, sort, page, size));
     }
     
     // 판매자 상품 등록
@@ -88,13 +109,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.register(adminId, dto));
     }
 	
-    // 상품 상세
-    // GET /api/products/{productId}
-    @GetMapping("/products/{productId}")
-    public ResponseEntity<ProductDetailResponseDTO> getProduct(@PathVariable("productId") Long productId) {
-    	log.info("상품 상세 조회 ID: " + productId);
-    	return ResponseEntity.ok(productService.getProduct(productId));
-    }
+
     
     
     

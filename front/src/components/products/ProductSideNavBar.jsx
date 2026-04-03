@@ -90,7 +90,7 @@ const ProductSideNavBar = () => {
     return (
         <div className="flex flex-col py-8 pr-4 sticky top-24">
             {/* 1뎁스 카테고리명 */}
-            <h2 className="font-bold text-2xl text-green-900 dark:text-green-400 mb-1">
+            <h2 className="font-bold text-2xl text-green-900 mb-1">
                 {parentCategory?.categoryName || '전체 상품'}
             </h2>
             <p className="font-manrope text-xs text-stone-500 mb-8 tracking-wide">로컬 김포 푸드</p>
@@ -105,8 +105,8 @@ const ProductSideNavBar = () => {
                             onClick={() => moveToCategory(child.categoryId)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-r-full transition-all text-left
                                 ${isActive
-                                    ? 'bg-stone-200/50 dark:bg-stone-800/50 text-green-900 dark:text-amber-500 font-semibold'
-                                    : 'text-stone-500 dark:text-stone-400 hover:translate-x-1 hover:bg-stone-100 dark:hover:bg-stone-800'
+                                    ? 'bg-stone-200/50 text-green-900 font-semibold'
+                                    : 'text-stone-500 hover:translate-x-1 hover:bg-stone-100'
                                 }`}
                         >
                             <span className="material-symbols-outlined text-xl">
