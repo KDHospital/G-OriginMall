@@ -23,6 +23,7 @@ import FindPwdPage from './pages/member/FindPwdPage';
 import SellerDashboardPage from './pages/seller/SellerDashboardPage';
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
 import SellerProductListPage from './pages/seller/SellerProductListPage';
+import SellerOrders from './pages/seller/SellerOrders';
 
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
@@ -102,6 +103,7 @@ function App() {
         <Route path="/seller" element={<SellerDashboardPage />} />
         <Route path="/seller/products/new" element={<SellerProductNewPage />} />
         <Route path="/seller/products" element={<SellerProductListPage />} />
+        <Route path="/seller/orders" element={<SellerOrders />} />
 
 
         {/* 어드민-상품등록 */}
