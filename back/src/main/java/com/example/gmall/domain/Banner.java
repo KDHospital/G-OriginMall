@@ -41,4 +41,14 @@ public class Banner {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+    
+    public void updateBanner(String linkUrl, Integer sortOrder, boolean isActive) {
+        this.linkUrl   = linkUrl;
+        this.sortOrder = sortOrder;
+        this.isActive  = isActive;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

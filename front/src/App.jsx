@@ -10,16 +10,23 @@ import AdminProductNewPage from './pages/admin/AdminProductNewPage';
 import OrderFormPage from './pages/orders/OrderFormPage';
 import ProductListPage from './pages/products/ProductListPage';
 import ProductDetailPage from './pages/products/ProductDetailPage';
+import CertifiedListPage from './pages/products/CertifiedListPage';
+import CertifiedDetailPage from './pages/products/CertifiedDetailPage';
 import OrderSuccessPage from './pages/orders/OrderSuccessPage';
 import OrderFailPage from './pages/orders/OrderFailPage';
+import MyOrders from './pages/member/MyOrders';
+import MyOrderDetail from './pages/member/MyOrderDetail';
 
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
 import FindIdPage from './pages/member/FindIdPage';
 import FindPwdPage from './pages/member/FindPwdPage';
 
-import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
+import SellerDashboardPage from './pages/seller/SellerDashboardPage';
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
+import SellerProductListPage from './pages/seller/SellerProductListPage';
+import SellerOrders from './pages/seller/SellerOrders';
+import SellerOrderDetail from './pages/seller/SellerOrderDetail';
 
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
@@ -74,12 +81,15 @@ function App() {
         {/* 상품 - 이효진 담당 */}
         <Route path="/products" element={<ProductListPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
+        <Route path="/products/certified" element={<CertifiedListPage />} />
+        <Route path="/products/certified/:productId" element={<CertifiedDetailPage />} />
 
         {/* 주문 - 김슬기 담당 */}
         <Route path="/orders/new" element={<OrderFormPage />} />
         <Route path="/orders/success" element={<OrderSuccessPage />} />
         <Route path="/orders/fail"    element={<OrderFailPage />} />
-        {/* <Route path="/orders" element={<OrderPage />} /> */}
+        <Route path="/orders" element={<MyOrders />} /> 
+        <Route path="/orders/:orderId" element={<MyOrderDetail />} />
 
         {/* 게시판>공지사항 - 신시온 담당*/}
         <Route path="/board" element={<BoardPage />} />
@@ -97,6 +107,9 @@ function App() {
         {/* 판매자 */}
         <Route path="/seller" element={<SellerDashboardPage />} />
         <Route path="/seller/products/new" element={<SellerProductNewPage />} />
+        <Route path="/seller/products" element={<SellerProductListPage />} />
+        <Route path="/seller/orders" element={<SellerOrders />} />
+        <Route path="/seller/orders/:orderId" element={<SellerOrderDetail />} />
 
 
         {/* 어드민-상품등록 */}
