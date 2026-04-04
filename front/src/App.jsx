@@ -20,6 +20,7 @@ import FindPwdPage from './pages/member/FindPwdPage';
 
 import SellerDashboardPage from "./pages/seller/SellerDashboardPage";
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
+import SellerSingupPage from './pages/member/SellerSignupPage';
 
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
@@ -67,7 +68,7 @@ function App() {
         <Route path='/findpwd' element={<FindPwdPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
-        
+        <Route path='/sellersignup' element={<SellerSingupPage />} />
         {/* 장바구니 - 김슬기 담당 */}
         <Route path="/cart" element={<CartPage />} />
 

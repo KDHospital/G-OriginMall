@@ -22,7 +22,7 @@ const FooterMenu = () =>{
         },
         {
             name:"입점신청",
-            path:"/"
+            path:"/sellersignup"
         },
     ]
 
