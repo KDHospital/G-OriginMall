@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import BasicLayout from "../../layouts/BasicLayout";
-
+import { BASE_URL } from "../../util/imagesUtil";
 
 
 
@@ -66,7 +66,7 @@ function CartItemRow({ item, checked, onCheck, onQuantityChange, onRemove }) {
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 bg-gray-100 rounded flex-shrink-0 overflow-hidden border border-gray-200">
             {item.thumbnailImageUrl ? (
-              <img src={item.thumbnailImageUrl} alt={item.pname} className="w-full h-full object-cover" />
+              <img src={`${BASE_URL}${item.thumbnailImageUrl}`} alt={item.pname} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">No Image</div>
             )}

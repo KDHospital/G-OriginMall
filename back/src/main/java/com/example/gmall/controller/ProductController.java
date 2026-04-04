@@ -3,6 +3,8 @@ package com.example.gmall.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -34,7 +36,7 @@ public class ProductController {
 	private final ProductService productService;
 	private final CategoryService categoryService;
 	
-    // 상품 전체/카테고리별 목록
+    // 웹-상품 전체/카테고리별 목록
     // GET /api/products?page=0&size=12&categoryId=1
     @GetMapping("/products")
     public ResponseEntity<Page<ProductListResponseDTO>> getProducts(
@@ -45,6 +47,27 @@ public class ProductController {
             @RequestParam(value = "page",defaultValue = "0")  int page,
             @RequestParam(value = "size",defaultValue = "12") int size) {
         return ResponseEntity.ok(productService.getProducts(categoryId, minPrice, maxPrice, sort, page, size));
+    }
+    
+    // 웹-상품 상세
+    // GET /api/products/{productId}
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<ProductDetailResponseDTO> getProduct(@PathVariable("productId") Long productId) {
+    	log.info("상품 상세 조회 ID: " + productId);
+    	return ResponseEntity.ok(productService.getProduct(productId));
+    }
+    
+    // 웹-금빛나루 전용관
+    // GET /api/products/certified?page=0&size=12&categoryId=1
+    @GetMapping("/products/certified")
+    public ResponseEntity<Page<ProductListResponseDTO>> getCertifiedProducts(
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "minPrice", defaultValue = "0") int minPrice,
+            @RequestParam(value = "maxPrice", defaultValue = "200000") int maxPrice,
+            @RequestParam(value = "sort",defaultValue = "latest") String sort,
+            @RequestParam(value = "page",defaultValue = "0")  int page,
+            @RequestParam(value = "size",defaultValue = "12") int size) {
+        return ResponseEntity.ok(productService.getCertifiedProducts(categoryId, minPrice, maxPrice, sort, page, size));
     }
     
     // 판매자 상품 등록
@@ -58,6 +81,20 @@ public class ProductController {
         Long sellerId = (Long) authentication.getPrincipal();
         return ResponseEntity.ok(productService.register(sellerId, dto));
     }
+    
+	 // 판매자 본인 상품 목록
+	 // GET /api/seller/products
+	 @GetMapping("/seller/products")
+	 public ResponseEntity<Page<ProductResponseDTO>> getSellerProducts(
+	         @RequestParam(name = "page", defaultValue = "0") int page,
+	         @RequestParam(name = "size", defaultValue = "10") int size,
+	         Authentication authentication
+	 ) {
+	     Long sellerId = (Long) authentication.getPrincipal();
+	     Pageable pageable = PageRequest.of(page, size);
+	     Page<ProductResponseDTO> result = productService.getSellerProducts(sellerId, pageable);
+	     return ResponseEntity.ok(result);
+	 }
 
     // 어드민 상품 등록 (기획전용)
     @PostMapping(value = "/admin/products",
@@ -72,12 +109,8 @@ public class ProductController {
         return ResponseEntity.ok(productService.register(adminId, dto));
     }
 	
-    // 상품 상세
-    // GET /api/products/{productId}
-    @GetMapping("/products/{productId}")
-    public ResponseEntity<ProductDetailResponseDTO> getProduct(@PathVariable("productId") Long productId) {
-    	log.info("상품 상세 조회 ID: " + productId);
-    	return ResponseEntity.ok(productService.getProduct(productId));
-    }
+
+    
+    
     
 }

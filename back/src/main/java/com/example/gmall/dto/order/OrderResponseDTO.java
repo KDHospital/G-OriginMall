@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 public class OrderResponseDTO {
 
     private Long orderId;
-    private String orderGroupId; // ← 추가
+    private String orderGroupId;
     private Long memberId;
     private Long sellerId;
-    private String sellerName;   // ← 추가
+    private String sellerName;
     private Integer totalPrice;
     private Byte status;
     private String statusLabel;

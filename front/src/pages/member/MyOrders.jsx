@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { getMemberInfo } from "../../api/memberApi";
-import axiosInstance from "../../api/axios";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
+import axiosInstance from "../../api/axios";
 import MyPageComponent from "../../components/member/MyPageComponent";
 import { BASE_URL } from "../../util/imagesUtil";
 
@@ -25,108 +24,52 @@ function StatusBadge({ status, label }) {
     );
 }
 
-function MyPage() {
-    const navigate = useNavigate();
-    const [member, setMember] = useState(null);
+export default function MyOrders() {
+    const [orders, setOrders] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [orderSummary, setOrderSummary] = useState({ total: 0, delivering: 0 });
-    const [recentOrders, setRecentOrders] = useState([]);
-    const [cartCount, setCartCount] = useState(0);
 
-    const genderMap = { 0: "미지정", 1: "남성", 2: "여성" };
-
-    const formatPhoneNumber = (phoneNumber) => {
-        if (!phoneNumber) return "";
-        const num = phoneNumber.replace(/[^0-9]/g, "");
-        return num.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
-    };
+    const PAGE_SIZE = 10;
 
     useEffect(() => {
-        const savedMember = localStorage.getItem("member");
-        if (!savedMember) {
-            alert("로그인이 필요한 서비스입니다.");
-            navigate("/login");
-            return;
-        }
-
-        // 회원 정보
-        getMemberInfo()
+        setLoading(true);
+        axiosInstance.get(`/orders?page=${currentPage}&size=${PAGE_SIZE}`)
             .then((res) => {
-                setMember(res.data);
-                setLoading(false);
+                setOrders(res.data.content);
+                setTotalPages(res.data.totalPages);
+                setTotalElements(res.data.totalElements);
             })
-            .catch((err) => {
-                console.error("내 정보 불러오기 실패:", err);
-                alert("세션이 만료되었거나 정보를 가져올 수 없습니다. 다시 로그인해주세요.");
-                localStorage.removeItem("member");
-                navigate("/login");
-            });
-
-        // 주문 요약 + 최근 3건
-        axiosInstance.get("/orders?page=0&size=100")
-            .then((res) => {
-                const allOrders = res.data.content;
-                setOrderSummary({
-                    total: res.data.totalElements,
-                    delivering: allOrders.filter((o) => o.status === 2).length,
-                });
-                setRecentOrders(allOrders.slice(0, 3));
-            })
-            .catch((err) => console.error("주문 내역 로드 실패:", err));
-
-        // 장바구니
-        axiosInstance.get("/cart")
-            .then((res) => setCartCount(res.data.items?.length ?? 0))
-            .catch((err) => console.error("장바구니 로드 실패:", err));
-
-    }, [navigate]);
-
-    if (loading) {
-        return <div className="text-center p-20 font-bold">데이터를 불러오는 중입니다.</div>;
-    }
+            .catch((err) => console.error("주문 내역 로드 실패:", err))
+            .finally(() => setLoading(false));
+    }, [currentPage]);
 
     return (
         <BasicLayout>
             <div className="max-w-7xl mx-auto flex gap-8 p-10 bg-gray-50 min-h-screen">
 
                 {/* 사이드바 */}
-                <MyPageComponent member={member} />
+                <MyPageComponent member={null} />
 
                 {/* 메인 컨텐츠 */}
                 <main className="flex-grow space-y-6">
-                    <h2 className="text-2xl font-bold border-l-4 border-black pl-3">마이페이지</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-black pl-3">주문 내역</h2>
+                    <p className="text-sm text-gray-400">전체 {totalElements}건</p>
 
-                    {/* 요약 카드 */}
-                    <section className="grid grid-cols-3 gap-4">
-                        {[
-                            { label: "전체 주문", value: orderSummary.total, unit: "건" },
-                            { label: "배송 중", value: orderSummary.delivering, unit: "건" },
-                            { label: "장바구니", value: cartCount, unit: "개 상품" },
-                        ].map((card) => (
-                            <div key={card.label} className="bg-white border border-gray-200 rounded-md p-6 shadow-sm">
-                                <p className="text-xs text-gray-400 mb-1">{card.label}</p>
-                                <p className="text-3xl font-bold">{card.value}</p>
-                                <p className="text-xs text-gray-400 mt-1">{card.unit}</p>
-                            </div>
-                        ))}
-                    </section>
-
-                    {/* 최근 주문 내역 */}
                     <section className="bg-white border border-gray-200 shadow-sm rounded-md">
-                        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-                            <h3 className="font-bold text-base">최근 주문 내역</h3>
-                            <Link to="/orders" className="text-xs text-gray-400 hover:text-gray-700">
-                                전체보기 →
-                            </Link>
-                        </div>
-                        {recentOrders.length === 0 ? (
-                            <div className="text-center py-12 text-sm text-gray-400">
+                        {loading ? (
+                            <div className="flex items-center justify-center py-20">
+                                <div className="w-8 h-8 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin" />
+                            </div>
+                        ) : orders.length === 0 ? (
+                            <div className="text-center py-20 text-sm text-gray-400">
                                 주문 내역이 없습니다.
                             </div>
                         ) : (
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="bg-gray-50 text-xs text-gray-500">
+                                    <tr className="bg-gray-50 text-xs text-gray-500 border-b border-gray-100">
                                         <th className="p-4 text-left font-medium">주문일</th>
                                         <th className="p-4 text-left font-medium">주문번호</th>
                                         <th className="p-4 text-left font-medium">상품정보</th>
@@ -136,7 +79,7 @@ function MyPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {recentOrders.map((order) => (
+                                    {orders.map((order) => (
                                         <tr key={order.orderId} className="border-t border-gray-50 hover:bg-gray-50 transition-colors">
                                             <td className="p-4 text-xs text-gray-500 whitespace-nowrap">
                                                 {order.createdAt?.slice(0, 10)}
@@ -163,7 +106,7 @@ function MyPage() {
                                                         <p className="font-medium text-gray-800 truncate max-w-[200px]">
                                                             {order.orderItems?.[0]?.productName}
                                                             {order.orderItems?.length > 1 && (
-                                                                <span className="text-gray-400"> 외 {order.orderItems.length - 1}건</span>
+                                                                <span className="text-gray-400 text-xs"> 외 {order.orderItems.length - 1}건</span>
                                                             )}
                                                         </p>
                                                         <p className="text-xs text-gray-400">수량 {order.orderItems?.[0]?.quantity}</p>
@@ -179,7 +122,7 @@ function MyPage() {
                                             <td className="p-4 text-center">
                                                 <Link
                                                     to={`/orders/${order.orderId}`}
-                                                    className="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                                                    className="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors whitespace-nowrap"
                                                 >
                                                     상세보기
                                                 </Link>
@@ -191,30 +134,40 @@ function MyPage() {
                         )}
                     </section>
 
-                    {/* 회원 정보 */}
-                    <section className="bg-white p-8 border border-gray-200 shadow-sm rounded-md">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-bold text-lg">회원 정보</h3>
+                    {/* 페이지네이션 */}
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-1">
                             <button
-                                className="text-sm border border-gray-300 px-4 py-1 hover:bg-gray-50"
-                                onClick={() => navigate("/modifypage")}
+                                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                                disabled={currentPage === 0}
+                                className="px-3 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                                수정하기
+                                이전
+                            </button>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentPage(i)}
+                                    className={`px-3 py-1.5 text-xs border rounded transition-colors ${
+                                        currentPage === i
+                                            ? "bg-gray-800 text-white border-gray-800"
+                                            : "border-gray-300 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
+                                disabled={currentPage === totalPages - 1}
+                                className="px-3 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                                다음
                             </button>
                         </div>
-                        <table className="w-full text-sm border-t border-gray-100">
-                            <tbody>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">아이디</td><td className="p-4">{member.loginId}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">이름</td><td className="p-4">{member.mname}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">연락처</td><td className="p-4">{formatPhoneNumber(member.tel)}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">성별</td><td className="p-4">{genderMap[member.gender] || "정보 없음"}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">가입일</td><td className="p-4">2026-01-15</td></tr>
-                            </tbody>
-                        </table>
-                    </section>
+                    )}
                 </main>
             </div>
         </BasicLayout>
     );
 }
-export default MyPage;

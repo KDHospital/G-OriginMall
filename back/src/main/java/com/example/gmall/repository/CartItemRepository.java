@@ -2,10 +2,12 @@ package com.example.gmall.repository;
 
 import com.example.gmall.domain.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     // 특정 회원의 장바구니 전체 조회

@@ -75,6 +75,12 @@ export default function SellerProductNewPage() {
     const parentId = parseInt(e.target.value);
     setSelectedParentId(parentId || null);
     setSelectedCategoryId(""); // 하위 카테고리 초기화
+
+    // ↓ 추가 — 하위 카테고리가 없는 경우 상위 카테고리 ID 바로 사용
+    const hasChildren = categories.some((c) => c.parentId === parentId);
+    if (!hasChildren) {
+        setSelectedCategoryId(String(parentId));
+    }
   };
 
   // 이미지 추가
@@ -182,14 +188,18 @@ export default function SellerProductNewPage() {
                 <select
                   value={selectedCategoryId}
                   onChange={(e) => setSelectedCategoryId(e.target.value)}
-                  disabled={!selectedParentId}
+                  disabled={!selectedParentId || childCategories.length === 0}
                   className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 focus:outline-none focus:border-green-400 bg-white disabled:opacity-40"
-                >
-                  <option value="">하위 카테고리 선택</option>
+              >
+                  <option value="">
+                      {childCategories.length === 0 && selectedParentId
+                          ? "하위 카테고리 없음"
+                          : "하위 카테고리 선택"}
+                  </option>
                   {childCategories.map((c) => (
-                    <option key={c.categoryId} value={c.categoryId}>
-                      {c.categoryName}
-                    </option>
+                      <option key={c.categoryId} value={c.categoryId}>
+                          {c.categoryName}
+                      </option>
                   ))}
                 </select>
               </div>
