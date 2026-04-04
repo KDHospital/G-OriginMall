@@ -1,9 +1,11 @@
 package com.example.gmall.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.SellerDTO;
 import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 
@@ -38,4 +40,6 @@ public interface MemberService {
 	void approveSeller(Long memberId);
 	
 	void rejectSeller(Long memberId);
+	
+	List<SellerDTO> getPendingSellerList();
 }

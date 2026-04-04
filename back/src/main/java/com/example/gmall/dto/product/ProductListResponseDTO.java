@@ -16,10 +16,11 @@ public class ProductListResponseDTO {
 	private Integer price;
 	private Integer stock;
 	private Integer deliveryFee;
-	//대표이미지url,판매상태,김포시인증여부
+	//대표이미지url,판매상태,김포시인증여부,기획전 여부
 	private String thumbnailImageUrl;
 	private Byte soldStatus;
 	private boolean isCertified;
+	private boolean isExhibition;
 	//카테고리 id,카테고리 명, 생성일시 
 	private Integer categoryId;
 	private String categoryName;
@@ -36,6 +37,7 @@ public class ProductListResponseDTO {
 		this.thumbnailImageUrl = p.getThumbnailImageUrl();
 		this.soldStatus = p.getSoldStatus();
 		this.isCertified = p.isCertified();
+		this.isExhibition = p.isExhibition();
 		this.categoryId = p.getCategory().getCategoryId();
 		this.categoryName = p.getCategory().getCategoryName();
 		this.createdAt = p.getCreatedAt();
