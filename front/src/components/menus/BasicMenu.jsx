@@ -16,6 +16,7 @@ const BasicMenu = () => {
 
   const [categories, setCategories] = useState([])
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false)
+  const [isExMenuOpen, setIsExMenuOpen] = useState(false)
 
   useEffect(() => {
     getCategories().then(res => setCategories(res.data)).catch(err => console.error("카테고리 로드 실패", err))
@@ -64,15 +65,7 @@ const BasicMenu = () => {
 
                 {/* 드롭다운 */}
                 {isProductMenuOpen && (
-                  <div className="absolute left-0 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
-                    {/* 금빛나루 전용관 */}
-                    <Link
-                      to="/products/certified"
-                      className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
-                    >
-                      금빛나루 전용관
-                    </Link>
-                    <hr className="my-1 border-slate-100" />                    
+                  <div className="absolute left-0 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">               
                     {/* 전체 상품 */}
                     <Link
                       to="/products"
@@ -98,9 +91,44 @@ const BasicMenu = () => {
                 )}
               </li>
 
+              {/* 기획전 메뉴 — 호버 드롭다운 */}
+              <li
+                className="relative "
+                onMouseEnter={() => setIsExMenuOpen(true)}
+                onMouseLeave={() => setIsExMenuOpen(false)}
+              >
+                <div className="h-full flex items-center">
+                  <div
+                    className="text-sm font-semibold hover:text-primary transition-colors"
+                  >
+                    기획전
+                  </div>
+                </div>
+
+                {/* 드롭다운 */}
+                {isExMenuOpen && (
+                  <div className="absolute left-0 w-40 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50">
+                    {/* 금빛나루 전용관 */}
+                    <Link
+                      to="/products/certified"
+                      className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
+                    >
+                      금빛나루 전용관
+                    </Link>
+                    <hr className="my-1 border-slate-100" />                    
+                    {/* 기획전  */}
+                    <Link
+                      to="/products/exhibition"
+                      className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
+                    >
+                      기획전
+                    </Link>
+
+                  </div>
+                )}
+              </li>
               {/* 나머지 메뉴 */}
               {[
-                { name: "기획전", path: "/products/exhibition" },
                 { name: "고객센터", path: "/board" },
                 { name: "입점신청", path: "/" },
               ].map(item => (

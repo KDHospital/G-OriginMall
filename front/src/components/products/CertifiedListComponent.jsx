@@ -75,42 +75,50 @@ const CertifiedListComponent = () => {
     if (error) return <div>{error}</div>
 
     return(
-        <div className="pt-24 pb-16 max-w-screen-2xl mx-auto px-6">
-            {/* navigation bar */}
-            <nav className="flex items-center gap-2 mb-8 text-on-surface-variant font-manrope text-sm">
-                <Link to={"/"} className="hover:text-primary">홈</Link>
-                <span className="material-symbols-outlined text-xs">chevron_right</span>
-                <Link to={"/products/certified"} className="hover:text-primary">금빛나루 전용관</Link>
-                <span className="material-symbols-outlined text-xs">chevron_right</span>
-                <span className="font-semibold text-primary">전체 상품</span>
-            </nav>
-            <div className="flex flex-col md:flex-row gap-12">
-                {/* Product Canvas */}
-                <section className="flex-1">
-                    {/* Title & Sort */}
-                    <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                        <ProducstListHeader title={'금빛나루 전용관'} desc={"김포 특산물을 신선하게 만나보세요!"}  />
-                        {/* 필터 */}
-                        <ProductSortSelect />
-                    </header>
-                    {/* Product Grid */}
-                    {product.length === 0 ? (
-                    <div className="text-center py-24 text-on-surface-variant">
-                        <span className="material-symbols-outlined text-5xl">inventory_2</span>
-                        <p className="mt-4">등록된 인증 상품이 없습니다.</p>
-                    </div>
-                    ) :
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
-                        {product.map((product) => (
-                            <div key={product.productId} product={product} onClick={()=>moveToCertifiedRead(product.productId)}>
-                                <ProductCard item={product} />
-                            </div>
-                        ))}
-                    </div>}
-                    <Pagination serverData={serverData} movePage={moveToCertified} />
-                </section>
+        <section>
+            <div className="relative h-[400px] overflow-hidden">
+                <div className="absolute inset-0 transition-opacity duration-700">
+                    <img className="w-full h-full object-cover" src="https://i.postimg.cc/YS8fxgPg/Gemini-Generated-Image-ymprnhymprnhympr.png" alt="금빛나루 배너 이미지" />
+                </div>
+            </div>        
+            <div className="pt-10 pb-16 max-w-screen-2xl mx-auto px-6">
+                {/* navigation bar */}
+                <nav className="flex items-center gap-2 mb-8 text-on-surface-variant font-manrope text-sm">
+                    <Link to={"/"} className="hover:text-primary">홈</Link>
+                    <span className="material-symbols-outlined text-xs">chevron_right</span>
+                    <span className="hover:text-primary">기획전</span>
+                    <span className="material-symbols-outlined text-xs">chevron_right</span>
+                    <span className="font-semibold text-primary">금빛나루 전용관</span>
+                </nav>
+                <div className="flex flex-col md:flex-row gap-12">
+                    {/* Product Canvas */}
+                    <section className="flex-1">
+                        {/* Title & Sort */}
+                        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                            <ProducstListHeader title={'금빛나루 전용관'} desc={"김포시의 우수 농특산물 통합 브랜드로, 엄격한 심의를 거쳐 인증받은 고품질 농산물만을 선보입니다."}  />
+                            {/* 필터 */}
+                            <ProductSortSelect />
+                        </header>
+                        {/* Product Grid */}
+                        {product.length === 0 ? (
+                        <div className="text-center py-24 text-on-surface-variant">
+                            <span className="material-symbols-outlined text-5xl">inventory_2</span>
+                            <p className="mt-4">등록된 인증 상품이 없습니다.</p>
+                        </div>
+                        ) :
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                            {product.map((product) => (
+                                <div key={product.productId} product={product} onClick={()=>moveToCertifiedRead(product.productId)}>
+                                    <ProductCard item={product} />
+                                </div>
+                            ))}
+                        </div>}
+                        <Pagination serverData={serverData} movePage={moveToCertified} />
+                    </section>
+                </div>
             </div>
-        </div>
+
+        </section>
     )
 }
 export default CertifiedListComponent

@@ -21,10 +21,6 @@ public interface ProductService {
     
 	// 상품 등록 (판매자/어드민 공용)
     ProductResponseDTO register(Long sellerId, ProductRequestDTO dto);
-
-	
-	//웹-상품 상세 조회
-    ProductDetailResponseDTO getProduct(Long productId);
     
     // 판매자별 상품 목록 조회 (전체 상태 포함)
     Page<ProductResponseDTO> getSellerProducts(Long sellerId, Pageable pageable);
