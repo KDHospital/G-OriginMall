@@ -44,9 +44,9 @@ public class PostController {
     }
     
     // 4. [공통] 게시글 상세 조회 (경로 간소화)
-    @GetMapping("/{id}")
-    public ResponseEntity<PostDetailResponseDTO> getPost(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(postService.getPost(id));
+    @GetMapping("/{postid}")
+    public ResponseEntity<PostDetailResponseDTO> getPost(@PathVariable("postid") Long postId) {
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 
     // 5. [관리자] 답변 등록 (새로 추가)

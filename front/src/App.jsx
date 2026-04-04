@@ -83,7 +83,7 @@ function App() {
 
         {/* 게시판>공지사항 - 신시온 담당*/}
         <Route path="/board" element={<BoardPage />} />
-        <Route path="/board/read/:bno" element={<BoardReadPage />} />
+        <Route path="/board/read/:postId" element={<BoardReadPage />} />
         <Route path="/inquiry" element={<InquiryPage />} />
         <Route path="/inquiry/add" element={<InquiryAddModal />} />
         <Route path="/faq" element={<FaqPage />} />
@@ -107,8 +107,8 @@ function App() {
         {/* 어드민-게시판>공지사항 - 신시온 담당*/}
         <Route path="/admin/board" element={<AdminBoardListPage />} />
         <Route path="/admin/board/new" element={<AdminBoardAddPage />} />
-        <Route path="/admin/board/read/:bno" element={<AdminBoardReadPage />} />
-        <Route path="/admin/board/modify/:bno" element={<AdminBoardModifyPage />} />
+        <Route path="/admin/board/read/:postId" element={<AdminBoardReadPage />} />
+        <Route path="/admin/board/modify/:postId" element={<AdminBoardModifyPage />} />
         
         {/* 어드민-게시판>고객문의 - 신시온 담당*/}
         <Route path="/admin/inquiry" element={<AdminInquiryPage />} />

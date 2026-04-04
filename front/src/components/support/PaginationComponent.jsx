@@ -1,15 +1,17 @@
 import React from 'react';
 
-const PaginationComponent = ({ serverData, movePage }) => {
+const PaginationComponent = ({ currentPage, totalItems, itemsPerPage, onPageChange}) => {
 
-  const { pageNumList = [], current = 1, prev = false, next = false, prevPage = 0, nextPage = 0 } = serverData || {};
+  const totalPages = Math.ceil(totalItems/itemsPerPage);
+  const pageNumList = Array.from({length:totalPages}, (_, i)=> i+1);
+
+  if(totalItems < 0) return null;
 
   return (
     <div className="flex justify-center items-center gap-1 mt-12 pb-10">
-      {/* 이전 버튼: prev가 true일 때만 작동하도록 설정 가능 */}
+      {/* 이전 버튼*/}
       <button 
-        onClick={() => prev && movePage({ page: prevPage })}
-        disabled={!prev}
+        onClick={() => currentPage > 1 && onPageChange(currentPage -1)}
         className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 text-xs disabled:opacity-30"
       >
         &lt;
@@ -19,9 +21,9 @@ const PaginationComponent = ({ serverData, movePage }) => {
       {pageNumList.map(num => (
         <button
           key={num}
-          onClick={() => movePage && movePage({ page: num })}
+          onClick={() => onPageChange(num)}
           className={`w-8 h-8 flex items-center justify-center text-[13px] border ${
-            num === current 
+            num === currentPage 
               ? 'bg-[#333] text-white border-[#333] font-bold' 
               : 'text-gray-500 border-gray-200 hover:bg-gray-50'
           }`}
@@ -32,8 +34,7 @@ const PaginationComponent = ({ serverData, movePage }) => {
 
       {/* 다음 버튼 */}
       <button 
-        onClick={() => next && movePage({ page: nextPage })}
-        disabled={!next}
+        onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
         className="w-8 h-8 border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 text-xs disabled:opacity-30"
       >
         &gt;
