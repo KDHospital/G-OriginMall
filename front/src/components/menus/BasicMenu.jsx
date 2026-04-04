@@ -102,7 +102,7 @@ const BasicMenu = () => {
               {[
                 { name: "기획전", path: "/" },
                 { name: "고객센터", path: "/board" },
-                { name: "입점신청", path: "/" },
+                { name: "입점신청", path: "/sellersignup" },
               ].map(item => (
                 <li key={item.name} className="text-sm font-semibold hover:text-primary transition-colors">
                   <Link to={item.path}>{item.name}</Link>
