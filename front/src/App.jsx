@@ -33,6 +33,8 @@ import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
 import AdminBoardReadPage from './pages/admin/AdminBoardReadPage';
 import AdminBoardModifyPage from './pages/admin/AdminBoardModifyPage';
 import AdminInquiryPage from './pages/admin/AdminInquiryPage';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 
 import BoardPage from './pages/support/BoardPage';
 import BoardReadPage from './pages/support/BoardReadPage';
@@ -103,6 +105,8 @@ function App() {
 
         {/* 어드민 */}
         <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
+        <Route path="/admin/orders/:orderId" element={<AdminOrderDetail />} />
 
         {/* 판매자 */}
         <Route path="/seller" element={<SellerDashboardPage />} />

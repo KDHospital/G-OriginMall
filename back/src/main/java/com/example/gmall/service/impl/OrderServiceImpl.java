@@ -432,5 +432,100 @@ public class OrderServiceImpl implements OrderService {
 
         return new OrderResponseDTO(orders);
     }
+    
+    // 관리자 페이지 - 주문 조회
+    @Override
+    public Page<OrderResponseDTO> getAdminOrders(Byte status, String keyword, String sellerName,
+                                                  LocalDateTime startDate, LocalDateTime endDate,
+                                                  Pageable pageable) {
+        return ordersRepository.findAllWithFilters(status, keyword, sellerName, startDate, endDate, pageable)
+                .map(OrderResponseDTO::new);
+    }
+    
+    // 관리자 페이지 - 주문 집계
+    @Override
+    public Map<String, Long> getAdminOrderCount() {
+        Map<String, Long> count = new HashMap<>();
+        count.put("total", ordersRepository.count());
+        count.put("status0", ordersRepository.countByStatus((byte) 0));
+        count.put("status1", ordersRepository.countByStatus((byte) 1));
+        count.put("status2", ordersRepository.countByStatus((byte) 2));
+        count.put("status3", ordersRepository.countByStatus((byte) 3));
+        count.put("status4", ordersRepository.countByStatus((byte) 4));
+        return count;
+    }
+
+    @Override
+    public OrderResponseDTO getAdminOrder(Long orderId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+        return new OrderResponseDTO(orders);
+    }
+
+    @Override
+    public void adminCancelOrder(Long orderId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        orders.getOrderItems().stream()
+                .filter(item -> !item.isCancelled())
+                .forEach(item -> {
+                    item.getProduct().restoreStock(item.getQuantity());
+                    item.cancel();
+                });
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus((byte) 4)
+                .memo("관리자 주문 취소")
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+        orders.updateStatus((byte) 4);
+
+        log.info("관리자 주문 취소 - orderId: {}", orderId);
+    }
+    
+    // 관리자 페이지 - 주문 상태 변경
+    @Override
+    public void adminUpdateOrderStatus(Long orderId, Byte newStatus) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 취소(4)는 adminCancelOrder() 사용
+        if (newStatus == 4) {
+            throw new IllegalStateException("취소는 취소 API를 사용해주세요.");
+        }
+
+        // 배송완료(3) 이후는 변경 불가
+        if (orders.getStatus() >= 3) {
+            throw new IllegalStateException("배송완료된 주문은 상태를 변경할 수 없습니다.");
+        }
+
+        // 한 단계씩만 앞으로
+        if (newStatus != orders.getStatus() + 1) {
+            throw new IllegalStateException("순서에 맞게 상태를 변경해주세요.");
+        }
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus(newStatus)
+                .memo(switch (newStatus) {
+                    case 1 -> "상품 준비 확인 (관리자)";
+                    case 2 -> "배송 시작 (관리자)";
+                    case 3 -> "배송 완료 (관리자)";
+                    default -> "상태 변경 (관리자)";
+                })
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+        orders.updateStatus(newStatus);
+
+        log.info("관리자 주문 상태 변경 - orderId: {}, {} → {}", orderId, orders.getStatus(), newStatus);
+    }
 	
 }
