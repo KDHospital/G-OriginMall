@@ -4,7 +4,6 @@ import CertifiedListComponent from "../../components/products/CertifiedListCompo
 const CertifiedListPage = () => {
     return(
         <BasicLayout>
-            {/* CertifiedListComponent 삽입 */}
             <CertifiedListComponent />
         </BasicLayout>
     )

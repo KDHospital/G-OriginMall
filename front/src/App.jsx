@@ -12,6 +12,9 @@ import ProductListPage from './pages/products/ProductListPage';
 import ProductDetailPage from './pages/products/ProductDetailPage';
 import CertifiedListPage from './pages/products/CertifiedListPage';
 import CertifiedDetailPage from './pages/products/CertifiedDetailPage';
+import ExhibitionListPage from './pages/products/ExhibitionListPage';
+import ExhibitionDetailPage from './pages/products/ExhibitionDetailPage';
+
 import OrderSuccessPage from './pages/orders/OrderSuccessPage';
 import OrderFailPage from './pages/orders/OrderFailPage';
 import MyOrders from './pages/member/MyOrders';
@@ -86,6 +89,9 @@ function App() {
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/products/certified" element={<CertifiedListPage />} />
         <Route path="/products/certified/:productId" element={<CertifiedDetailPage />} />
+        <Route path="/products/exhibition" element={<ExhibitionListPage />} />
+        <Route path="/products/exhibition/:productId" element={<ExhibitionDetailPage />} />
+        
 
         {/* 주문 - 김슬기 담당 */}
         <Route path="/orders/new" element={<ProtectedRoute allowRole={0}><OrderFormPage /></ProtectedRoute>} />

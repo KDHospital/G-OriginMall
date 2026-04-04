@@ -109,7 +109,23 @@ const useCustomMove = () => {
             search: queryDefault
         })
     }
+    //웹-기획전 상품 목록 조회
+    const moveToExhibition = (pageParam) => {
+        const queryStr = createSearchParams({
+            page: pageParam?.page ?? 1,
+            size: pageParam?.size ?? 12,
+            ...(categoryId && { categoryId }),
+            sort,
+        }).toString()
+        navigate({ pathname: '/products/exhibition', search: queryStr })
+    }
+    const moveToExhibitionRead = (num) => {
+        navigate({
+            pathname: `/products/exhibition/${num}`,
+            search: queryDefault
+        })
+    }
 
-    return {moveToList,moveToRead,moveToCategory,moveToPrice,moveToSort,moveToCertified, moveToCertifiedRead,page,size,refresh,categoryId,minPrice,maxPrice,sort}
+    return {moveToList,moveToRead,moveToCategory,moveToPrice,moveToSort,moveToCertified, moveToCertifiedRead,moveToExhibition,moveToExhibitionRead,page,size,refresh,categoryId,minPrice,maxPrice,sort}
 }
 export default useCustomMove

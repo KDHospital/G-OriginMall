@@ -70,6 +70,20 @@ public class ProductController {
         return ResponseEntity.ok(productService.getCertifiedProducts(categoryId, minPrice, maxPrice, sort, page, size));
     }
     
+    // 웹-기획전 전용관
+    // GET /api/products/exhibition?page=0&size=12&categoryId=1
+    @GetMapping("/products/exhibition")
+    public ResponseEntity<Page<ProductListResponseDTO>> getExhibitionProducts(
+            @RequestParam(value = "categoryId", required = false) Integer categoryId,
+            @RequestParam(value = "minPrice", defaultValue = "0") int minPrice,
+            @RequestParam(value = "maxPrice", defaultValue = "200000") int maxPrice,
+            @RequestParam(value = "sort",defaultValue = "latest") String sort,
+            @RequestParam(value = "page",defaultValue = "0")  int page,
+            @RequestParam(value = "size",defaultValue = "12") int size) {
+        return ResponseEntity.ok(productService.getExhibitionProducts(categoryId, minPrice, maxPrice, sort, page, size));
+    }
+    
+    
     // 판매자 상품 등록
     // ── JWT 적용 완료 ─────────────────────────────────────────────────
     @PostMapping(value = "/seller/products",

@@ -22,6 +22,7 @@ public class ProductDetailResponseDTO {
     private String thumbnailImageUrl;
     private Byte soldStatus;
     private boolean isCertified;
+    private boolean isExhibition; //기획전 여부
     private Integer categoryId;
     private String categoryName;
     private Long sellerId;
@@ -45,6 +46,7 @@ public class ProductDetailResponseDTO {
         this.thumbnailImageUrl = p.getThumbnailImageUrl();
         this.soldStatus        = p.getSoldStatus();
         this.isCertified       = p.isCertified();
+        this.isExhibition	   = p.isExhibition();
         this.categoryId        = p.getCategory().getCategoryId();
         this.categoryName      = p.getCategory().getCategoryName();
         this.sellerId          = p.getSeller().getId();

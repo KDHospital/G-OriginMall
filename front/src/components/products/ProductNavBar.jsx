@@ -42,7 +42,7 @@ const ProductNavBar = () => {
             {/* Link to 링크 수정 필요 */}
             <Link to={"/"} className="hover:text-primary">홈</Link>
             <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <Link to={"/"} className="hover:text-primary">상품</Link>
+            <Link to={"/products"} className="hover:text-primary">상품</Link>
             <span className="material-symbols-outlined text-xs">chevron_right</span>
             <span className="font-semibold text-primary">{parentCategory?.categoryName || '전체 상품'}</span>
         </nav>
