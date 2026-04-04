@@ -180,4 +180,11 @@ public class ProductServiceImpl implements ProductService {
 	            })
 	            .toList();
 	}
+	
+	// 판매자별 상품 목록 조회 (전체 상태 포함)
+	@Override
+	public Page<ProductResponseDTO> getSellerProducts(Long sellerId, Pageable pageable) {
+	    return productRepository.findBySellerIdOrderByProductIdDesc(sellerId, pageable)
+	            .map(ProductResponseDTO::new);
+	}
 }

@@ -60,6 +60,10 @@ dependencies {
 
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-parameters']
+}
+
 // QClass 생성 위치를 build 폴더 밖으로 빼서 이클립스가 바로 인식하게 합니다.
 def querydslDir = "src/main/generated"
 

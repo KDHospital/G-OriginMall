@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.example.gmall.domain.DeliveryAddress;
 
+@Repository
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, Long> {
 
 	// 어드민 회원의 전체 배송지 목록 조회
