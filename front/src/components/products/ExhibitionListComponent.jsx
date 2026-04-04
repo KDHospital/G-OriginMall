@@ -83,7 +83,7 @@ const ExhibitionListComponent = () => {
                     <img className="w-full h-full object-cover" src="https://i.postimg.cc/CKYp8Tyk/Gemini-Generated-Image-db84xddb84xddb84.png" alt="기획전 배너 이미지" />
                 </div>
             </div>
-            <div className="pt-24 pb-16 max-w-screen-2xl mx-auto px-6">
+            <div className="pt-20 pb-16 max-w-screen-2xl mx-auto px-6">
                 {/* navigation bar */}
                 <nav className="flex items-center gap-2 mb-8 text-on-surface-variant font-manrope text-sm">
                     <Link to={"/"} className="hover:text-primary">홈</Link>

@@ -81,7 +81,7 @@ const CertifiedListComponent = () => {
                     <img className="w-full h-full object-cover" src="https://i.postimg.cc/YS8fxgPg/Gemini-Generated-Image-ymprnhymprnhympr.png" alt="금빛나루 배너 이미지" />
                 </div>
             </div>        
-            <div className="pt-10 pb-16 max-w-screen-2xl mx-auto px-6">
+            <div className="pt-20 pb-16 max-w-screen-2xl mx-auto px-6">
                 {/* navigation bar */}
                 <nav className="flex items-center gap-2 mb-8 text-on-surface-variant font-manrope text-sm">
                     <Link to={"/"} className="hover:text-primary">홈</Link>
