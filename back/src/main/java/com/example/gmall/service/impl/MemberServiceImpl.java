@@ -91,12 +91,12 @@ public class MemberServiceImpl implements MemberService {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
  	 	}
  	 	Map<String, Object> claims = member.getClaims();
- 	 	String accessToken = jwtUtil.generateToken(claims, 60);
+ 	 	String accessToken = jwtUtil.generateToken(claims, 180);
  	 	
  	 	Cookie cookie = new Cookie("accessToken", accessToken);
  	 	cookie.setHttpOnly(true);
  	 	cookie.setPath("/");
- 	 	cookie.setMaxAge(60*60);
+ 	 	cookie.setMaxAge(60*180);
  	 	cookie.setSecure(true);
  	 	
  	 	response.addCookie(cookie);
