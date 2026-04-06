@@ -66,5 +66,7 @@ public class SellerSignupDTO {
     @NotNull(message = "특산물 인증 여부를 선택해주세요.")
     private Boolean isVerified;
     
+    private String description;
+    
     private final Byte role = 1;
 }

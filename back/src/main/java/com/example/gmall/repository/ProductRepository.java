@@ -45,6 +45,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 		    Pageable pageable
 		);
 	
+	//기획전 전용관
+	@Query("SELECT p FROM Product p JOIN FETCH p.category c " +
+		       "WHERE p.soldStatus = 0 AND p.isExhibition = true " +
+		       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
+		       "AND p.price >= :minPrice " +
+		       "AND p.price <= :maxPrice")
+		Page<Product> findExhibitionProducts(
+		    @Param("categoryId") Integer categoryId,
+		    @Param("minPrice") Integer minPrice,
+		    @Param("maxPrice") Integer maxPrice,
+		    Pageable pageable
+		);
 	// 판매자별 상품 목록 조회 (전체 상태 포함)
 	Page<Product> findBySellerIdOrderByProductIdDesc(Long sellerId, Pageable pageable);
 	

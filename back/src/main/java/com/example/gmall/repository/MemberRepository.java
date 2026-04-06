@@ -85,4 +85,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m WHERE m.role = :role AND m.isDeleted = :isDeleted AND (m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.email LIKE %:keyword%)")
     Page<Member> findByRoleAndIsDeletedAndKeyword(@Param("role") Byte role, @Param("isDeleted") boolean isDeleted, @Param("keyword") String keyword, Pageable pageable);
+    //
+    List<Member> findAllByRoleAndBusinessVerified(Byte role, boolean businessVerified);
+ 
+   
 }

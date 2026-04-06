@@ -96,6 +96,9 @@ public class Member {
     @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT NOW()")
     private LocalDateTime updatedAt;
  
+    @Column(name = "description", length = 500)
+    private String description;
+    
     // 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sns> snsList = new ArrayList<>();

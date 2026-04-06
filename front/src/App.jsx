@@ -12,6 +12,9 @@ import ProductListPage from './pages/products/ProductListPage';
 import ProductDetailPage from './pages/products/ProductDetailPage';
 import CertifiedListPage from './pages/products/CertifiedListPage';
 import CertifiedDetailPage from './pages/products/CertifiedDetailPage';
+import ExhibitionListPage from './pages/products/ExhibitionListPage';
+import ExhibitionDetailPage from './pages/products/ExhibitionDetailPage';
+
 import OrderSuccessPage from './pages/orders/OrderSuccessPage';
 import OrderFailPage from './pages/orders/OrderFailPage';
 import MyOrders from './pages/member/MyOrders';
@@ -24,6 +27,7 @@ import FindPwdPage from './pages/member/FindPwdPage';
 
 import SellerDashboardPage from './pages/seller/SellerDashboardPage';
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
+import SellerSingupPage from './pages/member/SellerSignupPage';
 import SellerProductListPage from './pages/seller/SellerProductListPage';
 import SellerOrders from './pages/seller/SellerOrders';
 import SellerOrderDetail from './pages/seller/SellerOrderDetail';
@@ -43,6 +47,8 @@ import BoardReadPage from './pages/support/BoardReadPage';
 import InquiryPage from './pages/support/InquiryPage';
 import InquiryAddModal from './pages/support/InquiryAddModal';
 import FaqPage from './pages/support/FaqPage';
+
+import ProtectedRoute from './components/support/ProtectedRoute';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -72,28 +78,31 @@ function App() {
         {/* 회원(구매자) - 유재영 담당 */}
         <Route path='/signup' element={<UserSignupPage />} />
         <Route path='/login' element={<JoinPage />} />
-        <Route path='/mypage' element={<Mypapge />} />
-        <Route path='/modifypage' element={<ModifyPage />} />
+        <Route path='/mypage' element={<ProtectedRoute><Mypapge /></ProtectedRoute>} />
+        <Route path='/modifypage' element={<ProtectedRoute><ModifyPage /></ProtectedRoute>} />
         <Route path='/findid' element={<FindIdPage />} />
         <Route path='/findpwd' element={<FindPwdPage />} />
         {/* 회원(판매자) - 유재영 담당 */}
         {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
-        
+        <Route path='/sellersignup' element={<SellerSingupPage />} />
         {/* 장바구니 - 김슬기 담당 */}
-        <Route path="/cart" element={<CartPage />} />
+        <Route path="/cart" element={<ProtectedRoute allowRole={0}><CartPage /></ProtectedRoute>} />
 
         {/* 상품 - 이효진 담당 */}
         <Route path="/products" element={<ProductListPage />} />
         <Route path="/products/:productId" element={<ProductDetailPage />} />
         <Route path="/products/certified" element={<CertifiedListPage />} />
         <Route path="/products/certified/:productId" element={<CertifiedDetailPage />} />
+        <Route path="/products/exhibition" element={<ExhibitionListPage />} />
+        <Route path="/products/exhibition/:productId" element={<ExhibitionDetailPage />} />
+        
 
         {/* 주문 - 김슬기 담당 */}
-        <Route path="/orders/new" element={<OrderFormPage />} />
-        <Route path="/orders/success" element={<OrderSuccessPage />} />
-        <Route path="/orders/fail"    element={<OrderFailPage />} />
-        <Route path="/orders" element={<MyOrders />} /> 
-        <Route path="/orders/:orderId" element={<MyOrderDetail />} />
+        <Route path="/orders/new" element={<ProtectedRoute allowRole={0}><OrderFormPage /></ProtectedRoute>} />
+        <Route path="/orders/success" element={<ProtectedRoute allowRole={0}><OrderSuccessPage /></ProtectedRoute>} />
+        <Route path="/orders/fail"    element={<ProtectedRoute allowRole={0}><OrderFailPage /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute allowRole={0}><MyOrders /></ProtectedRoute>} /> 
+        <Route path="/orders/:orderId" element={<ProtectedRoute allowRole={0}><MyOrderDetail /></ProtectedRoute>} />
 
         {/* 게시판 - 신시온 담당*/}
         <Route path="/board" element={<BoardPage />} />
@@ -106,7 +115,7 @@ function App() {
 
 
         {/* 어드민 */}
-        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin" element={<ProtectedRoute allowRole={2}><AdminDashboardPage /></ProtectedRoute>} />
 
         {/* 어드민-회원관리 - 신시온 담당*/}
         <Route path="/admin/members" element={<AdminMemberListPage />} />
@@ -115,15 +124,15 @@ function App() {
         <Route path="/admin/members/:memberId/modify" element={<AdminMemberModifyPage />} />
 
         {/* 판매자 */}
-        <Route path="/seller" element={<SellerDashboardPage />} />
-        <Route path="/seller/products/new" element={<SellerProductNewPage />} />
-        <Route path="/seller/products" element={<SellerProductListPage />} />
-        <Route path="/seller/orders" element={<SellerOrders />} />
-        <Route path="/seller/orders/:orderId" element={<SellerOrderDetail />} />
+        <Route path="/seller" element={<ProtectedRoute allowRole={1}><SellerDashboardPage /></ProtectedRoute>} />
+        <Route path="/seller/products/new" element={<ProtectedRoute allowRole={1}><SellerProductNewPage /></ProtectedRoute>} />
+        <Route path="/seller/products" element={<ProtectedRoute allowRole={1}><SellerProductListPage /></ProtectedRoute>} />
+        <Route path="/seller/orders" element={<ProtectedRoute allowRole={1}><SellerOrders /></ProtectedRoute>} />
+        <Route path="/seller/orders/:orderId" element={<ProtectedRoute allowRole={1}><SellerOrderDetail /></ProtectedRoute>} />
 
 
         {/* 어드민-상품등록 */}
-        <Route path="/admin/products/new" element={<AdminProductNewPage />} />
+        <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
 
 
 

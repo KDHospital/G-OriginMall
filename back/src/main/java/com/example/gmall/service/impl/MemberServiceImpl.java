@@ -1,5 +1,6 @@
 package com.example.gmall.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.gmall.domain.Member;
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
+import com.example.gmall.dto.member.SellerDTO;
 import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.repository.MemberRepository;
@@ -89,12 +91,12 @@ public class MemberServiceImpl implements MemberService {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
  	 	}
  	 	Map<String, Object> claims = member.getClaims();
- 	 	String accessToken = jwtUtil.generateToken(claims, 60);
+ 	 	String accessToken = jwtUtil.generateToken(claims, 180);
  	 	
  	 	Cookie cookie = new Cookie("accessToken", accessToken);
  	 	cookie.setHttpOnly(true);
  	 	cookie.setPath("/");
- 	 	cookie.setMaxAge(60*60);
+ 	 	cookie.setMaxAge(60*180);
  	 	cookie.setSecure(true);
  	 	
  	 	response.addCookie(cookie);
@@ -229,7 +231,8 @@ public void registerSeller(SellerSignupDTO dto) {
                 .tel(dto.getTel())
                 .email(dto.getLoginId())
                 .gender(dto.getGender())
-                .role((byte) 1)             
+                .role((byte) 1)  
+                .emailVerified(true)
                 .businessNo(dto.getBusinessNo())
                 .taxInvoice(dto.getTaxInvoice())
                 .isVerified(dto.getIsVerified())
@@ -265,6 +268,22 @@ public void registerSeller(SellerSignupDTO dto) {
  	    emailService.sendSellerStatusNotice(email, name, false);
  	}
  	
+ 	@Override
+ 	public List<SellerDTO> getPendingSellerList() {
+ 		
+ 		return memberRepository.findAllByRoleAndBusinessVerified((byte) 1, false)
+ 				.stream()
+ 				.map(seller -> SellerDTO.builder()
+ 						.id(seller.getId())
+ 						.loginId(seller.getLoginId())
+ 						.mname(seller.getMname())
+ 						.businessNo(seller.getBusinessNo())
+ 						.tel(seller.getTel())
+ 						.createdAt(seller.getCreatedAt())
+ 						.build())
+ 				.toList();
  	
+ 	
+ 	}
 
 }

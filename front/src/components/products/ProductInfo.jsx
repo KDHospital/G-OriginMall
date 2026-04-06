@@ -1,9 +1,13 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 
 
 const ProductInfo = ({product}) => {
+
+    const location = useLocation()  //현 주소
+    // 현재 주소(pathname)에 'certified'가 포함되어 있는지 확인 (true/false)
+    const isCertified = location.pathname.includes('certified')
     const navigate = useNavigate();
 
     if (!product) return null;
@@ -122,10 +126,14 @@ const ProductInfo = ({product}) => {
                 </div>
             </div>
             <div className="pt-6 flex gap-8 items-center border-t border-outline-variant/30">
-                <div className="flex flex-col items-center gap-1 opacity-60">
-                    <span className="material-symbols-outlined text-3xl">verified</span>
-                    <span className="text-[10px] font-bold uppercase tracking-tighter">김포시 인증 상품</span>
-                </div>
+                {isCertified && (
+                    <div className="flex flex-col items-center gap-1 opacity-60">
+                        <span className="material-symbols-outlined text-3xl">verified</span>
+                        <span className="text-[10px] font-bold uppercase tracking-tighter">
+                            김포시 인증 상품
+                        </span>
+                    </div>
+                )}
                 <div className="flex flex-col items-center gap-1 opacity-60">
                     <span className="material-symbols-outlined text-3xl">eco</span>
                     <span className="text-[10px] font-bold uppercase tracking-tighter">유기농</span>
