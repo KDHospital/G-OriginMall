@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import axiosInstance from "../../api/axios";
 import { getCategories } from "../../api/productsApi";
+import { useCart } from "../../context/CartContext";
 
 const BasicMenu = () => {
 
@@ -17,6 +18,8 @@ const BasicMenu = () => {
   const [categories, setCategories] = useState([])
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false)
   const [isExMenuOpen, setIsExMenuOpen] = useState(false)
+
+  const { cartCount } = useCart();
 
   useEffect(() => {
     getCategories().then(res => setCategories(res.data)).catch(err => console.error("카테고리 로드 실패", err))
@@ -153,8 +156,12 @@ const BasicMenu = () => {
             {(isLoggedIn && role === 0) && (
               <Link to="/cart" className="p-2 hover:bg-slate-100 rounded-full relative">
                 <span className="material-symbols-outlined">shopping_cart</span>
-                <span className="absolute top-1 right-1 bg-secondary text-[10px] font-bold px-1 rounded-full text-white">3</span>
-              </Link>
+                {isLoggedIn && cartCount > 0 && (
+                    <span className="absolute top-1 right-1 bg-secondary text-[10px] font-bold px-1 rounded-full text-white">
+                        {cartCount > 9 ? "9+" : cartCount}
+                    </span>
+                )}
+            </Link>
             )}
 
             {isLoggedIn ? (
