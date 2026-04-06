@@ -19,8 +19,15 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.example.gmall.domain.Member;
 import com.example.gmall.domain.OrderItem;
@@ -185,14 +192,15 @@ public class OrderServiceImpl implements OrderService {
     // 주문 전체 취소
     @Override
     public void cancelOrder(Long memberId, Long orderId) {
-        Orders orders = getOrderOfMember(memberId, orderId);
+    	Orders orders = getOrderOfMember(memberId, orderId);
 
-        // 배송중, 배송완료는 취소 불가
         if (orders.getStatus() >= 2) {
             throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
         }
 
-        // 정상 상태인 OrderItem만 재고 복구
+        // 토스 결제 취소 — paymentKey 있을 때만 호출
+        cancelTossPayment(orders.getPaymentKey(), "구매자 주문 취소");
+
         orders.getOrderItems().stream()
                 .filter(item -> !item.isCancelled())
                 .forEach(item -> {
@@ -200,7 +208,6 @@ public class OrderServiceImpl implements OrderService {
                     item.cancel();
                 });
 
-        // 주문 상태 이력 저장
         OrderStatusHistory history = OrderStatusHistory.builder()
                 .orders(orders)
                 .seller(orders.getSeller())
@@ -210,8 +217,6 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderStatusHistoryRepository.save(history);
-
-        // 주문 상태 변경
         orders.updateStatus((byte) 4);
 
         log.info("주문 전체 취소 완료 - orderId: {}", orderId);
@@ -242,17 +247,43 @@ public class OrderServiceImpl implements OrderService {
         orderItem.getProduct().restoreStock(orderItem.getQuantity());
         orderItem.cancel();
 
-        // 총 금액 업데이트 (취소된 상품 금액 차감)
-        orders.updateTotalPrice(orders.getTotalPrice() - orderItem.getSubtotal());
-
-        // 모든 상품이 취소됐으면 주문 전체 취소 처리
+        // 모든 상품이 취소됐는지 확인
         boolean allCancelled = orders.getOrderItems().stream()
                 .allMatch(OrderItem::isCancelled);
+
         if (allCancelled) {
+            // 마지막 상품 취소 — 상품금액 취소
+            cancelTossPaymentPartial(
+                orders.getPaymentKey(),
+                orderItem.getSubtotal(),
+                "상품 개별 취소: " + orderItem.getProductName()
+            );
+
+            // 배송비 취소 (남은 금액)
+            int deliveryFee = orders.getTotalPrice() - orderItem.getSubtotal();
+            if (deliveryFee > 0) {
+                cancelTossPaymentPartial(
+                    orders.getPaymentKey(),
+                    deliveryFee,
+                    "배송비 취소"
+                );
+            }
+
+            orders.updateTotalPrice(0);
             orders.updateStatus((byte) 4);
+
+        } else {
+            // 부분 취소 — 상품금액만
+            cancelTossPaymentPartial(
+                orders.getPaymentKey(),
+                orderItem.getSubtotal(),
+                "상품 개별 취소: " + orderItem.getProductName()
+            );
+
+            orders.updateTotalPrice(orders.getTotalPrice() - orderItem.getSubtotal());
         }
 
-        // 주문 상태 이력 저장
+        // 상태 이력 저장
         OrderStatusHistory history = OrderStatusHistory.builder()
                 .orders(orders)
                 .seller(orders.getSeller())
@@ -281,11 +312,21 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void confirmPayment(Long memberId, Long orderId, String tossOrderId, String paymentKey, Long amount) {
         Orders orders = getOrderOfMember(memberId, orderId);
+        
+        // 같은 orderGroupId의 전체 주문 금액 합산
+        List<Orders> groupOrders = ordersRepository
+                .findByOrderGroupId(orders.getOrderGroupId());
+        
+        long totalGroupPrice = groupOrders.stream()
+                .mapToLong(o -> o.getTotalPrice().longValue())
+                .sum();
 
-        // 금액 위변조 검증 — 토스에서 받은 amount와 실제 주문 금액 비교
-        if (orders.getTotalPrice().longValue()  != amount) {
+        // 합산 금액으로 검증
+        if (totalGroupPrice != amount) {
             throw new IllegalStateException("결제 금액이 주문 금액과 일치하지 않습니다.");
         }
+
+
 
         // 토스 최종 승인 API 호출
         try {
@@ -313,28 +354,34 @@ public class OrderServiceImpl implements OrderService {
                 throw new IllegalStateException("결제 승인에 실패했습니다.");
             }
             
-            // 승인 성공 후 tossOrderId 저장
-            orders.updateTossOrderId(tossOrderId);
 
         } catch (IOException | InterruptedException e) {
             log.error("토스 승인 API 호출 오류", e);
             throw new IllegalStateException("결제 승인 중 오류가 발생했습니다.");
         }
 
-        // 결제 정보 업데이트
-        orders.updatePayment(paymentKey, "CARD", LocalDateTime.now());
+     // 같은 그룹 전체 주문에 결제 정보 + 상태 업데이트
+        for (int i = 0; i < groupOrders.size(); i++) {
+            Orders o = groupOrders.get(i);
 
-        // 주문 상태 변경: 0(결제대기) → 1(결제완료)
-        OrderStatusHistory history = OrderStatusHistory.builder()
-            .orders(orders)
-            .seller(orders.getSeller())
-            .fromStatus(orders.getStatus())
-            .toStatus((byte) 1)
-            .memo("토스페이먼츠 결제 승인 완료")
-            .build();
+            // tossOrderId는 대표 주문(첫 번째)에만 저장
+            if (i == 0) {
+                o.updateTossOrderId(tossOrderId);
+            }
 
-        orderStatusHistoryRepository.save(history);
-        orders.updateStatus((byte) 1);
+            o.updatePayment(paymentKey, "CARD", LocalDateTime.now());
+
+            OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(o)
+                .seller(o.getSeller())
+                .fromStatus(o.getStatus())
+                .toStatus((byte) 1)
+                .memo("토스페이먼츠 결제 승인 완료")
+                .build();
+            orderStatusHistoryRepository.save(history);
+
+            o.updateStatus((byte) 1);
+        }
 
         log.info("결제 승인 완료 - orderId: {}, paymentKey: {}", orderId, paymentKey);
     }
@@ -464,8 +511,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void adminCancelOrder(Long orderId) {
-        Orders orders = ordersRepository.findById(orderId)
+    	Orders orders = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 토스 결제 취소
+        cancelTossPayment(orders.getPaymentKey(), "관리자 주문 취소");
 
         orders.getOrderItems().stream()
                 .filter(item -> !item.isCancelled())
@@ -485,7 +535,7 @@ public class OrderServiceImpl implements OrderService {
         orderStatusHistoryRepository.save(history);
         orders.updateStatus((byte) 4);
 
-        log.info("관리자 주문 취소 - orderId: {}", orderId);
+        log.info("관리자 주문 취소 완료 - orderId: {}", orderId);
     }
     
     // 관리자 페이지 - 주문 상태 변경
@@ -527,5 +577,85 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("관리자 주문 상태 변경 - orderId: {}, {} → {}", orderId, orders.getStatus(), newStatus);
     }
+    
+    // 결제 취소 - 토스 페이먼츠 결제 취소 API 연동
+    private void cancelTossPayment(String paymentKey, String cancelReason) {
+        if (paymentKey == null) {
+            log.warn("paymentKey가 없어 토스 취소 API를 호출하지 않습니다.");
+            return;
+        }
+
+        try {
+            String authorizations = Base64.getEncoder()
+                .encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Basic " + authorizations);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("cancelReason", cancelReason);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel",
+                entity,
+                String.class
+            );
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                log.error("토스 취소 실패 응답: {}", response.getBody());
+                throw new IllegalStateException("결제 취소에 실패했습니다.");
+            }
+
+            log.info("토스 결제 취소 완료 - paymentKey: {}", paymentKey);
+
+        } catch (HttpClientErrorException e) {
+            log.error("토스 취소 API 오류: {}", e.getResponseBodyAsString());
+            throw new IllegalStateException("결제 취소에 실패했습니다: " + e.getMessage());
+        }
+    }
 	
+    // 부분 취소 (Toss 페이먼츠 API 연동)
+    private void cancelTossPaymentPartial(String paymentKey, Integer cancelAmount, String cancelReason) {
+        if (paymentKey == null) {
+            log.warn("paymentKey가 없어 토스 부분 취소 API를 호출하지 않습니다.");
+            return;
+        }
+
+        try {
+            String authorizations = Base64.getEncoder()
+                .encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Basic " + authorizations);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("cancelReason", cancelReason);
+            requestBody.put("cancelAmount", cancelAmount);  // 부분 취소 금액
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                "https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel",
+                entity,
+                String.class
+            );
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                log.error("토스 부분 취소 실패 응답: {}", response.getBody());
+                throw new IllegalStateException("결제 부분 취소에 실패했습니다.");
+            }
+
+            log.info("토스 결제 부분 취소 완료 - paymentKey: {}, cancelAmount: {}", paymentKey, cancelAmount);
+
+        } catch (HttpClientErrorException e) {
+            log.error("토스 부분 취소 API 오류: {}", e.getResponseBodyAsString());
+            throw new IllegalStateException("결제 부분 취소에 실패했습니다: " + e.getMessage());
+        }
+    }
 }

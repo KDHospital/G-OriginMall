@@ -53,4 +53,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 	// 상태별 카운트
 	long countByStatus(Byte status);
 	long count(); // 전체 카운트 (JPA 기본 제공)
+	
+	// 주문 그룹핑
+	List<Orders> findByOrderGroupId(String orderGroupId);
 }

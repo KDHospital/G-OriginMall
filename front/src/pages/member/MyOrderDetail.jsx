@@ -133,18 +133,23 @@ export default function MyOrderDetail() {
             });
     };
 
+    const [cancelling, setCancelling] = useState(false);
+
     // 개별 아이템 취소
     const handleCancelItem = (orderItemId) => {
+        if (cancelling) return;  // 중복 클릭 방지
         if (!window.confirm("해당 상품을 취소하시겠습니까?")) return;
 
+        setCancelling(true);
         axiosInstance.patch(`/orders/${orderId}/items/${orderItemId}/cancel`)
             .then(() => {
                 alert("상품이 취소되었습니다.");
-                fetchOrder(); // 상태 갱신
+                fetchOrder();
             })
             .catch((err) => {
                 alert(err.response?.data?.message ?? "취소 처리 중 오류가 발생했습니다.");
-            });
+            })
+            .finally(() => setCancelling(false));
     };
 
     if (loading) {
