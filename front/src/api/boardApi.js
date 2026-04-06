@@ -1,48 +1,67 @@
-import axios from "axios";
-
-// 1. 서버 기본 주소 
-export const API_SERVER_HOST = 'http://localhost:8080';
-
-// 2. 고객센터 공통 경로
-const host = `${API_SERVER_HOST}/api/board`;
-
+import axiosInstance from "./axios";
 
 // [공지사항] 목록 조회
-export const fetchBoard = async (page = 0, size = 10) => {
-    const response = await axios.get(`${host}`, { params: { page, size } });
+export const fetchBoard = async (page = 0, size = 10, keyword = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    const response = await axiosInstance.get('/board', { params });
     return response.data;
-}
+};
 
 // [고객문의] 목록 조회
-export const fetchInquiries = async (page = 0, size = 10) => {
-    const response = await axios.get(`${host}/inquiry`, { 
-        params: { page, size },
-        withCredentials: true 
-    });
+export const fetchInquiries = async (page = 0, size = 10, keyword = '', hasAnswer = null, isPublic = null) => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (hasAnswer !== null) params.hasAnswer = hasAnswer;
+    if (isPublic !== null) params.isPublic = isPublic;
+    const response = await axiosInstance.get('/board/inquiry', { params });
     return response.data;
 };
 
 // [고객문의] 신규 등록
 export const addInquiry = async (data) => {
-    const response = await axios.post(`${host}/inquiry`, data, {
-        withCredentials: true 
-    });
+    const response = await axiosInstance.post('/board/inquiry', data);
     return response.data;
 };
 
-//[공지사항/고객문의] 상세조회
-export const getBoardOne = async(id) => {
-    const response = await axios.get(`${host}/${id}`);
+// [공지사항/고객문의] 상세조회
+export const getBoardOne = async (id) => {
+    const response = await axiosInstance.get(`/board/${id}`);
     return response.data;
-}
+};
 
+// [게시글] 수정
+export const updatePost = async (id, data) => {
+    const response = await axiosInstance.put(`/board/inquiry/${id}`, data);
+    return response.data;
+};
 
-// 게시글 삭제 (소프트 삭제)
+// [게시글] 삭제 (소프트 삭제)
 export const removePost = async (id) => {
-    const response = await axios.post(`${host}/${id}/remove`, {}, {
-        withCredentials: true
-    });
+    const response = await axiosInstance.delete(`/board/${id}`);
     return response.data;
 };
 
+// [관리자] 공지사항 등록
+export const addNotice = async (data) => {
+    const response = await axiosInstance.post('/board/inquiry', data);
+    return response.data;
+};
 
+// [관리자] 게시글 수정
+export const adminUpdatePost = async (id, data) => {
+    const response = await axiosInstance.put(`/admin/board/post/${id}`, data);
+    return response.data;
+};
+
+// [관리자] 답변 등록/수정
+export const addAnswer = async (postId, answerContent) => {
+    const response = await axiosInstance.put(`/admin/board/inquiry/${postId}/answer`, { answerContent });
+    return response.data;
+};
+
+// [관리자] 게시글 삭제
+export const adminRemovePost = async (id) => {
+    const response = await axiosInstance.delete(`/admin/board/${id}`);
+    return response.data;
+};

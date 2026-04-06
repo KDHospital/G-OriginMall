@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { addInquiry } from '../../api/boardApi';
 
 const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
-  // 1. 폼 초기 상태 (로그인 정보 체크 로직 제거)
+  // 1. 폼 초기 상태: 기본값을 공개글(isPublic: true)로 설정
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    isPublic: true // 기본값 공개글
+    isPublic: true 
   });
 
   const [loading, setLoading] = useState(false);
@@ -15,12 +15,15 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
 
   // 입력 핸들러
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, checked } = e.target;
     
     if (name === "isSecret") {
+      // '비밀글로 작성하기' 체크박스 로직
+      // 체크됨(true) -> 비밀글이므로 isPublic은 false
+      // 체크해제(false) -> 공개글이므로 isPublic은 true
       setFormData({
         ...formData,
-        isPublic: !checked // '비밀글로 작성하기' 체크 시 isPublic은 false가 됨
+        isPublic: !checked 
       });
     } else {
       setFormData({
@@ -30,9 +33,8 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
     }
   };
 
-// 등록 제출 핸들러
+  // 등록 제출 핸들러
   const handleSubmit = async () => {
-    // 1. 필수 입력값 체크 (기획적으로 꼭 필요한 유효성 검사)
     if (!formData.title.trim() || !formData.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
@@ -41,24 +43,22 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
     setLoading(true);
 
     try {
-      // 2. [데이터 정리 핵심] 서버가 요청 헤더의 쿠키를 보고 작성자를 판단
-
+      // 백엔드 DTO 규격에 맞춘 데이터 전송
       const sendData = {
-        title: formData.title,
-        content: formData.content,
+        title: formData.title.trim(),
+        content: formData.content.trim(),
         isPublic: formData.isPublic,
-        boardId: 2, // 고객문의 게시판 ID (백엔드와 약속된 값)
-        viewCount: 0
+        boardId: 2
       };
 
-      // api 호출 (withCredentials: true 설정이 되어있는 함수)
       await addInquiry(sendData); 
       
       alert("문의사항이 성공적으로 등록되었습니다.");
       
+      // 상태 초기화 및 닫기
       onRefresh(); 
       onClose();   
-      setFormData({ title: '', content: '', isPublic: true });
+      setFormData({ title: '', content: '', isPublic: true }); // 다시 기본값 공개로 초기화
     } catch (error) {
       console.error("등록 실패:", error);
       if (error.response?.status === 401) {
@@ -75,13 +75,13 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-white w-full max-w-2xl rounded shadow-2xl overflow-hidden animate-fadeIn">
         
-        {/* 헤더 영역 */}
+        {/* 헤더 */}
         <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center">
           <h2 className="text-[20px] font-bold text-[#1D3C28]">고객문의 작성</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl"> &times; </button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl transition-colors"> &times; </button>
         </div>
 
-        {/* 본문 영역 (테이블 레이아웃) */}
+        {/* 본문 (기존 테이블 레이아웃) */}
         <div className="p-8">
           <table className="w-full text-[14px] border-collapse">
             <tbody>
@@ -105,6 +105,7 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
                     <input 
                       type="checkbox" 
                       name="isSecret" 
+                      // 기본이 공개글이므로, 초기값에서는 체크가 해제되어야 함
                       checked={!formData.isPublic} 
                       onChange={handleChange} 
                       className="w-4 h-4 accent-[#1D3C28]" 
@@ -130,7 +131,7 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
           </table>
         </div>
 
-        {/* 하단 버튼 영역 */}
+        {/* 하단 버튼 */}
         <div className="px-8 py-5 bg-gray-50 flex justify-end gap-2">
           <button 
             onClick={onClose} 
@@ -142,7 +143,7 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
           <button 
             onClick={handleSubmit} 
             disabled={loading}
-            className="px-6 py-2 bg-[#1D3C28] text-white rounded-sm text-[13px] hover:bg-[#2d5a3c] transition-colors flex items-center justify-center min-w-[80px]"
+            className="px-6 py-2 bg-[#1D3C28] text-white rounded-sm text-[13px] hover:bg-[#2d5a3c] transition-colors min-w-[100px]"
           >
             {loading ? "등록 중..." : "등록하기"}
           </button>

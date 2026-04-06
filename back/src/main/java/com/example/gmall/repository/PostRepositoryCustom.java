@@ -7,6 +7,12 @@ import com.example.gmall.dto.board.PostListResponseDTO;
 
 public interface PostRepositoryCustom {
 
-	//공지사항 문의글 고객목록을 페이징 처리하여 DTO로 가져오기
+	// 기본 목록
 	Page<PostListResponseDTO> getPostList(Integer boardId, Pageable pageable);
+
+	// 키워드 검색
+	Page<PostListResponseDTO> getPostList(Integer boardId, String keyword, Pageable pageable);
+
+	// 키워드 + 답변상태 + 공개여부 필터
+	Page<PostListResponseDTO> getPostList(Integer boardId, String keyword, Boolean hasAnswer, Boolean isPublic, Pageable pageable);
 }

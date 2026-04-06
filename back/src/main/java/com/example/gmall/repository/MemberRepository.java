@@ -4,7 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.gmall.domain.Member;
 
@@ -64,6 +68,21 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByIsDeletedTrueAndWithdrawAtBefore(LocalDateTime threshold);
     
     
- 
-   
+    //고객문의에서 사용
+    Optional<Member> findByIdAndIsDeletedFalse(Long id);
+
+    // ===== 관리자 회원 목록 조회 =====
+    Page<Member> findByRole(Byte role, Pageable pageable);
+
+    @Query("SELECT m FROM Member m WHERE m.role = :role AND m.isDeleted = false")
+    Page<Member> findByRoleAndIsDeletedFalse(@Param("role") Byte role, Pageable pageable);
+
+    @Query("SELECT m FROM Member m WHERE m.role = :role AND m.isDeleted = true")
+    Page<Member> findByRoleAndIsDeletedTrue(@Param("role") Byte role, Pageable pageable);
+
+    @Query("SELECT m FROM Member m WHERE m.role = :role AND (m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.email LIKE %:keyword%)")
+    Page<Member> findByRoleAndKeyword(@Param("role") Byte role, @Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT m FROM Member m WHERE m.role = :role AND m.isDeleted = :isDeleted AND (m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.email LIKE %:keyword%)")
+    Page<Member> findByRoleAndIsDeletedAndKeyword(@Param("role") Byte role, @Param("isDeleted") boolean isDeleted, @Param("keyword") String keyword, Pageable pageable);
 }

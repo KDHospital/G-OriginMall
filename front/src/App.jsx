@@ -28,6 +28,10 @@ import SellerProductListPage from './pages/seller/SellerProductListPage';
 import SellerOrders from './pages/seller/SellerOrders';
 import SellerOrderDetail from './pages/seller/SellerOrderDetail';
 
+import AdminMemberListPage from './pages/admin/AdminMemberListPage';
+import AdminMemberDetailPage from './pages/admin/AdminMemberDetailPage';
+import AdminMemberAddPage from './pages/admin/AdminMemberAddPage';
+import AdminMemberModifyPage from './pages/admin/AdminMemberModifyPage';
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
 import AdminBoardReadPage from './pages/admin/AdminBoardReadPage';
@@ -91,7 +95,7 @@ function App() {
         <Route path="/orders" element={<MyOrders />} /> 
         <Route path="/orders/:orderId" element={<MyOrderDetail />} />
 
-        {/* 게시판>공지사항 - 신시온 담당*/}
+        {/* 게시판 - 신시온 담당*/}
         <Route path="/board" element={<BoardPage />} />
         <Route path="/board/read/:postId" element={<BoardReadPage />} />
         <Route path="/inquiry" element={<InquiryPage />} />
@@ -103,6 +107,12 @@ function App() {
 
         {/* 어드민 */}
         <Route path="/admin" element={<AdminDashboardPage />} />
+
+        {/* 어드민-회원관리 - 신시온 담당*/}
+        <Route path="/admin/members" element={<AdminMemberListPage />} />
+        <Route path="/admin/members/new" element={<AdminMemberAddPage />} />
+        <Route path="/admin/members/:memberId" element={<AdminMemberDetailPage />} />
+        <Route path="/admin/members/:memberId/modify" element={<AdminMemberModifyPage />} />
 
         {/* 판매자 */}
         <Route path="/seller" element={<SellerDashboardPage />} />
@@ -122,9 +132,12 @@ function App() {
         <Route path="/admin/board/new" element={<AdminBoardAddPage />} />
         <Route path="/admin/board/read/:postId" element={<AdminBoardReadPage />} />
         <Route path="/admin/board/modify/:postId" element={<AdminBoardModifyPage />} />
-        
+
         {/* 어드민-게시판>고객문의 - 신시온 담당*/}
         <Route path="/admin/inquiry" element={<AdminInquiryPage />} />
+        <Route path="/admin/inquiry/new" element={<AdminBoardAddPage />} />
+        <Route path="/admin/inquiry/read/:postId" element={<AdminBoardReadPage />} />
+        <Route path="/admin/inquiry/modify/:postId" element={<AdminBoardModifyPage />} />
 
 
 

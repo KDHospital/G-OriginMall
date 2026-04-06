@@ -22,7 +22,7 @@ public class SecurityConfig {
 	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // 1. CSRF 보호 비활성화 (테스트 단계에서는 이걸 꺼야 POST 요청이 먹힙니다!)
+            // 1. CSRF 보호 비활성화 
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configure(http))
             .sessionManagement(session -> session
@@ -33,8 +33,15 @@ public class SecurityConfig {
             		org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             // 2. 모든 경로에 대해 인증 없이 접근 허용
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/api/member/me", "/api/members/addresses/**","/api/orders/**").authenticated()
-            		.anyRequest().permitAll() 
+            		// 관리자 전용
+            		.requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+            		// 인증 필요
+            		.requestMatchers("/api/member/me", "/api/members/addresses/**", "/api/orders/**").authenticated()
+            		.requestMatchers(org.springframework.http.HttpMethod.POST, "/api/board/inquiry").authenticated()
+            		.requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/board/inquiry/**").authenticated()
+            		.requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/board/**").authenticated()
+            		// 나머지 허용
+            		.anyRequest().permitAll()
             )
             
             // 3. 기본 로그인 폼 비활성화

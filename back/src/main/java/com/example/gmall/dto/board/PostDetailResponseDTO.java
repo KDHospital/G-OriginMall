@@ -1,10 +1,12 @@
 package com.example.gmall.dto.board;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.example.gmall.domain.Post;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -18,37 +20,43 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostDetailResponseDTO {
 
-    private Long postId;
+    private Long postId;      
     private Integer boardId;
     private String title;
     private String content;
-    private String MName;
+    private String mName;
     private LocalDateTime createdAt;
     private Integer viewCount;
+
+    @JsonProperty("isPublic")
     private boolean isPublic;
-    
-    // 상세 페이지이므로 답변 리스트를 포함
+
+    private Long memberId;
+
     private List<AnswerResponseDTO> answers;
 
-    // --- [핵심] Entity를 DTO로 변환하는 생성자 ---
-    public PostDetailResponseDTO(Post post) {
-        this.postId = post.getPostId();
-        this.boardId = (post.getBoard() != null) ? post.getBoard().getBoardId() : null;
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        
-        // 작성자 정보 (Member 엔티티 연동)
-        this.MName = (post.getMember() != null) ? post.getMember().getMname() : "익명";
-        
-        this.createdAt = post.getCreatedAt();
-        this.viewCount = (post.getViewCount() != null) ? post.getViewCount() : 0;
-        this.isPublic = post.isPublic();
-        
-        // Post 엔티티의 List<Answer>를 AnswerResponseDTO 리스트로 변환
+    public static PostDetailResponseDTO from(Post post) {
+
+        List<AnswerResponseDTO> answerList = Collections.emptyList();
+
         if (post.getAnswers() != null) {
-            this.answers = post.getAnswers().stream()
-                    .map(AnswerResponseDTO::new)
+            answerList = post.getAnswers().stream()
+                    .filter(a -> !a.isDeleted())   // 삭제된 답변 제외
+                    .map(AnswerResponseDTO::from) 
                     .collect(Collectors.toList());
         }
+
+        return PostDetailResponseDTO.builder()
+                .postId(post.getPostId())
+                .boardId(post.getBoard() != null ? post.getBoard().getBoardId() : null)
+                .title(post.getTitle())
+                .content(post.getContent())
+                .mName(post.getMember() != null ? post.getMember().getMname() : "익명")
+                .memberId(post.getMember() != null ? post.getMember().getId() : null)
+                .createdAt(post.getCreatedAt())
+                .viewCount(post.getViewCount() != null ? post.getViewCount() : 0)
+                .isPublic(post.isPublic())
+                .answers(answerList)
+                .build();
     }
 }
