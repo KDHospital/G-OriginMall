@@ -1,35 +1,23 @@
 import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import BoardReadComponent from '../../components/admin/BoardReadComponent';
 import AdminLayout from '../../layouts/AdminLayout';
 
 const AdminBoardReadPage = () => {
-  const { pno } = useParams();
+  const { postId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isInquiry = location.pathname.includes('inquiry');
 
-  const moveToList = () => {
-    navigate({ pathname: '/admin/board' });
-  };
-
-  const moveToModify = (pno) => {
-    navigate({ pathname: `/admin/board/modify/${pno}` });
-  };
+  const moveToList = () => navigate(isInquiry ? '/admin/inquiry' : '/admin/board');
+  const moveToModify = (id) => navigate(isInquiry ? `/admin/inquiry/modify/${id}` : `/admin/board/modify/${id}`);
 
   return (
     <AdminLayout>
-    <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
-      <div className="mb-8 text-sm text-gray-400">
-        게시판 관리 &gt; 공지사항 &gt; <span className="text-gray-600 font-semibold">게시글 상세</span>
+      <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
+        <div className="mb-4 text-sm text-gray-400">게시판 관리 &gt; {isInquiry ? '고객문의' : '공지사항'} &gt; <span className="text-gray-600 font-semibold">{isInquiry ? '고객문의' : '공지사항'} 상세</span></div>
+        <BoardReadComponent postId={postId} onMoveToList={moveToList} onMoveToModify={moveToModify} />
       </div>
-
-      <div className="w-full max-w-5xl mx-auto shadow-xl rounded-xl overflow-hidden bg-white">
-        <BoardReadComponent 
-          pno={pno} 
-          onMoveToList={moveToList} 
-          onMoveToModify={moveToModify} 
-        />
-      </div>
-    </div>
     </AdminLayout>
   );
 };

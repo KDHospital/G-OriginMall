@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
 import axiosInstance from "../../api/axios";
+import { useCart } from "../../context/CartContext";
+
+
 
 export default function OrderSuccessPage() {
+  const { fetchCartCount } = useCart();
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -38,7 +43,7 @@ export default function OrderSuccessPage() {
       .then(() => {
         if (source === "cart") {
           // 장바구니에서 진입 시 장바구니 삭제
-          return axiosInstance.delete("/cart");
+          return axiosInstance.delete("/cart").then(()=>fetchCartCount());
         }
       })
       .then(() => {

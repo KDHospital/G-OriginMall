@@ -133,18 +133,23 @@ export default function MyOrderDetail() {
             });
     };
 
+    const [cancelling, setCancelling] = useState(false);
+
     // 개별 아이템 취소
     const handleCancelItem = (orderItemId) => {
+        if (cancelling) return;  // 중복 클릭 방지
         if (!window.confirm("해당 상품을 취소하시겠습니까?")) return;
 
+        setCancelling(true);
         axiosInstance.patch(`/orders/${orderId}/items/${orderItemId}/cancel`)
             .then(() => {
                 alert("상품이 취소되었습니다.");
-                fetchOrder(); // 상태 갱신
+                fetchOrder();
             })
             .catch((err) => {
                 alert(err.response?.data?.message ?? "취소 처리 중 오류가 발생했습니다.");
-            });
+            })
+            .finally(() => setCancelling(false));
     };
 
     if (loading) {
@@ -160,6 +165,12 @@ export default function MyOrderDetail() {
     if (!order) return null;
 
     const canCancel = order.status < 2;
+
+    // 상품 금액 합계 = 모든 아이템의 subtotal 합산
+    const totalItemPrice = order.orderItems?.reduce((sum, item) => sum + item.subtotal, 0) ?? 0;
+
+    // 배송비 = 최종 결제금액 - 상품금액 합계
+    const deliveryFee = order.totalPrice - totalItemPrice;
 
     return (
         <BasicLayout>
@@ -296,10 +307,19 @@ export default function MyOrderDetail() {
                         <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
                             <div className="text-sm space-y-1 text-right">
                                 <p className="text-gray-500">
-                                    상품 금액 <span className="text-gray-800 font-medium ml-4">{order.totalPrice?.toLocaleString("ko-KR")}원</span>
+                                    상품 금액 <span className="text-gray-800 font-medium ml-4">
+                                        {totalItemPrice?.toLocaleString("ko-KR")}원
+                                    </span>
+                                </p>
+                                <p className="text-gray-500">
+                                    배송비 <span className="text-gray-800 font-medium ml-4">
+                                        + {deliveryFee?.toLocaleString("ko-KR")}원
+                                    </span>
                                 </p>
                                 <p className="text-base font-bold text-gray-900 pt-1 border-t border-gray-100">
-                                    최종 결제금액 <span className="ml-4">{order.totalPrice?.toLocaleString("ko-KR")}원</span>
+                                    최종 결제금액 <span className="ml-4">
+                                        {order.totalPrice?.toLocaleString("ko-KR")}원
+                                    </span>
                                 </p>
                             </div>
                         </div>

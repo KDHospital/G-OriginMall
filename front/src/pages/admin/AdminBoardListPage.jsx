@@ -9,15 +9,15 @@ const AdminBoardListPage = () => {
   const isInquiry = location.pathname.includes('inquiry');
   const boardId = isInquiry ? 2 : 1;
 
-  const moveToAdd = () => navigate({ pathname: isInquiry ? '/admin/inquiry/new' : '/admin/board/new' });
-  const moveToRead = (bno) => navigate({ pathname: isInquiry ? `/admin/inquiry/read/${bno}` : `/admin/board/read/${bno}` });
+  const moveToAdd = () => navigate(isInquiry ? '/admin/inquiry/new' : '/admin/board/new');
+  const moveToRead = (postId) => navigate(isInquiry ? `/admin/inquiry/read/${postId}` : `/admin/board/read/${postId}`);
 
   return (
     <AdminLayout>
-    <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
-       <div className="mb-4 text-sm text-gray-400">게시판 관리 &gt; <span className="text-gray-600 font-semibold">{isInquiry ? '고객문의' : '공지사항'}</span></div>
-       <BoardListComponent boardId={boardId} onMoveToRead={moveToRead} onMoveToAdd={moveToAdd} />
-    </div>
+      <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
+        <div className="mb-4 text-sm text-gray-400">게시판 관리 &gt; <span className="text-gray-600 font-semibold">{isInquiry ? '고객문의' : '공지사항'}</span></div>
+        <BoardListComponent boardId={boardId} onMoveToRead={moveToRead} onMoveToAdd={moveToAdd} />
+      </div>
     </AdminLayout>
   );
 };

@@ -1,19 +1,32 @@
 package com.example.gmall.dto.board;
 
+import java.time.LocalDateTime;
+
 import com.example.gmall.domain.Answer;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AnswerResponseDTO {
+
     private Long answerId;
     private String content;
-    private String adminName; // 답변자(관리자) 이름
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public AnswerResponseDTO(Answer answer) {
-        this.answerId = answer.getAnswerId();
-        this.content = answer.getContent();
-        this.adminName = (answer.getMember() != null) ? answer.getMember().getMname() : "관리자";
+    public static AnswerResponseDTO from(Answer answer) {
+        return AnswerResponseDTO.builder()
+                .answerId(answer.getAnswerId())
+                .content(answer.getContent())
+                .createdAt(answer.getCreatedAt())
+                .updatedAt(answer.getUpdatedAt())
+                .build();
     }
 }

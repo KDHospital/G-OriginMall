@@ -9,10 +9,6 @@ import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
-
-/**
- * QOrders is a Querydsl query type for Orders
- */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QOrders extends EntityPathBase<Orders> {
 
@@ -29,6 +25,8 @@ public class QOrders extends EntityPathBase<Orders> {
     public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
     public final QMember member;
+
+    public final StringPath orderGroupId = createString("orderGroupId");
 
     public final NumberPath<Long> orderId = createNumber("orderId", Long.class);
 
@@ -49,6 +47,8 @@ public class QOrders extends EntityPathBase<Orders> {
     public final NumberPath<Byte> status = createNumber("status", Byte.class);
 
     public final ListPath<OrderStatusHistory, QOrderStatusHistory> statusHistories = this.<OrderStatusHistory, QOrderStatusHistory>createList("statusHistories", OrderStatusHistory.class, QOrderStatusHistory.class, PathInits.DIRECT2);
+
+    public final StringPath tossOrderId = createString("tossOrderId");
 
     public final NumberPath<Integer> totalPrice = createNumber("totalPrice", Integer.class);
 
