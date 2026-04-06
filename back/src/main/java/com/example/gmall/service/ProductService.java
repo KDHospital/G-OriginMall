@@ -29,4 +29,7 @@ public interface ProductService {
 
 	// 상품 수정 (판매자/어드민 공용)
     ProductResponseDTO modify(Long productId, ProductRequestDTO dto);
+    
+    //재고처리
+    void decreaseStock(Long productId, int quantity);
 }

@@ -270,6 +270,8 @@ public class ProductServiceImpl implements ProductService {
 
 	    return new ProductResponseDTO(product);
 	}
+	
+
 
 	// ── 공통 유틸 메서드 ────────────────────────────────────────────────
 	private void saveProductImage(Product product, String imageUrl, int sortOrder) {
@@ -293,5 +295,24 @@ public class ProductServiceImpl implements ProductService {
 	        log.warn("파일 삭제 실패: {}", imageUrl);
 	    }
 	}
+	
+//	재고처리
+	@Transactional
+	public void decreaseStock(Long productId, int quantity) {
+	    Product product = productRepository.findById(productId)
+	            .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
+	    // 1. 재고 차감
+	    int remainStock = product.getStock() - quantity;
+	    if (remainStock < 0) throw new RuntimeException("재고가 부족합니다.");
+	    
+	    product.setStock(remainStock);
+
+	    // 2. 재고가 0이면 품절(2) 및 숨김(1) 등 비즈니스 로직 적용
+	    if (remainStock == 0) {
+	        product.setSoldStatus((byte) 2); // 2: SOLD_OUT (품절)
+	    }
+	}
+	
+	
 }
