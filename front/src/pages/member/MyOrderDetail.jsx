@@ -166,11 +166,13 @@ export default function MyOrderDetail() {
 
     const canCancel = order.status < 2;
 
-    // 상품 금액 합계 = 모든 아이템의 subtotal 합산
-    const totalItemPrice = order.orderItems?.reduce((sum, item) => sum + item.subtotal, 0) ?? 0;
+    // 취소되지 않은 아이템만 합산
+    const totalItemPrice = order.orderItems
+        ?.filter(item => item.status === 0)
+        .reduce((sum, item) => sum + item.subtotal, 0) ?? 0;
 
-    // 배송비 = 최종 결제금액 - 상품금액 합계
-    const deliveryFee = order.totalPrice - totalItemPrice;
+    // 배송비 = 최종 결제금액 - 정상 상품금액 합계
+    const deliveryFee = (order.totalPrice ?? 0) - totalItemPrice;
 
     return (
         <BasicLayout>

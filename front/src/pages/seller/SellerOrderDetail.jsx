@@ -75,9 +75,23 @@ export default function SellerOrderDetail() {
     const handleCancelOrder = () => {
         if (!window.confirm("주문을 취소하시겠습니까?")) return;
 
-        axiosInstance.patch(`/orders/${orderId}/cancel`)
+        axiosInstance.patch(`/seller/orders/${orderId}/cancel`)
             .then(() => {
                 alert("주문이 취소되었습니다.");
+                fetchOrder();
+            })
+            .catch((err) => {
+                alert(err.response?.data?.message ?? "취소 처리 중 오류가 발생했습니다.");
+            });
+    };
+
+    // 개별 취소
+    const handleCancelItem = (orderItemId) => {
+        if (!window.confirm("해당 상품을 취소하시겠습니까?")) return;
+
+        axiosInstance.patch(`/seller/orders/${orderId}/items/${orderItemId}/cancel`)
+            .then(() => {
+                alert("상품이 취소되었습니다.");
                 fetchOrder();
             })
             .catch((err) => {
@@ -99,6 +113,14 @@ export default function SellerOrderDetail() {
 
     const canUpdateStatus = order.status >= 0 && order.status <= 2;
     const canCancel = order.status < 2;
+
+    // 취소되지 않은 아이템만 합산
+    const totalItemPrice = order.orderItems
+        ?.filter(item => item.status === 0)
+        .reduce((sum, item) => sum + item.subtotal, 0) ?? 0;
+
+    // 배송비 = 최종 결제금액 - 정상 상품금액 합계
+    const deliveryFee = (order.totalPrice ?? 0) - totalItemPrice;
 
     return (
         <SellerLayout>
@@ -165,6 +187,9 @@ export default function SellerOrderDetail() {
                                 <th className="p-4 text-center font-medium">수량</th>
                                 <th className="p-4 text-right font-medium">소계</th>
                                 <th className="p-4 text-center font-medium">상태</th>
+                                {canCancel && (
+                                    <th className="p-4 text-center font-medium">관리</th>
+                                )}
                             </tr>
                         </thead>
                         <tbody>
@@ -206,6 +231,20 @@ export default function SellerOrderDetail() {
                                             {item.statusLabel}
                                         </span>
                                     </td>
+                                    {canCancel && (
+                                        <td className="p-4 text-center">
+                                            {item.status === 0 ? (
+                                                <button
+                                                    onClick={() => handleCancelItem(item.orderItemId)}
+                                                    className="text-xs px-3 py-1.5 border border-red-300 text-red-500 rounded hover:bg-red-50 transition-colors whitespace-nowrap"
+                                                >
+                                                    취소
+                                                </button>
+                                            ) : (
+                                                <span className="text-xs text-gray-300">-</span>
+                                            )}
+                                        </td>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>
@@ -215,10 +254,19 @@ export default function SellerOrderDetail() {
                     <div className="px-5 py-4 border-t border-gray-100 flex justify-end">
                         <div className="text-sm space-y-1 text-right">
                             <p className="text-gray-500">
-                                상품 금액 <span className="text-gray-800 font-medium ml-4">{order.totalPrice?.toLocaleString("ko-KR")}원</span>
+                                상품 금액 <span className="text-gray-800 font-medium ml-4">
+                                    {totalItemPrice?.toLocaleString("ko-KR")}원
+                                </span>
+                            </p>
+                            <p className="text-gray-500">
+                                배송비 <span className="text-gray-800 font-medium ml-4">
+                                    + {deliveryFee > 0 ? deliveryFee?.toLocaleString("ko-KR") : 0}원
+                                </span>
                             </p>
                             <p className="text-base font-bold text-gray-900 pt-1 border-t border-gray-100">
-                                최종 결제금액 <span className="ml-4">{order.totalPrice?.toLocaleString("ko-KR")}원</span>
+                                최종 결제금액 <span className="ml-4">
+                                    {order.totalPrice?.toLocaleString("ko-KR")}원
+                                </span>
                             </p>
                         </div>
                     </div>
