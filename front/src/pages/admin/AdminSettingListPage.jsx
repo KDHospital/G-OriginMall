@@ -14,6 +14,7 @@ const AdminSettingListPage = () => {
 
   const [searchInput, setSearchInput] = useState('');
   const [keyword, setKeyword] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
 
   const handleSelectAll = (e) => setSelectedIds(e.target.checked ? admins.map(a => a.id) : []);
@@ -30,10 +31,10 @@ const AdminSettingListPage = () => {
     } catch { alert("삭제 중 오류가 발생했습니다."); }
   };
 
-  const loadData = async (page, kw = keyword) => {
+  const loadData = async (page, kw = keyword, status = filterStatus) => {
     setLoading(true);
     try {
-      const data = await adminGetAdmins(page - 1, itemsPerPage, kw);
+      const data = await adminGetAdmins(page - 1, itemsPerPage, kw, status);
       setAdmins(data.dtoList || []);
       setTotalItems(data.totalCount || 0);
     } catch (error) {
@@ -44,11 +45,12 @@ const AdminSettingListPage = () => {
     }
   };
 
-  useEffect(() => { loadData(currentPage); }, [currentPage]);
+  useEffect(() => { setSelectedIds([]); loadData(currentPage); }, [currentPage]);
 
-  const handleSearch = () => { setKeyword(searchInput); setCurrentPage(1); loadData(1, searchInput); };
+  const handleSearch = () => { setKeyword(searchInput); setCurrentPage(1); loadData(1, searchInput, filterStatus); };
   const handleSearchKeyDown = (e) => { if (e.key === 'Enter') handleSearch(); };
-  const handleSearchClear = () => { setSearchInput(''); setKeyword(''); setCurrentPage(1); loadData(1, ''); };
+  const handleSearchClear = () => { setSearchInput(''); setKeyword(''); setFilterStatus(''); setCurrentPage(1); loadData(1, '', ''); };
+  const handleFilterStatus = (v) => { setFilterStatus(v); setCurrentPage(1); loadData(1, keyword, v); };
 
   return (
     <AdminLayout>
@@ -62,6 +64,12 @@ const AdminSettingListPage = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <select value={filterStatus} onChange={(e) => handleFilterStatus(e.target.value)}
+              className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none bg-white focus:border-blue-300 text-gray-700">
+              <option value="">회원상태 전체</option>
+              <option value="active">활성</option>
+              <option value="withdrawn">탈퇴</option>
+            </select>
             <div className="relative flex-1 max-w-sm">
               <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={handleSearchKeyDown}
                 placeholder="이름, 아이디, 이메일 검색"
@@ -71,7 +79,7 @@ const AdminSettingListPage = () => {
             <button onClick={handleSearch} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">검색</button>
             {keyword && (
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <span>검색결과: <strong className="text-gray-800">"{keyword}"</strong> ({totalItems}명)</span>
+                <span>"{keyword}" ({totalItems}명)</span>
                 <button onClick={handleSearchClear} className="text-blue-600 hover:text-blue-800 font-semibold">전체보기</button>
               </div>
             )}
@@ -93,6 +101,7 @@ const AdminSettingListPage = () => {
                   <tr className="border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
                     <th className="pl-5 pr-2 py-4 w-10"><input type="checkbox" onChange={handleSelectAll} checked={selectedIds.length === admins.length && admins.length > 0} className="rounded border-gray-300" /></th>
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
+                    <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
                     <th className="px-4 py-4 w-28 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디(이메일)</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>
@@ -101,7 +110,7 @@ const AdminSettingListPage = () => {
                 </thead>
                 <tbody>
                   {admins.length === 0 ? (
-                    <tr><td colSpan={6} className="py-24 text-center text-gray-400">등록된 관리자가 없습니다.</td></tr>
+                    <tr><td colSpan={7} className="py-24 text-center text-gray-400">등록된 관리자가 없습니다.</td></tr>
                   ) : admins.map((admin, idx) => {
                     const virtualNo = totalItems - (currentPage - 1) * itemsPerPage - idx;
                     return (
@@ -111,6 +120,11 @@ const AdminSettingListPage = () => {
                           <input type="checkbox" checked={selectedIds.includes(admin.id)} onChange={() => handleSelect(admin.id)} className="rounded border-gray-300" />
                         </td>
                         <td className="px-3 py-4 text-center text-gray-400 font-mono text-xs">{virtualNo}</td>
+                        <td className="px-4 py-4 text-center">
+                          <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${admin.isDeleted ? 'bg-gray-100 text-gray-500' : 'bg-emerald-50 text-emerald-600'}`}>
+                            {admin.isDeleted ? '탈퇴' : '활성'}
+                          </span>
+                        </td>
                         <td className="px-4 py-4 text-center font-medium text-gray-800">{admin.mname}</td>
                         <td className="px-4 py-4 text-left text-gray-600">{admin.loginId}</td>
                         <td className="px-4 py-4 text-center text-gray-500 text-xs">{admin.tel}</td>

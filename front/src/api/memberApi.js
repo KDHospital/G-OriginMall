@@ -146,9 +146,10 @@ export const adminRejectSeller = async (memberId) => {
 };
 
 // ===== 관리자 설정 =====
-export const adminGetAdmins = async (page = 0, size = 10, keyword = '') => {
+export const adminGetAdmins = async (page = 0, size = 10, keyword = '', status = '') => {
     const params = { page, size };
     if (keyword) params.keyword = keyword;
+    if (status) params.status = status;
     const response = await axiosInstance.get('/admin/admins', { params });
     return response.data;
 };

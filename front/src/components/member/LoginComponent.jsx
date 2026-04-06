@@ -41,8 +41,8 @@ const LoginComponent = () => {
     
             localStorage.setItem("member",JSON.stringify(data))
 
-            if(data.accessToken){
-                axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.accessToken}`
+            if(data.refreshToken || data.accessToken){
+                axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.refreshToken || data.accessToken}`
             }
 
             alert("로그인에 성공했습니다.")

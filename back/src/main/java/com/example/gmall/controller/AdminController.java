@@ -342,16 +342,28 @@ public class AdminController {
 	@Transactional(readOnly = true)
 	public ResponseEntity<?> getAdminList(
 			@RequestParam(name = "keyword", required = false) String keyword,
+			@RequestParam(name = "status", required = false) String status,
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "10") int size) {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 		Page<Member> result;
 
-		if (keyword != null && !keyword.trim().isEmpty()) {
-			result = memberRepository.findByRoleAndKeyword((byte) 2, keyword.trim(), pageable);
+		boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+		String kw = hasKeyword ? keyword.trim() : null;
+
+		if ("active".equals(status)) {
+			result = hasKeyword
+				? memberRepository.findByRoleAndIsDeletedAndKeyword((byte) 2, false, kw, pageable)
+				: memberRepository.findByRoleAndIsDeletedFalse((byte) 2, pageable);
+		} else if ("withdrawn".equals(status)) {
+			result = hasKeyword
+				? memberRepository.findByRoleAndIsDeletedAndKeyword((byte) 2, true, kw, pageable)
+				: memberRepository.findByRoleAndIsDeletedTrue((byte) 2, pageable);
 		} else {
-			result = memberRepository.findByRole((byte) 2, pageable);
+			result = hasKeyword
+				? memberRepository.findByRoleAndKeyword((byte) 2, kw, pageable)
+				: memberRepository.findByRole((byte) 2, pageable);
 		}
 
 		var dtoList = result.getContent().stream().map(m -> {
@@ -361,6 +373,7 @@ public class AdminController {
 			map.put("mname", m.getMname());
 			map.put("tel", m.getTel());
 			map.put("email", m.getEmail());
+			map.put("isDeleted", m.isDeleted());
 			map.put("createdAt", m.getCreatedAt() != null ? m.getCreatedAt().toString() : "");
 			return map;
 		}).toList();

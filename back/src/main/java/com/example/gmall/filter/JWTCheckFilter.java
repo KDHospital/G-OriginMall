@@ -51,25 +51,25 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request , HttpServletResponse response ,
 			FilterChain filterChain) throws ServletException , IOException{
 		
-		String accessToken = null;
+		String refreshToken = null;
 		
 		jakarta.servlet.http.Cookie[] cookies = request.getCookies();
 		
 		if(cookies != null) {
 			for (jakarta.servlet.http.Cookie cookie : cookies) {
-				if("accessToken".equals(cookie.getName())) {
-					accessToken = cookie.getValue();
+				if("refreshToken".equals(cookie.getName())) {
+					refreshToken = cookie.getValue();
 					break;
 				}
 			}
 		}
 		
-		if(accessToken == null) {
+		if(refreshToken == null) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		try {
-			Map<String, Object> claims = jwtUtil.validateToken(accessToken);
+			Map<String, Object> claims = jwtUtil.validateToken(refreshToken);
 			
 			Object idObj = claims.get("memberId");
 		    if (idObj == null) {
