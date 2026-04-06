@@ -459,7 +459,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<OrderResponseDTO> getSellerOrders(Long sellerId, Byte status, Pageable pageable) {
         if (status == null) {
-            return ordersRepository.findByMemberIdOrderByCreatedAtDescOrderIdDesc(sellerId, pageable)
+            return ordersRepository.findBySellerIdOrderByCreatedAtDescOrderIdDesc(sellerId, pageable)
                     .map(OrderResponseDTO::new);
         }
         return ordersRepository.findBySellerIdAndStatusOrderByCreatedAtDesc(sellerId, status, pageable)
@@ -658,4 +658,45 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("결제 부분 취소에 실패했습니다: " + e.getMessage());
         }
     }
+    
+    // 판매자 페이지 - 판매자용 주문 취소
+    @Override
+    public void sellerCancelOrder(Long sellerId, Long orderId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 본인 상점 주문인지 검증
+        if (!orders.getSeller().getId().equals(sellerId)) {
+            throw new SecurityException("본인 상점의 주문만 취소할 수 있습니다.");
+        }
+
+        // 배송중, 배송완료는 취소 불가
+        if (orders.getStatus() >= 2) {
+            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        }
+
+        // 토스 결제 취소
+        cancelTossPayment(orders.getPaymentKey(), "판매자 주문 취소");
+
+        orders.getOrderItems().stream()
+                .filter(item -> !item.isCancelled())
+                .forEach(item -> {
+                    item.getProduct().restoreStock(item.getQuantity());
+                    item.cancel();
+                });
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus((byte) 4)
+                .memo("판매자 주문 취소")
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+        orders.updateStatus((byte) 4);
+
+        log.info("판매자 주문 취소 완료 - orderId: {}", orderId);
+    }
+    
 }

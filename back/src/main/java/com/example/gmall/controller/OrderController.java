@@ -242,4 +242,16 @@ public class OrderController {
 	    orderService.adminUpdateOrderStatus(orderId, status);  // adminId 파라미터 제거
 	    return ResponseEntity.noContent().build();
 	}
+	
+	// 판매자 주문 취소
+	// PATCH /api/seller/orders/{orderId}/cancel
+	@PatchMapping("/seller/orders/{orderId}/cancel")
+	public ResponseEntity<Void> sellerCancelOrder(
+	        @PathVariable("orderId") Long orderId,
+	        Authentication authentication
+	) {
+	    Long sellerId = (Long) authentication.getPrincipal();
+	    orderService.sellerCancelOrder(sellerId, orderId);
+	    return ResponseEntity.noContent().build();
+	}
 }

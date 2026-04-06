@@ -75,7 +75,7 @@ export default function SellerOrderDetail() {
     const handleCancelOrder = () => {
         if (!window.confirm("주문을 취소하시겠습니까?")) return;
 
-        axiosInstance.patch(`/orders/${orderId}/cancel`)
+        axiosInstance.patch(`/seller/orders/${orderId}/cancel`)
             .then(() => {
                 alert("주문이 취소되었습니다.");
                 fetchOrder();
