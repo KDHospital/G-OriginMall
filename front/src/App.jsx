@@ -46,6 +46,8 @@ import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
 import AdminBoardReadPage from './pages/admin/AdminBoardReadPage';
 import AdminBoardModifyPage from './pages/admin/AdminBoardModifyPage';
 import AdminInquiryPage from './pages/admin/AdminInquiryPage';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 
 import BoardPage from './pages/support/BoardPage';
 import BoardReadPage from './pages/support/BoardReadPage';
@@ -54,6 +56,7 @@ import InquiryAddModal from './pages/support/InquiryAddModal';
 import FaqPage from './pages/support/FaqPage';
 
 import ProtectedRoute from './components/support/ProtectedRoute';
+import { CartProvider } from './context/CartContext';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -65,49 +68,42 @@ import ProtectedRoute from './components/support/ProtectedRoute';
 
 
 function App() {
-
-  useEffect(()=>{
-
-        axiosInstance.get('/test')
-        .then((res) => console.log("Axios로 CORS :", res.data))
-        .catch((err) => console.error("Axios로 CORS :", err));
-
-  },[]);
   
   return (
     <BrowserRouter>
-      <Routes>
-        {/* 메인 */}
-        <Route path="/" element={<MainPage />} />
+      <CartProvider>
+        <Routes>
+          {/* 메인 */}
+          <Route path="/" element={<MainPage />} />
 
-        {/* 회원(구매자) - 유재영 담당 */}
-        <Route path='/signup' element={<UserSignupPage />} />
-        <Route path='/login' element={<JoinPage />} />
-        <Route path='/mypage' element={<ProtectedRoute><Mypapge /></ProtectedRoute>} />
-        <Route path='/modifypage' element={<ProtectedRoute><ModifyPage /></ProtectedRoute>} />
-        <Route path='/findid' element={<FindIdPage />} />
-        <Route path='/findpwd' element={<FindPwdPage />} />
-        {/* 회원(판매자) - 유재영 담당 */}
-        {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
-        <Route path='/sellersignup' element={<SellerSingupPage />} />
-        {/* 장바구니 - 김슬기 담당 */}
-        <Route path="/cart" element={<ProtectedRoute allowRole={0}><CartPage /></ProtectedRoute>} />
+          {/* 회원(구매자) - 유재영 담당 */}
+          <Route path='/signup' element={<UserSignupPage />} />
+          <Route path='/login' element={<JoinPage />} />
+          <Route path='/mypage' element={<ProtectedRoute><Mypapge /></ProtectedRoute>} />
+          <Route path='/modifypage' element={<ProtectedRoute><ModifyPage /></ProtectedRoute>} />
+          <Route path='/findid' element={<FindIdPage />} />
+          <Route path='/findpwd' element={<FindPwdPage />} />
+          {/* 회원(판매자) - 유재영 담당 */}
+          {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
+          <Route path='/sellersignup' element={<SellerSingupPage />} />
+          {/* 장바구니 - 김슬기 담당 */}
+          <Route path="/cart" element={<ProtectedRoute allowRole={0}><CartPage /></ProtectedRoute>} />
 
-        {/* 상품 - 이효진 담당 */}
-        <Route path="/products" element={<ProductListPage />} />
-        <Route path="/products/:productId" element={<ProductDetailPage />} />
-        <Route path="/products/certified" element={<CertifiedListPage />} />
-        <Route path="/products/certified/:productId" element={<CertifiedDetailPage />} />
-        <Route path="/products/exhibition" element={<ExhibitionListPage />} />
-        <Route path="/products/exhibition/:productId" element={<ExhibitionDetailPage />} />
-        
+          {/* 상품 - 이효진 담당 */}
+          <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/:productId" element={<ProductDetailPage />} />
+          <Route path="/products/certified" element={<CertifiedListPage />} />
+          <Route path="/products/certified/:productId" element={<CertifiedDetailPage />} />
+          <Route path="/products/exhibition" element={<ExhibitionListPage />} />
+          <Route path="/products/exhibition/:productId" element={<ExhibitionDetailPage />} />
+          
 
-        {/* 주문 - 김슬기 담당 */}
-        <Route path="/orders/new" element={<ProtectedRoute allowRole={0}><OrderFormPage /></ProtectedRoute>} />
-        <Route path="/orders/success" element={<ProtectedRoute allowRole={0}><OrderSuccessPage /></ProtectedRoute>} />
-        <Route path="/orders/fail"    element={<ProtectedRoute allowRole={0}><OrderFailPage /></ProtectedRoute>} />
-        <Route path="/orders" element={<ProtectedRoute allowRole={0}><MyOrders /></ProtectedRoute>} /> 
-        <Route path="/orders/:orderId" element={<ProtectedRoute allowRole={0}><MyOrderDetail /></ProtectedRoute>} />
+          {/* 주문 - 김슬기 담당 */}
+          <Route path="/orders/new" element={<ProtectedRoute allowRole={0}><OrderFormPage /></ProtectedRoute>} />
+          <Route path="/orders/success" element={<ProtectedRoute allowRole={0}><OrderSuccessPage /></ProtectedRoute>} />
+          <Route path="/orders/fail"    element={<ProtectedRoute allowRole={0}><OrderFailPage /></ProtectedRoute>} />
+          <Route path="/orders" element={<ProtectedRoute allowRole={0}><MyOrders /></ProtectedRoute>} /> 
+          <Route path="/orders/:orderId" element={<ProtectedRoute allowRole={0}><MyOrderDetail /></ProtectedRoute>} />
 
         {/* 게시판 - 신시온 담당*/}
         <Route path="/board" element={<BoardPage />} />
@@ -121,17 +117,14 @@ function App() {
 
         {/* 어드민 */}
         <Route path="/admin" element={<ProtectedRoute allowRole={2}><AdminDashboardPage /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute allowRole={2}><AdminOrders /></ProtectedRoute>} />
+        <Route path="/admin/orders/:orderId" element={<ProtectedRoute allowRole={2}><AdminOrderDetail /></ProtectedRoute>} />
 
         {/* 어드민-회원관리 - 신시온 담당*/}
-        <Route path="/admin/members" element={<AdminMemberListPage />} />
-        <Route path="/admin/members/new" element={<AdminMemberAddPage />} />
-        <Route path="/admin/members/:memberId" element={<AdminMemberDetailPage />} />
-        <Route path="/admin/members/:memberId/modify" element={<AdminMemberModifyPage />} />
-        <Route path="/admin/sellers" element={<AdminSellerListPage />} />
-        <Route path="/admin/sellers/:memberId" element={<AdminSellerDetailPage />} />
-        <Route path="/admin/admins" element={<AdminSettingListPage />} />
-        <Route path="/admin/admins/new" element={<AdminSettingAddPage />} />
-        <Route path="/admin/admins/:memberId" element={<AdminSettingDetailPage />} />
+        <Route path="/admin/members" element={<ProtectedRoute allowRole={2}><AdminMemberListPage /></ProtectedRoute>} />
+        <Route path="/admin/members/new" element={<ProtectedRoute allowRole={2}><AdminMemberAddPage /></ProtectedRoute>} />
+        <Route path="/admin/members/:memberId" element={<ProtectedRoute allowRole={2}><AdminMemberDetailPage /></ProtectedRoute>} />
+        <Route path="/admin/members/:memberId/modify" element={<ProtectedRoute allowRole={2}><AdminMemberModifyPage /></ProtectedRoute>} />
 
         {/* 판매자 */}
         <Route path="/seller" element={<ProtectedRoute allowRole={1}><SellerDashboardPage /></ProtectedRoute>} />
@@ -147,20 +140,21 @@ function App() {
 
 
         {/* 어드민-게시판>공지사항 - 신시온 담당*/}
-        <Route path="/admin/board" element={<AdminBoardListPage />} />
-        <Route path="/admin/board/new" element={<AdminBoardAddPage />} />
-        <Route path="/admin/board/read/:postId" element={<AdminBoardReadPage />} />
-        <Route path="/admin/board/modify/:postId" element={<AdminBoardModifyPage />} />
+        <Route path="/admin/board" element={<ProtectedRoute allowRole={2}><AdminBoardListPage /></ProtectedRoute>} />
+        <Route path="/admin/board/new" element={<ProtectedRoute allowRole={2}><AdminBoardAddPage /></ProtectedRoute>} />
+        <Route path="/admin/board/read/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardReadPage /></ProtectedRoute>} />
+        <Route path="/admin/board/modify/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardModifyPage /></ProtectedRoute>} />
 
         {/* 어드민-게시판>고객문의 - 신시온 담당*/}
-        <Route path="/admin/inquiry" element={<AdminInquiryPage />} />
-        <Route path="/admin/inquiry/new" element={<AdminBoardAddPage />} />
-        <Route path="/admin/inquiry/read/:postId" element={<AdminBoardReadPage />} />
-        <Route path="/admin/inquiry/modify/:postId" element={<AdminBoardModifyPage />} />
+        <Route path="/admin/inquiry" element={<ProtectedRoute allowRole={2}><AdminInquiryPage /></ProtectedRoute>} />
+        <Route path="/admin/inquiry/new" element={<ProtectedRoute allowRole={2}><AdminBoardAddPage /></ProtectedRoute>} />
+        <Route path="/admin/inquiry/read/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardReadPage /></ProtectedRoute>} />
+        <Route path="/admin/inquiry/modify/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardModifyPage /></ProtectedRoute>} />
 
 
 
-      </Routes>
+        </Routes>
+      </CartProvider>
     </BrowserRouter>
   );
 }

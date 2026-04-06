@@ -1,5 +1,6 @@
 package com.example.gmall.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -183,4 +184,62 @@ public class OrderController {
 	    return ResponseEntity.noContent().build();
 	}
     
+	// 어드민 주문 카운트
+	// GET /api/admin/orders/count
+	@GetMapping("/admin/orders/count")
+	public ResponseEntity<Map<String, Long>> getAdminOrderCount() {
+	    return ResponseEntity.ok(orderService.getAdminOrderCount());
+	}
+
+	// 어드민 전체 주문 목록
+	// GET /api/admin/orders
+	@GetMapping("/admin/orders")
+	public ResponseEntity<Page<OrderResponseDTO>> getAdminOrders(
+	        @RequestParam(name = "page", defaultValue = "0") int page,
+	        @RequestParam(name = "size", defaultValue = "10") int size,
+	        @RequestParam(name = "status", required = false) Byte status,
+	        @RequestParam(name = "keyword", required = false) String keyword,
+	        @RequestParam(name = "sellerName", required = false) String sellerName,
+	        @RequestParam(name = "startDate", required = false) String startDate,
+	        @RequestParam(name = "endDate", required = false) String endDate
+	) {
+	    LocalDateTime start = startDate != null
+	            ? LocalDateTime.parse(startDate + "T00:00:00") : null;
+	    LocalDateTime end = endDate != null
+	            ? LocalDateTime.parse(endDate + "T23:59:59") : null;
+
+	    Pageable pageable = PageRequest.of(page, size);
+	    Page<OrderResponseDTO> result = orderService.getAdminOrders(
+	            status, keyword, sellerName, start, end, pageable);
+	    return ResponseEntity.ok(result);
+	}
+
+	// 어드민 주문 상세
+	// GET /api/admin/orders/{orderId}
+	@GetMapping("/admin/orders/{orderId}")
+	public ResponseEntity<OrderResponseDTO> getAdminOrder(
+	        @PathVariable("orderId") Long orderId
+	) {
+	    return ResponseEntity.ok(orderService.getAdminOrder(orderId));
+	}
+
+	// 어드민 주문 취소
+	// PATCH /api/admin/orders/{orderId}/cancel
+	@PatchMapping("/admin/orders/{orderId}/cancel")
+	public ResponseEntity<Void> adminCancelOrder(
+	        @PathVariable("orderId") Long orderId
+	) {
+	    orderService.adminCancelOrder(orderId);
+	    return ResponseEntity.noContent().build();
+	}
+
+	// PATCH /api/admin/orders/{orderId}/status
+	@PatchMapping("/admin/orders/{orderId}/status")
+	public ResponseEntity<Void> adminUpdateOrderStatus(
+	        @PathVariable("orderId") Long orderId,
+	        @RequestParam(name = "status") Byte status
+	) {
+	    orderService.adminUpdateOrderStatus(orderId, status);  // adminId 파라미터 제거
+	    return ResponseEntity.noContent().build();
+	}
 }
