@@ -53,13 +53,20 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 		
 		String accessToken = null;
 		
+		String authHeader = request.getHeader("Authorization");
+		if(authHeader != null && authHeader.startsWith("Bearer ")) {
+			accessToken = authHeader.substring(7);
+			log.info("Header에서 토큰 추출 성공");
+		}
+		if(accessToken == null) {
 		jakarta.servlet.http.Cookie[] cookies = request.getCookies();
-		
+	
 		if(cookies != null) {
 			for (jakarta.servlet.http.Cookie cookie : cookies) {
 				if("accessToken".equals(cookie.getName())) {
 					accessToken = cookie.getValue();
 					break;
+				}
 				}
 			}
 		}
