@@ -16,9 +16,10 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         const member = JSON.parse(localStorage.getItem("member"));
-        const token = member?.data?.accessToken;    // response.data.accessToken
+        const token = member?.accessToken;    // response.data.accessToken
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log("토큰이 헤더에 포함되었습니다.");
             
         }
         return config;
