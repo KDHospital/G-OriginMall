@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import PaginationComponent from '../../components/support/PaginationComponent';
-import { adminGetMembers } from '../../api/memberApi';
+import { adminGetMembers, adminDeleteMember } from '../../api/memberApi';
 
 const AdminMemberListPage = () => {
   const navigate = useNavigate();
@@ -15,6 +15,23 @@ const AdminMemberListPage = () => {
   const [searchInput, setSearchInput] = useState('');
   const [keyword, setKeyword] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const handleSelectAll = (e) => setSelectedIds(e.target.checked ? members.map(m => m.id) : []);
+  const handleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+  const handleDelete = async () => {
+    if (selectedIds.length === 0) return alert("삭제할 회원을 선택해주세요.");
+    if (!window.confirm(`${selectedIds.length}명을 비활성화하시겠습니까?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => adminDeleteMember(id)));
+      alert("처리되었습니다.");
+      setSelectedIds([]);
+      loadData(currentPage);
+    } catch (error) {
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
 
   const loadData = async (page, searchKeyword = keyword, status = filterStatus) => {
     setLoading(true);
@@ -67,12 +84,12 @@ const AdminMemberListPage = () => {
   return (
     <AdminLayout>
       <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
-        <div className="mb-4 text-sm text-gray-400"><span className="text-gray-600 font-semibold">회원 관리</span></div>
+        <div className="mb-4 text-sm text-gray-400">회원 관리 &gt; <span className="text-gray-600 font-semibold">일반회원</span></div>
 
         <div className="space-y-5">
           {/* 페이지 헤더 */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">회원 관리</h2>
+            <h2 className="text-2xl font-bold text-gray-900">일반회원 관리</h2>
             <p className="text-sm text-gray-400 mt-1">총 {totalItems}명의 일반 회원이 있습니다.</p>
           </div>
 
@@ -111,9 +128,15 @@ const AdminMemberListPage = () => {
                 <button onClick={handleSearchClear} className="text-blue-600 hover:text-blue-800 font-semibold">전체보기</button>
               </div>
             )}
-            <button onClick={() => navigate('/admin/members/new')} className="ml-auto px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
-              등록
-            </button>
+            <div className="flex gap-2 ml-auto">
+              <button onClick={handleDelete} disabled={selectedIds.length === 0}
+                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>
+                {selectedIds.length > 0 ? `${selectedIds.length}명 삭제` : '삭제'}
+              </button>
+              <button onClick={() => navigate('/admin/members/new')} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
+                등록
+              </button>
+            </div>
           </div>
 
           {/* 테이블 */}
@@ -124,7 +147,8 @@ const AdminMemberListPage = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
-                    <th className="px-5 py-4 w-14 text-center font-semibold">No.</th>
+                    <th className="pl-5 pr-2 py-4 w-10"><input type="checkbox" onChange={handleSelectAll} checked={selectedIds.length === members.length && members.length > 0} className="rounded border-gray-300" /></th>
+                    <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
                     <th className="px-4 py-4 w-28 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디(이메일)</th>
@@ -136,7 +160,7 @@ const AdminMemberListPage = () => {
                 <tbody>
                   {members.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-24 text-center text-gray-400">등록된 회원이 없습니다.</td>
+                      <td colSpan={8} className="py-24 text-center text-gray-400">등록된 회원이 없습니다.</td>
                     </tr>
                   ) : (
                     members.map((member, idx) => {
@@ -147,7 +171,10 @@ const AdminMemberListPage = () => {
                           className="border-b border-gray-50 transition-colors cursor-pointer hover:bg-gray-50/70"
                           onClick={() => navigate(`/admin/members/${member.id}`)}
                         >
-                          <td className="px-5 py-4 text-center text-gray-400 font-mono text-xs">{virtualNo}</td>
+                          <td className="pl-5 pr-2 py-4" onClick={e => e.stopPropagation()}>
+                          <input type="checkbox" checked={selectedIds.includes(member.id)} onChange={() => handleSelect(member.id)} className="rounded border-gray-300" />
+                        </td>
+                        <td className="px-3 py-4 text-center text-gray-400 font-mono text-xs">{virtualNo}</td>
                           <td className="px-4 py-4 text-center">
                             <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${
                               member.isDeleted ? 'bg-gray-100 text-gray-500' : 'bg-emerald-50 text-emerald-600'

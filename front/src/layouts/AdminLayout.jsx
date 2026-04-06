@@ -11,7 +11,16 @@ const menuGroups = [
     {
         label: 'MANAGEMENT',
         items: [
-            { path: '/admin/members', label: '회원 관리', icon: '👤' },
+            {
+                path: '/admin/members',
+                label: '회원 관리',
+                icon: '👤',
+                children: [
+                    { path: '/admin/members', label: '일반회원' },
+                    { path: '/admin/sellers', label: '판매회원' },
+                    { path: '/admin/admins', label: '관리자설정' },
+                ],
+            },
             { path: '/admin/products', label: '상품 목록', icon: '🛍️' },
             { path: '/admin/products/new', label: '상품 등록', icon: '➕' },
             { path: '/admin/orders', label: '주문 목록', icon: '📦' },

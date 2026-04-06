@@ -36,6 +36,11 @@ import AdminMemberListPage from './pages/admin/AdminMemberListPage';
 import AdminMemberDetailPage from './pages/admin/AdminMemberDetailPage';
 import AdminMemberAddPage from './pages/admin/AdminMemberAddPage';
 import AdminMemberModifyPage from './pages/admin/AdminMemberModifyPage';
+import AdminSellerListPage from './pages/admin/AdminSellerListPage';
+import AdminSellerDetailPage from './pages/admin/AdminSellerDetailPage';
+import AdminSettingListPage from './pages/admin/AdminSettingListPage';
+import AdminSettingAddPage from './pages/admin/AdminSettingAddPage';
+import AdminSettingDetailPage from './pages/admin/AdminSettingDetailPage';
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
 import AdminBoardReadPage from './pages/admin/AdminBoardReadPage';
@@ -122,6 +127,11 @@ function App() {
         <Route path="/admin/members/new" element={<AdminMemberAddPage />} />
         <Route path="/admin/members/:memberId" element={<AdminMemberDetailPage />} />
         <Route path="/admin/members/:memberId/modify" element={<AdminMemberModifyPage />} />
+        <Route path="/admin/sellers" element={<AdminSellerListPage />} />
+        <Route path="/admin/sellers/:memberId" element={<AdminSellerDetailPage />} />
+        <Route path="/admin/admins" element={<AdminSettingListPage />} />
+        <Route path="/admin/admins/new" element={<AdminSettingAddPage />} />
+        <Route path="/admin/admins/:memberId" element={<AdminSettingDetailPage />} />
 
         {/* 판매자 */}
         <Route path="/seller" element={<ProtectedRoute allowRole={1}><SellerDashboardPage /></ProtectedRoute>} />

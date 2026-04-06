@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
-import { adminGetMember, adminGetMemberOrders } from '../../api/memberApi';
+import { adminGetMember, adminGetMemberOrders, adminDeleteMember } from '../../api/memberApi';
 
 const AdminMemberDetailPage = () => {
   const { memberId } = useParams();
@@ -101,9 +101,11 @@ const AdminMemberDetailPage = () => {
               </button>
               <h2 className="text-2xl font-bold text-gray-900">회원 상세</h2>
             </div>
-            <button onClick={() => navigate(`/admin/members/${memberId}/modify`)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
-              수정
-            </button>
+            <div className="flex gap-2">
+              <button onClick={async () => { if (!window.confirm("이 회원을 비활성화하시겠습니까?")) return; try { await adminDeleteMember(memberId); alert("처리되었습니다."); navigate('/admin/members'); } catch { alert("삭제에 실패했습니다."); } }}
+                className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors">삭제</button>
+              <button onClick={() => navigate(`/admin/members/${memberId}/modify`)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">수정</button>
+            </div>
           </div>
 
           {/* 회원 정보 카드 */}
