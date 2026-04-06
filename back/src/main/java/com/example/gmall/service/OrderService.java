@@ -1,5 +1,6 @@
 package com.example.gmall.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,21 @@ public interface OrderService {
 	
 	// 판매자 주문 관리 - 상태값 변경
 	void updateOrderStatus(Long sellerId, Long orderId, Byte newStatus);
+	
+	// 관리자 페이지 - 주문 조회
+	Page<OrderResponseDTO> getAdminOrders(Byte status, String keyword, String sellerName,
+	            LocalDateTime startDate, LocalDateTime endDate,
+	            Pageable pageable);
+	
+	// 관리자 페이지 - 주문 집계
+	Map<String, Long> getAdminOrderCount();
+	OrderResponseDTO getAdminOrder(Long orderId);
+	
+	// 관리자 페이지 - 주문 취소
+	void adminCancelOrder(Long orderId);
+	
+	// 관리자 페이지 - 상태 변경(sellerId 제약 없음)
+	void adminUpdateOrderStatus(Long orderId, Byte newStatus);
 
 	
 }

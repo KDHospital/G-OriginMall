@@ -1,9 +1,13 @@
 import { useState } from "react";
 import axiosInstance from "../../api/axios";
 import { useNavigate,useLocation } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+
 
 
 const ProductInfo = ({product}) => {
+
+    const { fetchCartCount } = useCart();
 
     const location = useLocation()  //현 주소
     // 현재 주소(pathname)에 'certified'가 포함되어 있는지 확인 (true/false)
@@ -58,7 +62,7 @@ const ProductInfo = ({product}) => {
             await axiosInstance.post("/cart",{
                 productId:product.productId,
                 quantity: quantity,
-            })
+            }).then(()=>fetchCartCount());
             alert(`${product.pname} ${quantity}개를 장바구니에 담았습니다.`)
         } catch (err) {
             console.error(err)
