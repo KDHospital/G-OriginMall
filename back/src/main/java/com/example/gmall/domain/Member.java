@@ -135,6 +135,8 @@ public class Member {
     public void rejectBusinessVerify() {
     	this.businessVerified = false;
     }
+    
+    
     public Map<String, Object> getClaims() {
        
         Map<String, Object> dataMap = new HashMap<>(); 

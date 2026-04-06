@@ -1,43 +1,50 @@
 package com.example.gmall.dto.board;
 
 import java.time.LocalDateTime;
-
 import com.example.gmall.domain.Post;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@Getter 
+@Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED) // 외부에서 빈 객체 생성을 막습니다.
+@NoArgsConstructor
 public class PostListResponseDTO {
 
     private Long postId;
     private String title;
-    private String writerName;
+    private String mName;
+    private String loginId;
     private LocalDateTime createdAt;
     private Integer viewCount;
-    private boolean isPublic;
+    private String content;
     private boolean hasAnswer;
+    private Long memberId;
 
-    // --- [핵심] Entity를 DTO로 변환하는 생성자 ---
-    // 이 생성자가 있으면 서비스 계층에서 Setter 없이도 깔끔하게 변환이 가능합니다.
-    public PostListResponseDTO(Post post) {
-        this.postId = post.getPostId();
-        this.title = post.getTitle();
-        
-        // 작성자 이름 (Member 엔티티와 연동)
-        this.writerName = (post.getMember() != null) ? post.getMember().getMname() : "익명";
-        
-        this.createdAt = post.getCreatedAt();
-        this.viewCount = (post.getViewCount() != null) ? post.getViewCount() : 0;
-        this.isPublic = post.isPublic();
-        
-        // 답변 리스트가 비어있지 않으면 답변 완료(true) 처리
-        this.hasAnswer = post.getAnswers() != null && !post.getAnswers().isEmpty();
+    @JsonProperty("isPublic")
+    private boolean isPublic;
+
+    public static PostListResponseDTO from(Post post) {
+
+        PostListResponseDTOBuilder builder = PostListResponseDTO.builder()
+                .postId(post.getPostId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .createdAt(post.getCreatedAt())
+                .viewCount(post.getViewCount() != null ? post.getViewCount() : 0)
+                .isPublic(post.isPublic())
+                .hasAnswer(post.getAnswers() != null && !post.getAnswers().isEmpty());
+
+        if (post.getMember() != null) {
+            builder.mName(post.getMember().getMname())
+                   .loginId(post.getMember().getLoginId())
+                   .memberId(post.getMember().getId());
+        } else {
+            builder.mName("익명")
+                   .loginId(null)
+                   .memberId(null);
+        }
+
+        return builder.build();
     }
 }

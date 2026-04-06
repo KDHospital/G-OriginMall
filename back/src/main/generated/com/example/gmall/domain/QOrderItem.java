@@ -9,10 +9,6 @@ import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
-
-/**
- * QOrderItem is a Querydsl query type for OrderItem
- */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QOrderItem extends EntityPathBase<OrderItem> {
 
@@ -33,6 +29,8 @@ public class QOrderItem extends EntityPathBase<OrderItem> {
     public final StringPath productName = createString("productName");
 
     public final NumberPath<Integer> quantity = createNumber("quantity", Integer.class);
+
+    public final NumberPath<Byte> status = createNumber("status", Byte.class);
 
     public final NumberPath<Integer> subtotal = createNumber("subtotal", Integer.class);
 

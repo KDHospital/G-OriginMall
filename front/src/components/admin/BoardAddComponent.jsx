@@ -1,75 +1,100 @@
 import React, { useState } from 'react';
-
-const initState = {
-  title: '',
-  content: '',
-  writer: 'admin',
-  boardId: 0,
-  isPublic: 'V',
-  startDate: '2026-03-01',
-  endDate: '2026-03-31'
-};
+import { addInquiry } from '../../api/boardApi';
 
 const BoardAddComponent = ({ boardId, onMoveToList }) => {
-  const [post, setPost] = useState({ ...initState, boardId: boardId });
+  const [post, setPost] = useState({
+    title: '',
+    content: '',
+    boardId: boardId,
+    isPublic: true
+  });
   const [fetching, setFetching] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPost({ ...post, [name]: value });
+    if (name === 'isPublic') {
+      setPost({ ...post, isPublic: value === 'true' });
+    } else {
+      setPost({ ...post, [name]: value });
+    }
   };
 
-  const handleClickAdd = () => {
+  const handleClickAdd = async () => {
+    if (!post.title.trim()) return alert("제목을 입력해주세요.");
+    if (!post.content.trim()) return alert("내용을 입력해주세요.");
+
     setFetching(true);
-    console.log("서버 전송 데이터:", post);
-    alert("성공적으로 등록되었습니다.");
-    setFetching(false);
-    onMoveToList();
+    try {
+      await addInquiry({
+        title: post.title.trim(),
+        content: post.content.trim(),
+        boardId: post.boardId,
+        isPublic: post.isPublic
+      });
+      alert("성공적으로 등록되었습니다.");
+      onMoveToList();
+    } catch (error) {
+      console.error("등록 실패:", error);
+      alert("등록 중 오류가 발생했습니다.");
+    } finally {
+      setFetching(false);
+    }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-6 border-b flex justify-between items-center bg-gray-50/50">
-        <h2 className="text-xl font-bold text-gray-800">
-          <button onClick={onMoveToList} className="mr-3 text-gray-400 hover:text-black">{'<'}</button>
-          {boardId === 1 ? '공지사항' : '고객문의'} 등록
-        </h2>
+    <div className="space-y-5">
+      {/* 페이지 헤더 */}
+      <div className="flex justify-between items-end">
+        <div>
+          <button onClick={onMoveToList} className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-1 flex items-center gap-1">
+            <span>←</span> 목록으로
+          </button>
+          <h2 className="text-2xl font-bold text-gray-900">{boardId === 1 ? '공지사항' : '고객문의'} 등록</h2>
+        </div>
         <div className="flex gap-2">
-          <button onClick={onMoveToList} className="bg-gray-500 text-white px-6 py-2 rounded font-bold">취소</button>
-          <button onClick={handleClickAdd} className="bg-black text-white px-6 py-2 rounded font-bold">저장</button>
+          <button onClick={onMoveToList} className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">취소</button>
+          <button onClick={handleClickAdd} disabled={fetching} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">
+            {fetching ? '저장 중...' : '저장'}
+          </button>
         </div>
       </div>
 
-      <div className="p-8 space-y-6">
-        <div className="grid grid-cols-[120px_1fr] border rounded overflow-hidden">
-          <div className="bg-gray-100 p-4 font-bold text-center border-b border-r">제목</div>
-          <div className="p-3 border-b flex gap-3">
-            <select name="isPublic" value={post.isPublic} onChange={handleChange} className="border p-2 rounded font-bold text-blue-600">
-              <option value="V">공개 V</option>
-              <option value="X">비공개 X</option>
+      {/* 폼 카드 */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        {/* 제목 + 공개여부 */}
+        <div className="px-6 py-5 border-b border-gray-100">
+          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">제목</label>
+          <div className="flex gap-3 items-center">
+            <select
+              name="isPublic"
+              value={String(post.isPublic)}
+              onChange={handleChange}
+              className="shrink-0 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
+            >
+              <option value="true">공개</option>
+              <option value="false">비공개</option>
             </select>
-            <input name="title" value={post.title} onChange={handleChange} className="flex-1 border p-2 rounded outline-none" placeholder="제목을 입력하세요." />
-          </div>
-
-          <div className="bg-gray-100 p-4 font-bold text-center border-r">노출 기간</div>
-          <div className="p-3 flex items-center gap-4">
-            <input name="startDate" type="date" value={post.startDate} onChange={handleChange} className="border p-2 rounded text-sm" />
-            <span className="text-gray-400">~</span>
-            <input name="endDate" type="date" value={post.endDate} onChange={handleChange} className="border p-2 rounded text-sm" />
+            <input
+              name="title"
+              value={post.title}
+              onChange={handleChange}
+              type="text"
+              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg outline-none text-gray-800 placeholder-gray-300 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
+              placeholder="제목을 입력하세요"
+            />
           </div>
         </div>
 
-        <div className="border rounded overflow-hidden shadow-inner">
-          <div className="bg-gray-50 p-2 text-xs text-gray-400 border-b flex gap-4 font-mono">
-            <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span>
-          </div>
-          <textarea 
-            name="content" 
-            value={post.content} 
-            onChange={handleChange} 
-            className="w-full h-80 p-6 outline-none resize-none leading-relaxed" 
-            placeholder="내용을 상세히 입력해 주세요."
-          ></textarea>
+        {/* 본문 */}
+        <div className="px-6 py-5">
+          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">내용</label>
+          <textarea
+            name="content"
+            value={post.content}
+            onChange={handleChange}
+            className="w-full min-h-[400px] px-4 py-4 border border-gray-200 rounded-lg outline-none text-sm text-gray-700 leading-relaxed placeholder-gray-300 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all resize-y"
+            placeholder="내용을 상세히 입력해 주세요"
+          />
         </div>
       </div>
     </div>
