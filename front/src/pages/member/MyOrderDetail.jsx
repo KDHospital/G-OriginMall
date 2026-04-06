@@ -166,6 +166,12 @@ export default function MyOrderDetail() {
 
     const canCancel = order.status < 2;
 
+    // 상품 금액 합계 = 모든 아이템의 subtotal 합산
+    const totalItemPrice = order.orderItems?.reduce((sum, item) => sum + item.subtotal, 0) ?? 0;
+
+    // 배송비 = 최종 결제금액 - 상품금액 합계
+    const deliveryFee = order.totalPrice - totalItemPrice;
+
     return (
         <BasicLayout>
             <div className="max-w-7xl mx-auto flex gap-8 p-10 bg-gray-50 min-h-screen">
@@ -301,10 +307,19 @@ export default function MyOrderDetail() {
                         <div className="px-6 py-4 border-t border-gray-100 flex justify-end">
                             <div className="text-sm space-y-1 text-right">
                                 <p className="text-gray-500">
-                                    상품 금액 <span className="text-gray-800 font-medium ml-4">{order.totalPrice?.toLocaleString("ko-KR")}원</span>
+                                    상품 금액 <span className="text-gray-800 font-medium ml-4">
+                                        {totalItemPrice?.toLocaleString("ko-KR")}원
+                                    </span>
+                                </p>
+                                <p className="text-gray-500">
+                                    배송비 <span className="text-gray-800 font-medium ml-4">
+                                        + {deliveryFee?.toLocaleString("ko-KR")}원
+                                    </span>
                                 </p>
                                 <p className="text-base font-bold text-gray-900 pt-1 border-t border-gray-100">
-                                    최종 결제금액 <span className="ml-4">{order.totalPrice?.toLocaleString("ko-KR")}원</span>
+                                    최종 결제금액 <span className="ml-4">
+                                        {order.totalPrice?.toLocaleString("ko-KR")}원
+                                    </span>
                                 </p>
                             </div>
                         </div>

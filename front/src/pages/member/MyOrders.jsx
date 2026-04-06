@@ -82,7 +82,7 @@ export default function MyOrders() {
                                     {orders.map((order) => (
                                         <tr key={order.orderId} className="border-t border-gray-50 hover:bg-gray-50 transition-colors">
                                             <td className="p-4 text-xs text-gray-500 whitespace-nowrap">
-                                                {order.createdAt?.slice(0, 10)}
+                                                {order.createdAt?.replace("T", " ").slice(0, 16)}
                                             </td>
                                             <td className="p-4 text-xs text-gray-500 whitespace-nowrap">
                                                 ORDER_{order.orderId}

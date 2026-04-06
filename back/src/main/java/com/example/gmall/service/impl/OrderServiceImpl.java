@@ -177,7 +177,7 @@ public class OrderServiceImpl implements OrderService {
     // 주문 목록 조회
     @Override
     public Page<OrderResponseDTO> getOrders(Long memberId, Pageable pageable) {
-        return ordersRepository.findByMemberIdOrderByCreatedAtDesc(memberId, pageable)
+        return ordersRepository.findByMemberIdOrderByCreatedAtDescOrderIdDesc(memberId, pageable)
                 .map(OrderResponseDTO::new);
     }
 
@@ -459,7 +459,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<OrderResponseDTO> getSellerOrders(Long sellerId, Byte status, Pageable pageable) {
         if (status == null) {
-            return ordersRepository.findBySellerIdOrderByCreatedAtDesc(sellerId, pageable)
+            return ordersRepository.findByMemberIdOrderByCreatedAtDescOrderIdDesc(sellerId, pageable)
                     .map(OrderResponseDTO::new);
         }
         return ordersRepository.findBySellerIdAndStatusOrderByCreatedAtDesc(sellerId, status, pageable)
