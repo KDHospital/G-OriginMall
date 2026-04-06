@@ -63,6 +63,12 @@ public interface OrderService {
 	
 	// 판매자 페이지 - 판매자용 주문 취소
 	void sellerCancelOrder(Long sellerId, Long orderId);
+	
+	// 판매자 페이지 - 부분 결제 취소
+	void sellerCancelOrderItem(Long sellerId, Long orderId, Long orderItemId);
+	
+	// 관리자 페이지 - 부분 결제 취소
+	void adminCancelOrderItem(Long orderId, Long orderItemId);
 
 	
 }

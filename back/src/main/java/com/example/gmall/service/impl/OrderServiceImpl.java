@@ -699,4 +699,93 @@ public class OrderServiceImpl implements OrderService {
         log.info("판매자 주문 취소 완료 - orderId: {}", orderId);
     }
     
+    // 판매자 페이지 - 부분 결제 취소
+    @Override
+    public void sellerCancelOrderItem(Long sellerId, Long orderId, Long orderItemId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 본인 상점 주문인지 검증
+        if (!orders.getSeller().getId().equals(sellerId)) {
+            throw new SecurityException("본인 상점의 주문만 취소할 수 있습니다.");
+        }
+
+        // 배송중, 배송완료는 취소 불가
+        if (orders.getStatus() >= 2) {
+            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        }
+
+        cancelOrderItemInternal(orders, orderItemId, "판매자 상품 개별 취소");
+    }
+    
+    // 관리자 페이지 - 부분 결제 취소
+    @Override
+    public void adminCancelOrderItem(Long orderId, Long orderItemId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 관리자는 status < 4면 취소 가능
+        if (orders.getStatus() >= 4) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
+
+        cancelOrderItemInternal(orders, orderItemId, "관리자 상품 개별 취소");
+    }
+    
+ // 공통 개별 취소 로직
+    private void cancelOrderItemInternal(Orders orders, Long orderItemId, String memo) {
+        OrderItem orderItem = orders.getOrderItems().stream()
+                .filter(item -> item.getOrderItemId().equals(orderItemId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문 상품입니다."));
+
+        if (orderItem.isCancelled()) {
+            throw new IllegalStateException("이미 취소된 상품입니다.");
+        }
+
+        // 재고 복구 및 취소 처리
+        orderItem.getProduct().restoreStock(orderItem.getQuantity());
+        orderItem.cancel();
+
+        boolean allCancelled = orders.getOrderItems().stream()
+                .allMatch(OrderItem::isCancelled);
+
+        if (allCancelled) {
+            cancelTossPaymentPartial(
+                orders.getPaymentKey(),
+                orderItem.getSubtotal(),
+                memo
+            );
+            int deliveryFee = orders.getTotalPrice() - orderItem.getSubtotal();
+            if (deliveryFee > 0) {
+                cancelTossPaymentPartial(
+                    orders.getPaymentKey(),
+                    deliveryFee,
+                    "배송비 취소"
+                );
+            }
+            orders.updateTotalPrice(0);
+            orders.updateStatus((byte) 4);
+        } else {
+            cancelTossPaymentPartial(
+                orders.getPaymentKey(),
+                orderItem.getSubtotal(),
+                memo
+            );
+            orders.updateTotalPrice(orders.getTotalPrice() - orderItem.getSubtotal());
+        }
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus(allCancelled ? (byte) 4 : orders.getStatus())
+                .memo(memo + ": " + orderItem.getProductName())
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+
+        log.info("상품 개별 취소 완료 - orderId: {}, orderItemId: {}", orders.getOrderId(), orderItemId);
+    }
+    
 }

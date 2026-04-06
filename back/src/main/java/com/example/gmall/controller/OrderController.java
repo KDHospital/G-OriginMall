@@ -254,4 +254,28 @@ public class OrderController {
 	    orderService.sellerCancelOrder(sellerId, orderId);
 	    return ResponseEntity.noContent().build();
 	}
+	
+	// 판매자 주문 개별 아이템 취소
+	// PATCH /api/seller/orders/{orderId}/items/{orderItemId}/cancel
+	@PatchMapping("/seller/orders/{orderId}/items/{orderItemId}/cancel")
+	public ResponseEntity<Void> sellerCancelOrderItem(
+	        @PathVariable("orderId") Long orderId,
+	        @PathVariable("orderItemId") Long orderItemId,
+	        Authentication authentication
+	) {
+	    Long sellerId = (Long) authentication.getPrincipal();
+	    orderService.sellerCancelOrderItem(sellerId, orderId, orderItemId);
+	    return ResponseEntity.noContent().build();
+	}
+
+	// 관리자 주문 개별 아이템 취소
+	// PATCH /api/admin/orders/{orderId}/items/{orderItemId}/cancel
+	@PatchMapping("/admin/orders/{orderId}/items/{orderItemId}/cancel")
+	public ResponseEntity<Void> adminCancelOrderItem(
+	        @PathVariable("orderId") Long orderId,
+	        @PathVariable("orderItemId") Long orderItemId
+	) {
+	    orderService.adminCancelOrderItem(orderId, orderItemId);
+	    return ResponseEntity.noContent().build();
+	}
 }
