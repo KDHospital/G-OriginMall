@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axios';
 
 const menuGroups = [
     {
@@ -40,6 +41,16 @@ const menuGroups = [
         ],
     },
 ];
+const handleLogout = async () => {
+    try {
+     await axiosInstance.post("/member/logout")
+    } catch (err) {
+      console.error("로그아웃 요청 중 오류 발생", err)
+    } finally{
+      localStorage.removeItem("member")
+      window.location.href = "/"
+    }
+    }
 
 function AdminLayout({ children }) {
     const location = useLocation();
@@ -181,7 +192,7 @@ function AdminLayout({ children }) {
                     {!collapsed && (
                         <div className="px-4 py-4 border-t border-gray-700 text-xs text-gray-500">
                             <div>관리자 · ADMIN</div>
-                            <div className="mt-1 hover:text-white cursor-pointer">로그아웃</div>
+                            <div className="mt-1 hover:text-white cursor-pointer" onClick={handleLogout}>로그아웃</div>
                         </div>
                     )}
                 </aside>

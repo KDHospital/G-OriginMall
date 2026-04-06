@@ -34,9 +34,19 @@ const BasicMenu = () => {
       localStorage.removeItem("member")
       window.location.href = "/"
     }
+    }
+    const handleRegisterSellerClick = (e) => {
     
-   
+    e.preventDefault();
     
+    const member = JSON.parse(localStorage.getItem("member") || "null")
+    
+    if (member) {
+        alert("이미 로그인된 상태입니다. 판매자 가입을 위해서는 로그아웃 후 진행해 주세요.")
+        return;
+    }
+    
+    navigate("/sellersignup");
   }
 
   return (
@@ -136,7 +146,11 @@ const BasicMenu = () => {
                 { name: "입점신청", path: "/sellersignup" },
               ].map(item => (
                 <li key={item.name} className="text-sm font-semibold hover:text-primary transition-colors">
-                  <Link to={item.path}>{item.name}</Link>
+                 {item.name === "입점신청" ? (
+                  <Link to={item.path} onClick={handleRegisterSellerClick}>{item.name}</Link>
+                 ) :(<Link to={item.path}>{item.name}</Link>
+                  )}
+                  
                 </li>
               ))}
             </ul>
