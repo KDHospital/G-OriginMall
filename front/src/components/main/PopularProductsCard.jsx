@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import axiosInstance from "../../api/axios"
 import { useState,useEffect } from "react"
 import { getProducts } from "../../api/productsApi"
 import { getImageUrl } from "../../util/imagesUtil"
@@ -7,6 +8,21 @@ const PopularProductsCard = () =>{
     // 1. 데이터를 담을 상태(state) 선언
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState([true])
+
+    // 수량 변경 코드
+    const [quantity, setQuantity] = useState(1);
+    const MIN_QTY = 1;
+    const MAX_QTY = products.stock;
+
+    // 수량 감소 (1 미만 불가)
+    const handleDecrease = () => {
+        setQuantity(prev => Math.max(MIN_QTY, prev - 1));
+    };
+
+    // 수량 증가 (stock 초과 불가)
+    const handleIncrease = () => {
+        setQuantity(prev => Math.min(MAX_QTY, prev + 1));
+    };    
 
     useEffect(()=>{
         const fetchPopularProducts = async()=>{
@@ -23,6 +39,29 @@ const PopularProductsCard = () =>{
         }
         fetchPopularProducts()
     },[])
+    //장바구니 담기
+    const handleAddToCart = async (item, e) => {
+    // 버블링 방지: 버튼 클릭 시 상세 페이지로 이동하는 걸 막음
+        e.preventDefault();
+        e.stopPropagation();
+
+        try {
+            await axiosInstance.post("/cart", {
+                productId: item.productId, // products.productId가 아니라 item.productId!
+                quantity: 1, // 리스트 페이지이므로 기본 1개로 설정
+            })
+            alert(`${item.pname} 상품을 장바구니에 담았습니다.`)
+        } catch (err) {
+            if (err.response?.status === 401) {
+                alert("로그인이 필요합니다.")
+            } else if (err.response?.status === 500) {
+                alert("로그인이 필요합니다. 500")
+            }  else {
+                alert("장바구니 담기에 실패했습니다.")
+                console.error(err)
+            }
+        }
+    }    
 
     if (loading) return <div>상품 불러오는 중...</div>
 
@@ -56,7 +95,7 @@ return(
                                     <span className="text-slate-400 line-through text-xs font-medium">{item.listPrice.toLocaleString()}원</span>
                                     <span className="text-xl font-black text-primary">{item.price.toLocaleString()}원<span className="text-red-500 text-sm font-bold ml-2">{Math.round((item.discountPrice/item.listPrice)*100).toLocaleString()}% OFF</span></span>
                                 </div>
-                                <button className="p-3 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-white transition-all">
+                                <button onClick={(e)=>handleAddToCart(item,e)} className="p-3 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-white transition-all">
                                     <span className="material-symbols-outlined">add_shopping_cart</span>
                                 </button>
                             </div>                                                 
