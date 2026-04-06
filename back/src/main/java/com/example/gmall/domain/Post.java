@@ -86,14 +86,11 @@ public class Post {
  // 추가  --- 비즈니스 메서드 (Setter 대신 사용) ---
     
 	 // 1. [상태 관리] 소프트 삭제 처리
-	 // 'Setter' 대신 '삭제 상태 변경'이라는 명확한 이름을 사용합니다.
 	 public void changeDeleteStatus(boolean isDeleted) {
 	     this.isDeleted = isDeleted;
-	     // 필요한 경우 삭제 시점에 updatedAt을 강제로 갱신하는 로직을 넣을 수 있음
 	 }
 	
 	 // 2. [답변 관리] 답변 추가 및 양방향 연결
-	 // List<Answer> 구조에 맞춰 답변 객체를 안전하게 추가
 	 public void addAnswer(Answer answer) {
 	     if (this.answers == null) {
 	         this.answers = new ArrayList<>();
@@ -108,7 +105,6 @@ public class Post {
 	 
 	
 	 // 3. [조회수 관리] 조회수 증가 로직
-	 // 외부에서 viewCount를 마음대로 수정하지 못하게 하고, 1씩만 올리도록 제한
 	 public void incrementViewCount() {
 	     if (this.viewCount == null) {
 	         this.viewCount = 0;
@@ -123,7 +119,7 @@ public class Post {
 	     this.title = title;
 	     this.content = content;
 	     this.isPublic = isPublic;
-	     // @PreUpdate에 의해 updatedAt은 자동으로 갱신됩니다.
+	     // @PreUpdate에 의해 updatedAt은 자동으로 갱신
 	 }
 	 
 	 

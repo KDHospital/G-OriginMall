@@ -2,10 +2,12 @@ package com.example.gmall.handler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,6 +40,28 @@ public class GlobalExceptionHandler {
 				.body(Map.of("errors",errors));
 	}
 	
+	// 권한 부족 (403)
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<Map<String, String>> handleAccessDenied(
+			AccessDeniedException ex) {
+		log.warn("접근 권한 부족: {}", ex.getMessage());
+
+		return ResponseEntity
+				.status(HttpStatus.FORBIDDEN)
+				.body(Map.of("message", ex.getMessage()));
+	}
+
+	// 리소스 없음 (404)
+	@ExceptionHandler(NoSuchElementException.class)
+	public ResponseEntity<Map<String, String>> handleNotFound(
+			NoSuchElementException ex) {
+		log.warn("리소스 없음: {}", ex.getMessage());
+
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(Map.of("message", ex.getMessage()));
+	}
+
 	//비즈니스 예외
 	//발생 아이디 중복 / 전화번호 중복/ 인증코드 불일치 등
 	@ExceptionHandler(IllegalArgumentException.class)

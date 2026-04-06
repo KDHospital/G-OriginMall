@@ -9,6 +9,10 @@ import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
+
+/**
+ * QAnswer is a Querydsl query type for Answer
+ */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QAnswer extends EntityPathBase<Answer> {
 

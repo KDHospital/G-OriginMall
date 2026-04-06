@@ -4,6 +4,9 @@ import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,8 +14,10 @@ import com.example.gmall.domain.Answer;
 import com.example.gmall.domain.Board;
 import com.example.gmall.domain.Member;
 import com.example.gmall.domain.Post;
+import com.example.gmall.dto.board.PageResponseDTO;
 import com.example.gmall.dto.board.PostDetailResponseDTO;
 import com.example.gmall.dto.board.PostListResponseDTO;
+import com.example.gmall.dto.board.PostRegisterRequestDTO;
 import com.example.gmall.repository.BoardRepository;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.repository.PostRepository;
@@ -27,103 +32,167 @@ import lombok.extern.log4j.Log4j2;
 @Transactional
 public class PostServiceImpl implements PostService {
 
+    private static final int BOARD_NOTICE = 1;
+    private static final int BOARD_QNA = 2;
+
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
-    // 1. [사용자] 게시글 등록 (보드와 멤버 연관관계 필수!)
+    /**
+     * 현재 로그인한 회원의 memberId를 반환
+     * JWTCheckFilter에서 principal을 Long(memberId)으로 설정하므로 이를 그대로 사용
+     */
+    private Long getCurrentMemberId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new AccessDeniedException("로그인이 필요합니다.");
+        }
+        return ((Number) authentication.getPrincipal()).longValue();
+    }
+
+    private boolean isAdmin() {
+        return SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
     @Override
-    public Long register(PostDetailResponseDTO dto) {
-        log.info("Registering inquiry: " + dto.getTitle());
+    public Long register(PostRegisterRequestDTO dto) {
+        Long memberId = getCurrentMemberId();
+        log.info("게시글 등록 프로세스 시작: {}, 작성자ID: {}", dto.getTitle(), memberId);
 
-        // 기획상 게시판(Board)과 작성자(Member)가 먼저 DB에 있어야 합니다.
-        // 여기서는 예시로 1번 게시판(Q&A), 1번 멤버(현재 사용자)를 찾는다고 가정합니다.
-        Board board = boardRepository.findById(1) // 게시판 ID는 상황에 맞게 조정
-                .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
-        Member member = memberRepository.findById(1L) // 멤버 ID는 세션 등에서 가져옴
-                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        Member member = memberRepository.findByIdAndIsDeletedFalse(memberId)
+                .orElseThrow(() -> new NoSuchElementException(
+                    "활성화된 사용자 정보를 찾을 수 없습니다. ID: " + memberId));
 
-        // 빌더를 통해 Post 생성 (is_deleted 등 기본값은 엔티티 설정 따름)
+        Board board = boardRepository.findById(dto.getBoardId())
+                .orElseThrow(() -> new NoSuchElementException(
+                    "해당 게시판을 찾을 수 없습니다. ID: " + dto.getBoardId()));
+
         Post post = Post.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .isPublic(dto.isPublic())
+                .member(member)
+                .board(board)
+                .viewCount(0)
+                .isDeleted(false)
                 .build();
 
-        // [중요] 우리가 만든 연관관계 편의 메서드 사용!
-        board.addPost(post); 
-        post.updateMember(member); // Post 엔티티에 updateMember 메서드 추가 필요
+        board.addPost(post);
+        log.info("게시글 저장 완료 - 작성자: {}", member.getMname());
 
         return postRepository.save(post).getPostId();
     }
 
-    // 2. [사용자/관리자] 게시글 상세 조회 (조회수 증가 포함)
     @Override
+    @Transactional
     public PostDetailResponseDTO getPost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 게시글이 없습니다. ID: " + id));
 
-        // [중요] 비즈니스 메서드로 조회수 증가
-        post.incrementViewCount(); 
-        
-        return new PostDetailResponseDTO(post); // 생성자 방식 DTO 변환
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
+
+        if (post.isDeleted()) {
+            throw new NoSuchElementException("삭제된 게시글입니다.");
+        }
+
+        Integer boardId = post.getBoard().getBoardId();
+
+        if (boardId == BOARD_NOTICE) {
+            post.incrementViewCount();
+            return PostDetailResponseDTO.from(post);
+        }
+
+        if (boardId == BOARD_QNA && !post.isPublic()) {
+            // 비밀글인 경우 작성자 본인 또는 관리자만 조회 가능
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || "anonymousUser".equals(auth.getPrincipal())) {
+                throw new AccessDeniedException("해당 게시물은 작성자 본인과 관리자만 확인할 수 있습니다.");
+            }
+            Long currentMemberId = ((Number) auth.getPrincipal()).longValue();
+            boolean isOwner = post.getMember().getId().equals(currentMemberId);
+
+            if (!isOwner && !isAdmin()) {
+                throw new AccessDeniedException("해당 게시물은 작성자 본인과 관리자만 확인할 수 있습니다.");
+            }
+        }
+
+        post.incrementViewCount();
+        return PostDetailResponseDTO.from(post);
     }
 
-    // 3. [관리자] 답변 등록
     @Override
     public void addAnswer(Long id, String answerContent) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("관리자만 답변을 등록할 수 있습니다.");
+        }
+
+        Long adminMemberId = getCurrentMemberId();
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("답변할 게시글이 없습니다."));
 
-        // 답변자(관리자) 정보 조회
-        Member admin = memberRepository.findById(1L) // 실제론 로그인한 관리자 ID
+        Member admin = memberRepository.findById(adminMemberId)
                 .orElseThrow(() -> new NoSuchElementException("관리자 정보를 찾을 수 없습니다."));
 
-        // Answer 엔티티 생성 (No Setter)
         Answer answer = Answer.builder()
                 .content(answerContent)
                 .member(admin)
                 .build();
 
-        // [중요] Post 엔티티의 비즈니스 메서드로 답변 추가
-        post.addAnswer(answer); 
+        post.addAnswer(answer);
     }
 
-    // 4. [관리자] 게시글 삭제 (소프트 삭제)
     @Override
     public void remove(Long id) {
+        Long currentMemberId = getCurrentMemberId();
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("삭제할 게시글이 없습니다."));
 
-        // 진짜 삭제 대신 상태값만 변경
+        boolean isOwner = post.getMember().getId().equals(currentMemberId);
+        if (!isOwner && !isAdmin()) {
+            throw new AccessDeniedException("본인이 작성한 게시글이거나 관리자만 삭제할 수 있습니다.");
+        }
+
         post.changeDeleteStatus(true);
     }
-    
 
-	// 5. [공통] 목록 조회 (소프트 삭제 필터링 적용)
     @Override
     @Transactional(readOnly = true)
-    public Page<PostListResponseDTO> getInquiryList(Pageable pageable) {
-        // 1. 먼저 Q&A 게시판 객체를 가져옴 (보통 ID 2번 가정)
-        Board board = boardRepository.findById(2)
-                .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
+    public PageResponseDTO<PostListResponseDTO> getInquiryList(String keyword, Boolean hasAnswer, Boolean isPublic, Pageable pageable) {
+        Page<PostListResponseDTO> result = postRepository.getPostList(BOARD_QNA, keyword, hasAnswer, isPublic, pageable);
 
-        // 2. 작성하신 1번 메서드 호출!
-        return postRepository.findByBoardAndIsDeletedFalse(board, pageable)
-                .map(PostListResponseDTO::new);
+        return PageResponseDTO.<PostListResponseDTO>withAll()
+                .dtoList(result.getContent())
+                .totalCount(result.getTotalElements())
+                .build();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PostListResponseDTO> getNoticeList(Pageable pageable) {
-        // 1. 공지사항 게시판 객체를 가져옵니다 (ID 1번 가정)
-        Board board = boardRepository.findById(1)
-                .orElseThrow(() -> new NoSuchElementException("게시판을 찾을 수 없습니다."));
+    public PageResponseDTO<PostListResponseDTO> getBoardList(String keyword, Pageable pageable) {
+        Page<PostListResponseDTO> result = postRepository.getPostList(BOARD_NOTICE, keyword, pageable);
 
-        // 2. 작성하신 1번 메서드 호출!
-        return postRepository.findByBoardAndIsDeletedFalse(board, pageable)
-                .map(PostListResponseDTO::new);
+        return PageResponseDTO.<PostListResponseDTO>withAll()
+                .dtoList(result.getContent())
+                .totalCount(result.getTotalElements())
+                .build();
     }
-	    
-    
+
+    @Override
+    public void updatePost(Long id, PostRegisterRequestDTO dto) {
+        Long currentMemberId = getCurrentMemberId();
+
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("수정할 게시글을 찾을 수 없습니다."));
+
+        if (!post.getMember().getId().equals(currentMemberId) && !isAdmin()) {
+            throw new AccessDeniedException("본인이 작성한 게시글만 수정할 수 있습니다.");
+        }
+
+        post.updatePost(dto.getTitle(), dto.getContent(), dto.isPublic());
+    }
 }
