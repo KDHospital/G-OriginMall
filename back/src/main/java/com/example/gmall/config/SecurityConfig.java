@@ -35,6 +35,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
             		// 관리자 전용
             		.requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+            		//판매자 전용
+            		.requestMatchers("/api/seller/**").hasAuthority("ROLE_SELLER")
             		// 인증 필요
             		.requestMatchers("/api/member/me", "/api/members/addresses/**", "/api/orders/**").authenticated()
             		.requestMatchers(org.springframework.http.HttpMethod.POST, "/api/board/inquiry").authenticated()
