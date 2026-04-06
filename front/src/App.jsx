@@ -31,6 +31,7 @@ import SellerSingupPage from './pages/member/SellerSignupPage';
 import SellerProductListPage from './pages/seller/SellerProductListPage';
 import SellerOrders from './pages/seller/SellerOrders';
 import SellerOrderDetail from './pages/seller/SellerOrderDetail';
+import SellerProductModifyPage from './pages/seller/SellerProductModifyPage';
 
 import AdminBoardListPage from './pages/admin/AdminBoardListPage';
 import AdminBoardAddPage from './pages/admin/AdminBoardAddPage';
@@ -119,7 +120,7 @@ function App() {
         <Route path="/seller/products" element={<ProtectedRoute allowRole={1}><SellerProductListPage /></ProtectedRoute>} />
         <Route path="/seller/orders" element={<ProtectedRoute allowRole={1}><SellerOrders /></ProtectedRoute>} />
         <Route path="/seller/orders/:orderId" element={<ProtectedRoute allowRole={1}><SellerOrderDetail /></ProtectedRoute>} />
-
+        <Route path="/seller/products/:productId/edit" element={<ProtectedRoute allowRole={1}><SellerProductModifyPage /></ProtectedRoute>} />
 
         {/* 어드민-상품등록 */}
         <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />

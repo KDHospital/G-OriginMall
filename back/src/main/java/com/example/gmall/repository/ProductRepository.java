@@ -60,4 +60,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	// 판매자별 상품 목록 조회 (전체 상태 포함)
 	Page<Product> findBySellerIdOrderByProductIdDesc(Long sellerId, Pageable pageable);
 	
+	//상품 수정
+	boolean existsByProductIdAndSeller_Id(Long productId, Long sellerId);
+	
 }
