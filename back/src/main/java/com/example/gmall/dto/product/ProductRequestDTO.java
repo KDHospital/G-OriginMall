@@ -22,8 +22,11 @@ public class ProductRequestDTO {
     private Integer stock;
     private Integer deliveryFee;
     private boolean isCertified;
-    private boolean isExhibition;
-
+    private boolean isExhibition;    
     // 썸네일 이미지 (Multipart)
     private List<MultipartFile> images;
+    //품절
+    private Byte soldStatus;
+    // 수정 시 유지할 기존 이미지 URL 목록
+    private List<String> existingImageUrls;        
 }

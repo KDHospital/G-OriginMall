@@ -30,8 +30,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -187,4 +189,130 @@ public class ProductServiceImpl implements ProductService {
 	    return productRepository.findBySellerIdOrderByProductIdDesc(sellerId, pageable)
 	            .map(ProductResponseDTO::new);
 	}
+	
+	//상품 수정
+	@Override
+	@Transactional
+	public ProductResponseDTO modify(Long productId, ProductRequestDTO dto) {
+
+	    Product product = findProductOrThrow(productId);
+
+	    // 카테고리 변경
+	    Category category = categoryRepository.findById(dto.getCategoryId())
+	            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+
+	    // 기본 정보 수정 (Product 엔티티의 updateProduct 메서드 활용)
+	    product.updateProduct(
+	            dto.getPname(),
+	            dto.getPdesc(),
+	            category,
+	            dto.getListPrice(),
+	            dto.getDiscountPrice() != null ? dto.getDiscountPrice() : 0,
+	            dto.getPrice(),
+	            dto.getStock(),
+	            dto.getDeliveryFee() != null ? dto.getDeliveryFee() : 0
+	    );
+
+	    // 판매 상태 변경
+	    if (dto.getSoldStatus() != null) {
+	        product.updateSoldStatus(dto.getSoldStatus());
+	    }
+
+	    // 금빛나루 인증 변경
+	    product.updateIsCertified(dto.isCertified());
+
+	    // 기획전 여부 변경 (어드민만 사용, 판매자는 항상 false)
+	    product.updateIsExhibition(dto.isExhibition());
+
+	    // ── 이미지 처리 ──────────────────────────────────────────────────
+	    // 1. 기존 이미지 중 existingImageUrls에 없는 것 → 삭제
+	    List<String> keepUrls = dto.getExistingImageUrls() != null
+	            ? dto.getExistingImageUrls()
+	            : new ArrayList<>();
+
+	    // 썸네일이 keepUrls에 없으면 초기화
+	    if (product.getThumbnailImageUrl() != null
+	            && !keepUrls.contains(product.getThumbnailImageUrl())) {
+	        deleteFile(product.getThumbnailImageUrl());
+	        product.updateThumbnailImageUrl(null);
+	    }
+
+	    // product_image 테이블에서 keepUrls에 없는 것 삭제
+	    List<ProductImage> toDelete = product.getProductImages().stream()
+	            .filter(img -> !keepUrls.contains(img.getImageUrl()))
+	            .collect(Collectors.toList());
+
+	    toDelete.forEach(img -> {
+	        deleteFile(img.getImageUrl());
+	        productImageRepository.delete(img);
+	    });
+
+	    // 2. 새 이미지 업로드
+	    if (dto.getImages() != null && !dto.getImages().isEmpty()) {
+	        List<String> newUrls = uploadImages(dto.getImages(), productId);
+
+	        // 썸네일이 비어있으면 첫 번째 새 이미지를 썸네일로
+	        if (product.getThumbnailImageUrl() == null) {
+	            product.updateThumbnailImageUrl(newUrls.get(0));
+	            // 두 번째부터 product_image에 저장
+	            for (int i = 1; i < newUrls.size(); i++) {
+	                saveProductImage(product, newUrls.get(i),
+	                        product.getProductImages().size() + i);
+	            }
+	        } else {
+	            // 썸네일 있으면 전부 product_image에 추가
+	            for (int i = 0; i < newUrls.size(); i++) {
+	                saveProductImage(product, newUrls.get(i),
+	                        product.getProductImages().size() + i + 1);
+	            }
+	        }
+	    }
+
+	    return new ProductResponseDTO(product);
+	}
+	
+
+
+	// ── 공통 유틸 메서드 ────────────────────────────────────────────────
+	private void saveProductImage(Product product, String imageUrl, int sortOrder) {
+	    ProductImage productImage = ProductImage.builder()
+	            .product(product)
+	            .imageUrl(imageUrl)
+	            .sortOrder(sortOrder)
+	            .build();
+	    productImageRepository.save(productImage);
+	}
+
+	private void deleteFile(String imageUrl) {
+	    if (imageUrl == null) return;
+	    try {
+	        // "/uploads/products/..." → "uploads/products/..."
+	        String filePath = imageUrl.startsWith("/")
+	                ? imageUrl.substring(1)
+	                : imageUrl;
+	        java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(filePath));
+	    } catch (IOException e) {
+	        log.warn("파일 삭제 실패: {}", imageUrl);
+	    }
+	}
+	
+//	재고처리
+	@Transactional
+	public void decreaseStock(Long productId, int quantity) {
+	    Product product = productRepository.findById(productId)
+	            .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+	    // 1. 재고 차감
+	    int remainStock = product.getStock() - quantity;
+	    if (remainStock < 0) throw new RuntimeException("재고가 부족합니다.");
+	    
+	    product.setStock(remainStock);
+
+	    // 2. 재고가 0이면 품절(2) 및 숨김(1) 등 비즈니스 로직 적용
+	    if (remainStock == 0) {
+	        product.setSoldStatus((byte) 2); // 2: SOLD_OUT (품절)
+	    }
+	}
+	
+	
 }
