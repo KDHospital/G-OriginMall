@@ -299,7 +299,7 @@ export default function SellerProductModifyPage() {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="text-xs text-gray-500 mb-1 block">재고 수량 <span className="text-red-400">*</span></label>
-                                <input type="number" name="stock" value={form.stock} onChange={handleChange} min={0}
+                                <input type="number" name="stock" value={form.stock} onChange={handleChange} min={1}
                                     className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-green-400" />
                             </div>
                             <div>
