@@ -421,6 +421,22 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("접근 권한이 없습니다.");
         }
 
+        
+        // [추가] 배송 시작(2)으로 변경될 때 재고 및 품절 상태 체크
+        if (newStatus == 2) {
+            orders.getOrderItems().forEach(item -> {
+                Product product = item.getProduct();
+                
+                // 1. 이미 결제 시점에 재고는 차감 (createOrder 참고)
+                // 2. 현재 재고가 0이라면 상품의 soldStatus를 2(품절)로 변경
+                if (product.getStock() <= 0) {
+                    // Product 엔티티에 setSoldStatus가 있다고 가정
+                    product.setSoldStatus((byte) 2); 
+                    log.info("상품 품절 처리 완료 - productId: {}, pname: {}", product.getProductId(), product.getPname());
+                }
+            });
+        }
+        
         // 취소(4)는 cancelOrder() 사용
         if (newStatus == 4) {
             throw new IllegalStateException("취소는 취소 API를 사용해주세요.");
@@ -459,7 +475,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<OrderResponseDTO> getSellerOrders(Long sellerId, Byte status, Pageable pageable) {
         if (status == null) {
-            return ordersRepository.findByMemberIdOrderByCreatedAtDescOrderIdDesc(sellerId, pageable)
+            return ordersRepository.findBySellerIdOrderByCreatedAtDescOrderIdDesc(sellerId, pageable)
                     .map(OrderResponseDTO::new);
         }
         return ordersRepository.findBySellerIdAndStatusOrderByCreatedAtDesc(sellerId, status, pageable)
@@ -658,4 +674,134 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("결제 부분 취소에 실패했습니다: " + e.getMessage());
         }
     }
+    
+    // 판매자 페이지 - 판매자용 주문 취소
+    @Override
+    public void sellerCancelOrder(Long sellerId, Long orderId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 본인 상점 주문인지 검증
+        if (!orders.getSeller().getId().equals(sellerId)) {
+            throw new SecurityException("본인 상점의 주문만 취소할 수 있습니다.");
+        }
+
+        // 배송중, 배송완료는 취소 불가
+        if (orders.getStatus() >= 2) {
+            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        }
+
+        // 토스 결제 취소
+        cancelTossPayment(orders.getPaymentKey(), "판매자 주문 취소");
+
+        orders.getOrderItems().stream()
+                .filter(item -> !item.isCancelled())
+                .forEach(item -> {
+                    item.getProduct().restoreStock(item.getQuantity());
+                    item.cancel();
+                });
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus((byte) 4)
+                .memo("판매자 주문 취소")
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+        orders.updateStatus((byte) 4);
+
+        log.info("판매자 주문 취소 완료 - orderId: {}", orderId);
+    }
+    
+    // 판매자 페이지 - 부분 결제 취소
+    @Override
+    public void sellerCancelOrderItem(Long sellerId, Long orderId, Long orderItemId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 본인 상점 주문인지 검증
+        if (!orders.getSeller().getId().equals(sellerId)) {
+            throw new SecurityException("본인 상점의 주문만 취소할 수 있습니다.");
+        }
+
+        // 배송중, 배송완료는 취소 불가
+        if (orders.getStatus() >= 2) {
+            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        }
+
+        cancelOrderItemInternal(orders, orderItemId, "판매자 상품 개별 취소");
+    }
+    
+    // 관리자 페이지 - 부분 결제 취소
+    @Override
+    public void adminCancelOrderItem(Long orderId, Long orderItemId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 관리자는 status < 4면 취소 가능
+        if (orders.getStatus() >= 4) {
+            throw new IllegalStateException("이미 취소된 주문입니다.");
+        }
+
+        cancelOrderItemInternal(orders, orderItemId, "관리자 상품 개별 취소");
+    }
+    
+ // 공통 개별 취소 로직
+    private void cancelOrderItemInternal(Orders orders, Long orderItemId, String memo) {
+        OrderItem orderItem = orders.getOrderItems().stream()
+                .filter(item -> item.getOrderItemId().equals(orderItemId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문 상품입니다."));
+
+        if (orderItem.isCancelled()) {
+            throw new IllegalStateException("이미 취소된 상품입니다.");
+        }
+
+        // 재고 복구 및 취소 처리
+        orderItem.getProduct().restoreStock(orderItem.getQuantity());
+        orderItem.cancel();
+
+        boolean allCancelled = orders.getOrderItems().stream()
+                .allMatch(OrderItem::isCancelled);
+
+        if (allCancelled) {
+            cancelTossPaymentPartial(
+                orders.getPaymentKey(),
+                orderItem.getSubtotal(),
+                memo
+            );
+            int deliveryFee = orders.getTotalPrice() - orderItem.getSubtotal();
+            if (deliveryFee > 0) {
+                cancelTossPaymentPartial(
+                    orders.getPaymentKey(),
+                    deliveryFee,
+                    "배송비 취소"
+                );
+            }
+            orders.updateTotalPrice(0);
+            orders.updateStatus((byte) 4);
+        } else {
+            cancelTossPaymentPartial(
+                orders.getPaymentKey(),
+                orderItem.getSubtotal(),
+                memo
+            );
+            orders.updateTotalPrice(orders.getTotalPrice() - orderItem.getSubtotal());
+        }
+
+        OrderStatusHistory history = OrderStatusHistory.builder()
+                .orders(orders)
+                .seller(orders.getSeller())
+                .fromStatus(orders.getStatus())
+                .toStatus(allCancelled ? (byte) 4 : orders.getStatus())
+                .memo(memo + ": " + orderItem.getProductName())
+                .build();
+
+        orderStatusHistoryRepository.save(history);
+
+        log.info("상품 개별 취소 완료 - orderId: {}, orderItemId: {}", orders.getOrderId(), orderItemId);
+    }
+    
 }

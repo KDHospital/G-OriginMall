@@ -3,8 +3,11 @@ import axiosInstance from "../../api/axios"
 import { useState,useEffect } from "react"
 import { getProducts } from "../../api/productsApi"
 import { getImageUrl } from "../../util/imagesUtil"
+import { useNavigate } from "react-router-dom"
 
 const PopularProductsCard = () =>{
+    const navigate = useNavigate();
+
     // 1. 데이터를 담을 상태(state) 선언
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState([true])
@@ -41,10 +44,28 @@ const PopularProductsCard = () =>{
     },[])
     //장바구니 담기
     const handleAddToCart = async (item, e) => {
-    // 버블링 방지: 버튼 클릭 시 상세 페이지로 이동하는 걸 막음
+
+        // 버블링 방지: 버튼 클릭 시 상세 페이지로 이동하는 걸 막음
         e.preventDefault();
         e.stopPropagation();
 
+        const memberData = localStorage.getItem("member");
+    
+        // 비로그인
+        if (!memberData) {
+            alert("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+        }
+
+        // 판매자, 관리자는 장바구니 이용 불가
+        const member = JSON.parse(localStorage.getItem("member") || "null");
+        const role = member?.role ?? null;
+        if (role === 1 || role === 2) {
+            alert("판매자 및 관리자는 장바구니를 이용할 수 없습니다.");
+            return;
+        }
+        
         try {
             await axiosInstance.post("/cart", {
                 productId: item.productId, // products.productId가 아니라 item.productId!
@@ -52,14 +73,10 @@ const PopularProductsCard = () =>{
             })
             alert(`${item.pname} 상품을 장바구니에 담았습니다.`)
         } catch (err) {
-            if (err.response?.status === 401) {
-                alert("로그인이 필요합니다.")
-            } else if (err.response?.status === 500) {
-                alert("로그인이 필요합니다. 500")
-            }  else {
+        
                 alert("장바구니 담기에 실패했습니다.")
                 console.error(err)
-            }
+            
         }
     }    
 

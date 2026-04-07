@@ -135,4 +135,11 @@ public class Product {
     public void restoreStock(Integer quantity) {
     	this.stock += quantity;
     }
+    //재고 0이면 품절처리 로직 추가
+    public void setStock(int remainStock) {
+    	this.stock = remainStock;
+    }
+    public void setSoldStatus(Byte soldStatus) {
+    	this.soldStatus = soldStatus;
+    }
 }

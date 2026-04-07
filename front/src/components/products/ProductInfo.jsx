@@ -58,6 +58,24 @@ const ProductInfo = ({product}) => {
 
     //장바구니 담기
     const handleAddToCart = async()=>{
+
+        const memberData = localStorage.getItem("member");
+    
+        // 비로그인
+        if (!memberData) {
+            alert("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+        }
+
+        // 판매자, 관리자는 장바구니 이용 불가
+        const member = JSON.parse(localStorage.getItem("member") || "null");
+        const role = member?.role ?? null;
+        if (role === 1 || role === 2) {
+            alert("판매자 및 관리자는 장바구니를 이용할 수 없습니다.");
+            return;
+        }
+
         try {
             await axiosInstance.post("/cart",{
                 productId:product.productId,
@@ -65,13 +83,9 @@ const ProductInfo = ({product}) => {
             }).then(()=>fetchCartCount());
             alert(`${product.pname} ${quantity}개를 장바구니에 담았습니다.`)
         } catch (err) {
-            console.error(err)
-            //401:로그인이 안 된 경우 / 그 외 서버오류 시
-            if (err.response?.status === 401) {
-                alert("로그인이 필요합니다.")
-            }else {
-                alert("장바구니 담기에 실패했습니다.")
-            }
+            console.error(err);
+            alert("장바구니 담기에 실패했습니다.")
+            
         }
     }
 

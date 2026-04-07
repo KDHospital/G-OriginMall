@@ -26,3 +26,7 @@ export const getCertifiedProducts = (params) => {
 export const getExhibitionProducts = (params) => {
   return axiosInstance.get('/products/exhibition',{params});
 }
+
+export const putProductsmodify = (productId) => {
+  return axiosInstance.put(`/seller/products/${productId}`);
+}
