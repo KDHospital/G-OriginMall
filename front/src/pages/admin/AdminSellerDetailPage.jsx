@@ -128,7 +128,6 @@ const AdminSellerDetailPage = () => {
     try { await adminDeleteMember(memberId); alert("탈퇴 처리되었습니다."); navigate('/admin/sellers'); } catch { alert("탈퇴 처리에 실패했습니다."); }
   };
 
-  const formatDateTime = fmtDateTime;
 
   if (loading) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div></div></AdminLayout>;
   if (!seller) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">판매회원 정보를 찾을 수 없습니다.</div></div></AdminLayout>;
@@ -187,9 +186,9 @@ const AdminSellerDetailPage = () => {
                 <DetailField label="이름">{editing ? <><input name="mname" value={form.mname} onChange={handleChange} type="text" className={editCls('mname')} />{editErrMsg('mname') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mname')}</p>}</> : <DetailText value={seller.mname} />}</DetailField>
                 <DetailField label="이메일">{editing ? <input value={seller.email} disabled className="w-full px-4 py-2.5 border border-gray-100 rounded-lg text-sm bg-gray-50 text-gray-500" /> : <DetailText value={seller.email} />}</DetailField>
                 <DetailField label="연락처">{editing ? <><input name="tel" value={form.tel} onChange={handleChange} type="text" className={editCls('tel')} />{editErrMsg('tel') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('tel')}</p>}</> : <DetailText value={fmtTel(seller.tel)} />}</DetailField>
-                <DetailField label="가입일"><DetailText value={formatDateTime(seller.createdAt)} /></DetailField>
-                <DetailField label="최근 수정일"><DetailText value={formatDateTime(seller.updatedAt)} /></DetailField>
-                {seller.isDeleted && <DetailField label="탈퇴일"><p className="text-sm text-red-500 font-medium">{formatDateTime(seller.withdrawAt)}</p></DetailField>}
+                <DetailField label="가입일"><DetailText value={fmtDateTime(seller.createdAt)} /></DetailField>
+                <DetailField label="최근 수정일"><DetailText value={fmtDateTime(seller.updatedAt)} /></DetailField>
+                {seller.isDeleted && <DetailField label="탈퇴일"><p className="text-sm text-red-500 font-medium">{fmtDateTime(seller.withdrawAt)}</p></DetailField>}
                 {editing && (
                   <DetailField label="비밀번호 변경 (선택)"><input name="mpwd" value={form.mpwd} onChange={handleChange} type="password" placeholder="변경 시에만 입력" className={editCls('mpwd')} />{editErrMsg('mpwd') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mpwd')}</p>}</DetailField>
                 )}

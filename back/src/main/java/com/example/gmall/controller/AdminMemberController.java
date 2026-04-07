@@ -1,6 +1,9 @@
 package com.example.gmall.controller;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -74,7 +77,7 @@ public class AdminMemberController {
 		}
 
 		var dtoList = result.getContent().stream().map(m -> {
-			java.util.Map<String, Object> map = new java.util.HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 			map.put("id", m.getId());
 			map.put("loginId", m.getLoginId());
 			map.put("mname", m.getMname());
@@ -95,9 +98,9 @@ public class AdminMemberController {
 	@Transactional(readOnly = true)
 	public ResponseEntity<?> getMemberDetail(@PathVariable("memberId") Long memberId) {
 		Member m = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다."));
 
-		java.util.Map<String, Object> result = new java.util.HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("id", m.getId());
 		result.put("loginId", m.getLoginId());
 		result.put("mname", m.getMname());
@@ -126,7 +129,7 @@ public class AdminMemberController {
 		Page<Orders> result = ordersRepository.findByMemberIdOrderByCreatedAtDesc(memberId, pageable);
 
 		var dtoList = result.getContent().stream().map(o -> {
-			java.util.Map<String, Object> map = new java.util.HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 			map.put("orderId", o.getOrderId());
 			map.put("tossOrderId", o.getTossOrderId() != null ? o.getTossOrderId() : "ORDER_" + o.getOrderId());
 			map.put("totalPrice", o.getTotalPrice());
@@ -138,7 +141,7 @@ public class AdminMemberController {
 			var items = o.getOrderItems();
 			if (items != null && !items.isEmpty()) {
 				var itemList = items.stream().map(item -> {
-					java.util.Map<String, Object> itemMap = new java.util.HashMap<>();
+					Map<String, Object> itemMap = new HashMap<>();
 					itemMap.put("productName", item.getProductName());
 					itemMap.put("quantity", item.getQuantity());
 					itemMap.put("price", item.getPrice());
@@ -147,7 +150,7 @@ public class AdminMemberController {
 				}).toList();
 				map.put("items", itemList);
 			} else {
-				map.put("items", java.util.List.of());
+				map.put("items", List.of());
 			}
 			return map;
 		}).toList();
@@ -194,7 +197,7 @@ public class AdminMemberController {
 			@RequestBody Map<String, Object> body) {
 
 		Member member = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다."));
 
 		if (body.containsKey("mname")) member.changeName((String) body.get("mname"));
 		if (body.containsKey("tel")) member.changeTel((String) body.get("tel"));
@@ -257,7 +260,7 @@ public class AdminMemberController {
 			@PathVariable("memberId") Long memberId,
 			@RequestBody Map<String, Object> body) {
 		Member seller = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("판매회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("판매회원을 찾을 수 없습니다."));
 
 		if (body.containsKey("mname")) seller.changeName((String) body.get("mname"));
 		if (body.containsKey("tel")) seller.changeTel((String) body.get("tel"));
@@ -286,7 +289,7 @@ public class AdminMemberController {
 	@PostMapping("/members/{memberId}/delete")
 	public ResponseEntity<?> deleteMember(@PathVariable("memberId") Long memberId) {
 		Member member = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다."));
 		member.changeDeleteStatus(true);
 		return ResponseEntity.ok(Map.of("message", "회원이 비활성화되었습니다."));
 	}
@@ -384,7 +387,7 @@ public class AdminMemberController {
 		}
 
 		var dtoList = result.getContent().stream().map(m -> {
-			java.util.Map<String, Object> map = new java.util.HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 			map.put("id", m.getId());
 			map.put("loginId", m.getLoginId());
 			map.put("mname", m.getMname());
@@ -405,9 +408,9 @@ public class AdminMemberController {
 	@Transactional(readOnly = true)
 	public ResponseEntity<?> getSellerDetail(@PathVariable("memberId") Long memberId) {
 		Member m = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("판매회원을 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("판매회원을 찾을 수 없습니다."));
 
-		java.util.Map<String, Object> result = new java.util.HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("id", m.getId());
 		result.put("loginId", m.getLoginId());
 		result.put("mname", m.getMname());
@@ -466,7 +469,7 @@ public class AdminMemberController {
 		}
 
 		var dtoList = result.getContent().stream().map(m -> {
-			java.util.Map<String, Object> map = new java.util.HashMap<>();
+			Map<String, Object> map = new HashMap<>();
 			map.put("id", m.getId());
 			map.put("loginId", m.getLoginId());
 			map.put("mname", m.getMname());
@@ -485,9 +488,9 @@ public class AdminMemberController {
 	@Transactional(readOnly = true)
 	public ResponseEntity<?> getAdminDetail(@PathVariable("memberId") Long memberId) {
 		Member m = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("관리자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("관리자를 찾을 수 없습니다."));
 
-		java.util.Map<String, Object> result = new java.util.HashMap<>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("id", m.getId());
 		result.put("loginId", m.getLoginId());
 		result.put("mname", m.getMname());
@@ -539,7 +542,7 @@ public class AdminMemberController {
 			@RequestBody Map<String, Object> body) {
 
 		Member admin = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("관리자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("관리자를 찾을 수 없습니다."));
 
 		if (body.containsKey("mname")) admin.changeName((String) body.get("mname"));
 		if (body.containsKey("tel")) admin.changeTel((String) body.get("tel"));
@@ -557,7 +560,7 @@ public class AdminMemberController {
 	@PostMapping("/admins/{memberId}/delete")
 	public ResponseEntity<?> deleteAdmin(@PathVariable("memberId") Long memberId) {
 		Member admin = memberRepository.findById(memberId)
-				.orElseThrow(() -> new java.util.NoSuchElementException("관리자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new NoSuchElementException("관리자를 찾을 수 없습니다."));
 
 		if (admin.getRole() != 2) {
 			throw new IllegalArgumentException("관리자 계정만 삭제할 수 있습니다.");

@@ -92,7 +92,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
 
   const handleDelete = async () => {
     if (selectedIds.length === 0) return alert("삭제할 게시글을 선택해주세요.");
-    if (!window.confirm(`${selectedIds.length}건을 삭제하시겠습니까?`)) return;
+    if (!window.confirm("선택한 게시글을 삭제하시겠습니까?")) return;
     try {
       await Promise.all(selectedIds.map(id => adminRemovePost(id)));
       alert("삭제되었습니다.");
@@ -108,7 +108,6 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
       {/* 페이지 헤더 */}
       <div>
         <h2 className="text-2xl font-bold text-gray-900">{isNotice ? '공지사항 관리' : '고객문의 관리'}</h2>
-        <p className="text-sm text-gray-400 mt-1">총 {totalItems}건의 게시글이 있습니다.</p>
       </div>
 
       {/* 검색 + 필터 + 삭제 + 등록 (한 줄) */}
@@ -169,7 +168,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
                 : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'
             }`}
           >
-            {selectedIds.length > 0 ? `${selectedIds.length}건 삭제` : '삭제'}
+            삭제
           </button>
           {isNotice && (
             <button onClick={onMoveToAdd} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
@@ -193,7 +192,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
                 <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                 {!isNotice && <th className="px-3 py-4 w-24 text-center font-semibold">상태</th>}
                 <th className="px-4 py-4 text-left font-semibold">제목</th>
-                <th className="px-4 py-4 w-32 text-center font-semibold">작성자</th>
+                <th className="px-4 py-4 w-40 text-center font-semibold">작성자</th>
                 <th className="px-4 py-4 w-28 text-center font-semibold">작성일</th>
                 <th className="px-4 py-4 w-16 text-center font-semibold">조회</th>
               </tr>
