@@ -47,7 +47,9 @@ public class MemberController {
 	@PostMapping("/email/send")
 	public ResponseEntity<String> sendEmailCode(@RequestBody Map<String, String> request){
 		String email = request.get("email");
-		emailService.sendCode(email);
+		String tyep = request.get("type");
+		
+		emailService.sendCode(email,tyep);
 		return ResponseEntity.ok("인증 코드가 발송되었습니다.");
 	}
 	

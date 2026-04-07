@@ -61,7 +61,7 @@ useEffect(() => {
     if(!form.loginId) return alert("이메일을 입력해주세요")
        
         setIsSending(true)
-        sendEmailCode(form.loginId).then( ()=>{
+        sendEmailCode({email: form.loginId, type:"JOIN"}).then( ()=>{
         setIsCodeSent(true)
         setTimeLeft(180);
         alert("인증코드가 전송되었습니다")
