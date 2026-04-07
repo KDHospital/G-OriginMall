@@ -1,5 +1,5 @@
 import { useEffect,useState } from "react"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import { getProductDetail } from "../../api/productsApi"
 import useCustomMove from "../../hooks/useCustomMove"
 import ProductDetailTopSec from "./ProductDetailTopSec"
@@ -32,8 +32,6 @@ const ProductDetailComponents = ({productId}) => {
                 setLoading(true)
                 const response = await getProductDetail(productId)
                 setProduct(response.data)
-                console.log("디테일컴포넌트")
-                console.log()
             } catch (err) {
                 setError('상품 정보를 불러올 수 없습니다.')
                 console.error(err)
@@ -62,6 +60,14 @@ const ProductDetailComponents = ({productId}) => {
     }
     return(
         <main className="pt-24 pb-20 max-w-7xl mx-auto px-6">
+            {/* 목록으로 */}
+            <button
+                onClick={handleBackToList}
+                className="flex items-center gap-2 text-sm text-on-surface-variant hover:text-primary transition-colors"
+            >
+                <span className="material-symbols-outlined text-sm">arrow_back</span>
+                리스트로 돌아가기
+            </button>            
             <ProductDetailTopSec product={product} />
             <ProductDetailMidSec product={product} />
         </main>

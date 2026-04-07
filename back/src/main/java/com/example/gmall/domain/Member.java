@@ -2,7 +2,9 @@ package com.example.gmall.domain;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,9 +24,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "member")
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Member {
  
     @Id
@@ -46,6 +48,7 @@ public class Member {
     @Column(name = "email", length = 50, nullable = false)
     private String email;
  
+    //이메일 인증 여부
     @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT 0")
     private boolean emailVerified = false;
  
@@ -93,6 +96,9 @@ public class Member {
     @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT NOW()")
     private LocalDateTime updatedAt;
  
+    @Column(name = "description", length = 500)
+    private String description;
+    
     // 연관관계
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sns> snsList = new ArrayList<>();
@@ -122,5 +128,26 @@ public class Member {
     	}else {
     		this.withdrawAt = null;
     	}
+    }
+    public void updateBusinessVerify(boolean status) {
+    	this.businessVerified = status;
+    }
+    public void rejectBusinessVerify() {
+    	this.businessVerified = false;
+    }
+    
+    
+    public Map<String, Object> getClaims() {
+       
+        Map<String, Object> dataMap = new HashMap<>(); 
+
+        dataMap.put("loginId", this.loginId);
+        dataMap.put("mname", this.mname);
+        dataMap.put("role", this.role);
+        dataMap.put("memberId", this.id);
+      
+        dataMap.put("businessVerified", this.businessVerified); 
+        
+        return dataMap;
     }
 }

@@ -16,9 +16,10 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         const member = JSON.parse(localStorage.getItem("member"));
-        const token = member?.data?.accessToken;    // response.data.accessToken
+        const token = member?.accessToken;    // response.data.accessToken
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+            console.log("토큰이 헤더에 포함되었습니다.");
             
         }
         return config;
@@ -37,7 +38,7 @@ axiosInstance.interceptors.response.use(
                 console.warn('로그인이 필요합니다.');
                 // 토큰 만료 시 localStorage 정리 후 로그인 페이지로 이동
                 localStorage.removeItem("member");
-                window.location.href = "/member/login";
+                window.location.href = "/login";
             } else if (status === 403) {
                 // member.role 에 의한 접근 요청이 맞지 않는 경우 처리(추후 역할에 따른 페이지 접근 제한)
                 console.warn('접근 권한이 없습니다.');

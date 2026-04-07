@@ -1,5 +1,5 @@
 import BasicLayout from "../../layouts/BasicLayout";
-import MainBanner from "../../components/main/Mainbanner";
+import MainBanner from "../../components/main/MainBanner";
 import CategoryTabs from "../../components/main/CategoryTabs";
 import PopularProductsCard from "../../components/main/PopularProductsCard";
 import GeumbitnaruExclusive from "../../components/main/GeumbitnaruExclusive";

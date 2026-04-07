@@ -22,12 +22,17 @@ public class ProductDetailResponseDTO {
     private String thumbnailImageUrl;
     private Byte soldStatus;
     private boolean isCertified;
+    private boolean isExhibition; //기획전 여부
     private Integer categoryId;
     private String categoryName;
     private Long sellerId;
     private List<String> imageUrls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    private String sellerName;       // 판매자명
+    private String sellerBusinessNo; // 사업자번호 (노출 여부 팀이랑 상의)
+    private boolean sellerVerified;  // 김포시 인증 판매자 여부
 
     public ProductDetailResponseDTO(Product p) {
         this.productId         = p.getProductId();
@@ -41,6 +46,7 @@ public class ProductDetailResponseDTO {
         this.thumbnailImageUrl = p.getThumbnailImageUrl();
         this.soldStatus        = p.getSoldStatus();
         this.isCertified       = p.isCertified();
+        this.isExhibition	   = p.isExhibition();
         this.categoryId        = p.getCategory().getCategoryId();
         this.categoryName      = p.getCategory().getCategoryName();
         this.sellerId          = p.getSeller().getId();
@@ -49,5 +55,9 @@ public class ProductDetailResponseDTO {
                                     .collect(Collectors.toList());
         this.createdAt         = p.getCreatedAt();
         this.updatedAt         = p.getUpdatedAt();
+        //판매자 정보
+        this.sellerName       = p.getSeller().getMname();
+        this.sellerVerified   = p.getSeller().isVerified();
+        this.sellerBusinessNo = p.getSeller().getBusinessNo();
     }
 }

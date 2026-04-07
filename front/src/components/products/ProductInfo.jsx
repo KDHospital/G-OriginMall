@@ -1,7 +1,19 @@
 import { useState } from "react";
+import axiosInstance from "../../api/axios";
+import { useNavigate,useLocation } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+
 
 
 const ProductInfo = ({product}) => {
+
+    const { fetchCartCount } = useCart();
+
+    const location = useLocation()  //현 주소
+    // 현재 주소(pathname)에 'certified'가 포함되어 있는지 확인 (true/false)
+    const isCertified = location.pathname.includes('certified')
+    const navigate = useNavigate();
+
     if (!product) return null;
     console.log("프로덕트 인포의 프로덕트:", product);
     // 수량 변경 코드
@@ -21,9 +33,61 @@ const ProductInfo = ({product}) => {
 
     // Buy Now
     const handleBuyNow = () => {
-        alert('구매 페이지로 이동합니다');
-        // 추후 navigate('/orders/new') 연결 예정
+         navigate("/orders/new", {
+            state: {
+            source: "direct",
+            orderItems: [
+                {
+                cartItemId: null,
+                productId: product.productId,
+                sellerId: product.sellerId,
+                sellerName: product.sellerName,
+                pname: product.pname,
+                listPrice: product.listPrice,
+                discountPrice: product.discountPrice,
+                price: product.price,
+                deliveryFee: product.deliveryFee,
+                quantity: quantity,  // 수량 선택 state
+                itemSubtotal: product.price * quantity,
+                thumbnailImageUrl: product.thumbnailImageUrl,
+                }
+            ]
+            }
+        });
     };
+
+    //장바구니 담기
+    const handleAddToCart = async()=>{
+
+        const memberData = localStorage.getItem("member");
+    
+        // 비로그인
+        if (!memberData) {
+            alert("로그인이 필요합니다.");
+            navigate("/login");
+            return;
+        }
+
+        // 판매자, 관리자는 장바구니 이용 불가
+        const member = JSON.parse(localStorage.getItem("member") || "null");
+        const role = member?.role ?? null;
+        if (role === 1 || role === 2) {
+            alert("판매자 및 관리자는 장바구니를 이용할 수 없습니다.");
+            return;
+        }
+
+        try {
+            await axiosInstance.post("/cart",{
+                productId:product.productId,
+                quantity: quantity,
+            }).then(()=>fetchCartCount());
+            alert(`${product.pname} ${quantity}개를 장바구니에 담았습니다.`)
+        } catch (err) {
+            console.error(err);
+            alert("장바구니 담기에 실패했습니다.")
+            
+        }
+    }
 
     return(
         <div className="space-y-8">
@@ -65,21 +129,29 @@ const ProductInfo = ({product}) => {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
                     <button onClick={handleBuyNow} className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
-                        Buy Now
+                        구매하기
                     </button>
-                    <button className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
-                        Add to Cart
+                    <button
+                    onClick={handleAddToCart}
+                    disabled={product.soldStatus !== 0}
+                    className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
+                        장바구니
                     </button>
-                    <button className="w-16 h-16 flex items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:text-error hover:border-error transition-all">
-                        <span className="material-symbols-outlined">favorite</span>
-                    </button>
+                    {/* 품절 안내 */}
+                    {product.soldStatus === 2 && (
+                        <p className="text-center text-error font-bold">현재 품절된 상품입니다.</p>
+                    )}
                 </div>
             </div>
             <div className="pt-6 flex gap-8 items-center border-t border-outline-variant/30">
-                <div className="flex flex-col items-center gap-1 opacity-60">
-                    <span className="material-symbols-outlined text-3xl">verified</span>
-                    <span className="text-[10px] font-bold uppercase tracking-tighter">김포시 인증 상품</span>
-                </div>
+                {isCertified && (
+                    <div className="flex flex-col items-center gap-1 opacity-60">
+                        <span className="material-symbols-outlined text-3xl">verified</span>
+                        <span className="text-[10px] font-bold uppercase tracking-tighter">
+                            김포시 인증 상품
+                        </span>
+                    </div>
+                )}
                 <div className="flex flex-col items-center gap-1 opacity-60">
                     <span className="material-symbols-outlined text-3xl">eco</span>
                     <span className="text-[10px] font-bold uppercase tracking-tighter">유기농</span>

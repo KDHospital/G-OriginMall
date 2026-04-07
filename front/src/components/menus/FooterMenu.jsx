@@ -1,7 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 
 const FooterMenu = () =>{
+
+    const navigate = useNavigate()
+
+    const isLoggedIn = !!localStorage.getItem("member")
 
     const footerMenuItem = [
         {
@@ -18,14 +22,24 @@ const FooterMenu = () =>{
         },
         {
             name:"고객센터",
-            path:"/"
+            path:"/board"
         },
         {
             name:"입점신청",
-            path:"/"
+            path:"/sellersignup"
         },
     ]
 
+    const handleRegisterSellERClick = (e) => {
+        e.preventDefault()
+        
+        if(isLoggedIn) {
+            alert("이미 로그인된 상태입니다. 판매자 가입을 위해서는 로그아웃 후 진행해 주세요")
+            return
+        }
+
+        navigate("sellersignup")
+    }
     return(
             <footer className="bg-slate-100 pt-20 pb-10 border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4">
@@ -59,8 +73,16 @@ const FooterMenu = () =>{
                             <h5 className="font-bold mb-6">G-Origin-Mall</h5>
                             <ul className="space-y-4 text-sm text-slate-500">
                                 {footerMenuItem.map((item)=>(
-                                    <li key={item.name}>
+                                    <li key={item.name} className="hover:text-primary transition-colors">
+                                        {item.name === "입점신청" ? (
+                                            <button 
+                                            onClick={handleRegisterSellERClick}
+                                            className="text-left bg- bg-transparent border-none p-0 cursor-pointer">
+                                               {item.name} 
+                                            </button>
+                                        ) : (
                                         <Link to={item.path}>{item.name}</Link>
+                                        )}
                                     </li>
                                 ))}
                             </ul>

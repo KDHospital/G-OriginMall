@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import axiosInstance from '../api/axios';
 
 const menuGroups = [
     {
@@ -31,6 +32,16 @@ const menuGroups = [
         ],
     },
 ];
+const handleLogout = async () => {
+    try {
+     await axiosInstance.post("/member/logout")
+    } catch (err) {
+      console.error("로그아웃 요청 중 오류 발생", err)
+    } finally{
+      localStorage.removeItem("member")
+      window.location.href = "/"
+    }
+    }
 
 function SellerLayout({ children }) {
     const location = useLocation();
@@ -41,8 +52,8 @@ function SellerLayout({ children }) {
 
             {/* 상단 헤더 */}
             <header className="flex justify-between items-center bg-green-900 text-green-300 px-5 py-2 text-xs">
-                <span>WP › SELLER › DASHBOARD › 판매자 대시보드</span>
-                <span>gmallSeller · WP · Seller only</span>
+                <span>G-Origin Mall / Seller Page</span>
+                <span>Seller only</span>
             </header>
 
             <div className="flex flex-1">
@@ -54,7 +65,7 @@ function SellerLayout({ children }) {
                     <div className="flex justify-between items-start px-4 py-5 border-b border-green-700 mb-2">
                         {!collapsed && (
                             <div>
-                                <div className="text-white font-bold text-base">G-Origin Mall</div>
+                                <Link to="/"><div className="text-white font-bold text-base">G-Origin Mall</div></Link>
                                 <div className="text-green-400 text-xs mt-1">SELLER PANEL</div>
                             </div>
                         )}
@@ -99,7 +110,7 @@ function SellerLayout({ children }) {
                     {!collapsed && (
                         <div className="px-4 py-4 border-t border-green-700 text-xs text-green-500">
                             <div>판매자 · SELLER</div>
-                            <div className="mt-1 hover:text-white cursor-pointer">로그아웃</div>
+                            <div className="mt-1 hover:text-white cursor-pointer" onClick = {handleLogout}>로그아웃</div>
                         </div>
                     )}
                 </aside>

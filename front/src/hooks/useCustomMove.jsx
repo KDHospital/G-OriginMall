@@ -1,4 +1,4 @@
-import { createSearchParams, useNavigate, useSearchParams } from "react-router-dom"
+import { createSearchParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
 import { useState } from "react"
 
 const getNum =(param, defaultValue) =>{
@@ -9,6 +9,7 @@ const getNum =(param, defaultValue) =>{
 }
 const useCustomMove = () => {
     const navigate = useNavigate();
+    const location = useLocation()
 
     const [refresh, setRefresh] = useState(false);
     const [queryParams] = useSearchParams();
@@ -89,9 +90,42 @@ const useCustomMove = () => {
             ...(categoryId && { categoryId }),
             sort: sortValue,
         }).toString()
-        navigate({ pathname: `/products`, search: queryStr })
+        navigate({ pathname: location.pathname, search: queryStr })
     }
 
-    return {moveToList,moveToRead,moveToCategory,moveToPrice,moveToSort,page,size,refresh,categoryId,minPrice,maxPrice,sort}
+    //웹-금빛나루 전용관 상품 목록 조회
+    const moveToCertified = (pageParam) => {
+        const queryStr = createSearchParams({
+            page: pageParam?.page ?? 1,
+            size: pageParam?.size ?? 12,
+            ...(categoryId && { categoryId }),
+            sort,
+        }).toString()
+        navigate({ pathname: '/products/certified', search: queryStr })
+    }
+    const moveToCertifiedRead = (num) => {
+        navigate({
+            pathname: `/products/certified/${num}`,
+            search: queryDefault
+        })
+    }
+    //웹-기획전 상품 목록 조회
+    const moveToExhibition = (pageParam) => {
+        const queryStr = createSearchParams({
+            page: pageParam?.page ?? 1,
+            size: pageParam?.size ?? 12,
+            ...(categoryId && { categoryId }),
+            sort,
+        }).toString()
+        navigate({ pathname: '/products/exhibition', search: queryStr })
+    }
+    const moveToExhibitionRead = (num) => {
+        navigate({
+            pathname: `/products/exhibition/${num}`,
+            search: queryDefault
+        })
+    }
+
+    return {moveToList,moveToRead,moveToCategory,moveToPrice,moveToSort,moveToCertified, moveToCertifiedRead,moveToExhibition,moveToExhibitionRead,page,size,refresh,categoryId,minPrice,maxPrice,sort}
 }
 export default useCustomMove

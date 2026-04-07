@@ -43,7 +43,7 @@ export const userSignup = (payload) =>
 
 //로그인
 export const login = (loginParam) =>
-    axiosInstance.post("/member/login",loginParam)
+    axiosInstance.post("/member/login",loginParam).then(res => res.data)
 
 //아이디 중복 체크
 export const checkLoginId = (loginId) =>
@@ -73,3 +73,38 @@ export const resetPassword = (data) => {
 export const withdrawMember = (data) => {
     return axiosInstance.post("/member/withdraw",data)
 }
+
+// ===== 관리자 전용 =====
+
+// [관리자] 일반회원 목록 조회
+export const adminGetMembers = async (page = 0, size = 10, keyword = '', status = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (status) params.status = status;
+    const response = await axiosInstance.get('/admin/members', { params });
+    return response.data;
+};
+
+// [관리자] 회원 상세 조회
+export const adminGetMember = async (memberId) => {
+    const response = await axiosInstance.get(`/admin/members/${memberId}`);
+    return response.data;
+};
+
+// [관리자] 회원 등록
+export const adminCreateMember = async (data) => {
+    const response = await axiosInstance.post('/admin/members', data);
+    return response.data;
+};
+
+// [관리자] 회원 주문 목록 조회
+export const adminGetMemberOrders = async (memberId, page = 0, size = 5) => {
+    const response = await axiosInstance.get(`/admin/members/${memberId}/orders`, { params: { page, size } });
+    return response.data;
+};
+
+// [관리자] 회원 수정
+export const adminUpdateMember = async (memberId, data) => {
+    const response = await axiosInstance.put(`/admin/members/${memberId}`, data);
+    return response.data;
+};

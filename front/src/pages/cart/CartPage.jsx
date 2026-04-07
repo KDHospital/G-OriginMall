@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import BasicLayout from "../../layouts/BasicLayout";
-
+import { BASE_URL } from "../../util/imagesUtil";
+import { useCart } from "../../context/CartContext";
 
 
 
@@ -11,6 +12,8 @@ import BasicLayout from "../../layouts/BasicLayout";
 // 유틸
 // ─────────────────────────────────────────
 const formatPrice = (n) => n?.toLocaleString("ko-KR") ?? "0";
+
+
 
 // ─────────────────────────────────────────
 // 진행 단계 컴포넌트
@@ -66,7 +69,7 @@ function CartItemRow({ item, checked, onCheck, onQuantityChange, onRemove }) {
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 bg-gray-100 rounded flex-shrink-0 overflow-hidden border border-gray-200">
             {item.thumbnailImageUrl ? (
-              <img src={item.thumbnailImageUrl} alt={item.pname} className="w-full h-full object-cover" />
+              <img src={`${BASE_URL}${item.thumbnailImageUrl}`} alt={item.pname} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">No Image</div>
             )}
@@ -142,6 +145,8 @@ function OrderSummary({ totalItemPrice, totalDeliveryFee, totalPrice, onOrder })
 // CartPage (메인)
 // ─────────────────────────────────────────
 export default function CartPage() {
+  const { fetchCartCount } = useCart();
+
   const navigate = useNavigate();
 
   const [cartData, setCartData] = useState(null);
@@ -210,6 +215,7 @@ export default function CartPage() {
                 items: prev.items.filter((i) => i.cartItemId !== cartItemId),
             }));
             setCheckedIds((prev) => prev.filter((id) => id !== cartItemId));
+            fetchCartCount();
         })
         .catch((err) => console.error(err));
 
@@ -224,6 +230,7 @@ export default function CartPage() {
                 items: prev.items.filter((i) => !checkedIds.includes(i.cartItemId)),
             }));
             setCheckedIds([]);
+            fetchCartCount();
         })
         .catch((err) => console.error(err));
 

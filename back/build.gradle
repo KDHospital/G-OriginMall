@@ -50,7 +50,35 @@ dependencies {
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test' // ← 수정
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//querydsl
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 }
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-parameters']
+}
+
+// QClass 생성 위치를 build 폴더 밖으로 빼서 이클립스가 바로 인식하게 합니다.
+def querydslDir = "src/main/generated"
+
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+clean {
+    delete file(querydslDir)
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()
