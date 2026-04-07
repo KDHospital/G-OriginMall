@@ -26,4 +26,10 @@ public interface ProductService {
     
     // 판매자별 상품 목록 조회 (전체 상태 포함)
     Page<ProductResponseDTO> getSellerProducts(Long sellerId, Pageable pageable);
+
+	// 상품 수정 (판매자/어드민 공용)
+    ProductResponseDTO modify(Long productId, ProductRequestDTO dto);
+    
+    //재고처리
+    void decreaseStock(Long productId, int quantity);
 }

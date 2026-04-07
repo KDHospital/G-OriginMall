@@ -32,6 +32,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<DeliveryAddress, QDeliveryAddress> deliveryAddresses = this.<DeliveryAddress, QDeliveryAddress>createList("deliveryAddresses", DeliveryAddress.class, QDeliveryAddress.class, PathInits.DIRECT2);
 
+    public final StringPath description = createString("description");
+
     public final StringPath email = createString("email");
 
     public final BooleanPath emailVerified = createBoolean("emailVerified");

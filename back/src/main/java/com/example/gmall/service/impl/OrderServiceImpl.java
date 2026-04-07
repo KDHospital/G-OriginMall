@@ -421,6 +421,22 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("접근 권한이 없습니다.");
         }
 
+        
+        // [추가] 배송 시작(2)으로 변경될 때 재고 및 품절 상태 체크
+        if (newStatus == 2) {
+            orders.getOrderItems().forEach(item -> {
+                Product product = item.getProduct();
+                
+                // 1. 이미 결제 시점에 재고는 차감 (createOrder 참고)
+                // 2. 현재 재고가 0이라면 상품의 soldStatus를 2(품절)로 변경
+                if (product.getStock() <= 0) {
+                    // Product 엔티티에 setSoldStatus가 있다고 가정
+                    product.setSoldStatus((byte) 2); 
+                    log.info("상품 품절 처리 완료 - productId: {}, pname: {}", product.getProductId(), product.getPname());
+                }
+            });
+        }
+        
         // 취소(4)는 cancelOrder() 사용
         if (newStatus == 4) {
             throw new IllegalStateException("취소는 취소 API를 사용해주세요.");
