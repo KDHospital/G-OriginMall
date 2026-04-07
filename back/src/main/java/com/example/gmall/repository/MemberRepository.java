@@ -95,10 +95,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m FROM Member m WHERE m.role = :role AND m.businessVerified = :verified AND (m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.businessNo LIKE %:keyword%)")
     Page<Member> findByRoleAndBusinessVerifiedAndKeyword(@Param("role") Byte role, @Param("verified") boolean verified, @Param("keyword") String keyword, Pageable pageable);
 
-    // 판매회원: 동적 필터 (키워드 + 승인여부 + 회원상태)
-    @Query("SELECT m FROM Member m WHERE m.role = :role" +
-           " AND (:keyword IS NULL OR m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.businessNo LIKE %:keyword%)" +
-           " AND (:verified IS NULL OR m.businessVerified = :verified)" +
-           " AND (:isDeleted IS NULL OR m.isDeleted = :isDeleted)")
-    Page<Member> findSellersByFilters(@Param("role") Byte role, @Param("keyword") String keyword, @Param("verified") Boolean verified, @Param("isDeleted") Boolean isDeleted, Pageable pageable);
+    // 판매회원: 승인여부 + 회원상태 동시 필터
+    @Query("SELECT m FROM Member m WHERE m.role = :role AND m.businessVerified = :verified AND m.isDeleted = :isDeleted")
+    Page<Member> findByRoleAndBusinessVerifiedAndIsDeleted(@Param("role") Byte role, @Param("verified") boolean verified, @Param("isDeleted") boolean isDeleted, Pageable pageable);
+
+    @Query("SELECT m FROM Member m WHERE m.role = :role AND m.businessVerified = :verified AND m.isDeleted = :isDeleted AND (m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.businessNo LIKE %:keyword%)")
+    Page<Member> findByRoleAndBusinessVerifiedAndIsDeletedAndKeyword(@Param("role") Byte role, @Param("verified") boolean verified, @Param("isDeleted") boolean isDeleted, @Param("keyword") String keyword, Pageable pageable);
 }

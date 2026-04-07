@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import PaginationComponent from '../../components/support/PaginationComponent';
-import { adminGetSellers, adminApproveSeller, adminRejectSeller, adminDeleteMember } from '../../api/memberApi';
+import { adminGetSellers, adminApproveSeller, adminUpdateSeller, adminDeleteMember } from '../../api/memberApi';
+
+import { fmtBizNo, fmtTel } from '../../util/adminFormatUtil';
 
 const AdminSellerListPage = () => {
   const navigate = useNavigate();
@@ -49,16 +51,18 @@ const AdminSellerListPage = () => {
     try { await Promise.all(selectedIds.map(id => adminApproveSeller(id))); alert("일괄 승인되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("승인 처리 중 오류가 발생했습니다."); }
   };
 
-  const handleBulkReject = async () => {
-    if (selectedIds.length === 0) return alert("거절할 판매자를 선택해주세요.");
-    if (!window.confirm(`${selectedIds.length}명을 일괄 거절하시겠습니까?`)) return;
-    try { await Promise.all(selectedIds.map(id => adminRejectSeller(id))); alert("일괄 거절되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("거절 처리 중 오류가 발생했습니다."); }
+  const handleBulkPending = async () => {
+    if (selectedIds.length === 0) return alert("대기 처리할 판매자를 선택해주세요.");
+    if (!window.confirm(`선택한 ${selectedIds.length}명의 승인여부를 대기로 변경할까요?`)) return;
+    try { await Promise.all(selectedIds.map(id => adminUpdateSeller(id, { businessVerified: false }))); alert("일괄 대기 처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("대기 처리 중 오류가 발생했습니다."); }
   };
 
   const handleDelete = async () => {
-    if (selectedIds.length === 0) return alert("삭제할 판매자를 선택해주세요.");
-    if (!window.confirm(`${selectedIds.length}명을 비활성화하시겠습니까?`)) return;
-    try { await Promise.all(selectedIds.map(id => adminDeleteMember(id))); alert("처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("삭제 중 오류가 발생했습니다."); }
+    if (selectedIds.length === 0) return alert("탈퇴 처리할 판매자를 선택해주세요.");
+    const alreadyDeleted = sellers.filter(s => selectedIds.includes(s.id) && s.isDeleted);
+    if (alreadyDeleted.length > 0) return alert("이미 탈퇴한 회원이 포함되어 있습니다.");
+    if (!window.confirm(`선택한 ${selectedIds.length}명의 판매자를 탈퇴 처리 할까요?`)) return;
+    try { await Promise.all(selectedIds.map(id => adminDeleteMember(id))); alert("처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("탈퇴 처리 중 오류가 발생했습니다."); }
   };
 
   return (
@@ -69,7 +73,6 @@ const AdminSellerListPage = () => {
         <div className="space-y-5">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">판매회원 관리</h2>
-            <p className="text-sm text-gray-400 mt-1">총 {totalItems}명의 판매회원이 있습니다.</p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -101,10 +104,10 @@ const AdminSellerListPage = () => {
             <div className="flex gap-2 ml-auto">
               <button onClick={handleBulkApprove} disabled={selectedIds.length === 0}
                 className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>일괄승인</button>
-              <button onClick={handleBulkReject} disabled={selectedIds.length === 0}
-                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>일괄거절</button>
+              <button onClick={handleBulkPending} disabled={selectedIds.length === 0}
+                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>일괄대기</button>
               <button onClick={handleDelete} disabled={selectedIds.length === 0}
-                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>삭제</button>
+                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>탈퇴</button>
               <button onClick={() => navigate('/admin/sellers/new')} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">등록</button>
             </div>
           </div>
@@ -120,7 +123,7 @@ const AdminSellerListPage = () => {
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
                     <th className="px-4 py-4 w-24 text-center font-semibold">승인여부</th>
-                    <th className="px-4 py-4 w-28 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-36 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">사업자번호</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>
@@ -151,8 +154,8 @@ const AdminSellerListPage = () => {
                         </td>
                         <td className="px-4 py-4 text-center font-medium text-gray-800">{seller.mname}</td>
                         <td className="px-4 py-4 text-left text-gray-600">{seller.loginId}</td>
-                        <td className="px-4 py-4 text-center text-gray-500 text-xs">{seller.businessNo}</td>
-                        <td className="px-4 py-4 text-center text-gray-500 text-xs">{seller.tel}</td>
+                        <td className="px-4 py-4 text-center text-gray-500 text-xs">{fmtBizNo(seller.businessNo)}</td>
+                        <td className="px-4 py-4 text-center text-gray-500 text-xs">{fmtTel(seller.tel)}</td>
                         <td className="px-4 py-4 text-center text-gray-400 text-xs">{seller.createdAt?.split('T')[0]}</td>
                       </tr>
                     );

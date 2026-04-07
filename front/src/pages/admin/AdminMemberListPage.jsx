@@ -4,6 +4,8 @@ import AdminLayout from '../../layouts/AdminLayout';
 import PaginationComponent from '../../components/support/PaginationComponent';
 import { adminGetMembers, adminDeleteMember } from '../../api/memberApi';
 
+import { fmtTel, fmtGender } from '../../util/adminFormatUtil';
+
 const AdminMemberListPage = () => {
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
@@ -21,15 +23,17 @@ const AdminMemberListPage = () => {
   const handleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
   const handleDelete = async () => {
-    if (selectedIds.length === 0) return alert("삭제할 회원을 선택해주세요.");
-    if (!window.confirm(`${selectedIds.length}명을 비활성화하시겠습니까?`)) return;
+    if (selectedIds.length === 0) return alert("탈퇴 처리할 회원을 선택해주세요.");
+    const alreadyDeleted = members.filter(m => selectedIds.includes(m.id) && m.isDeleted);
+    if (alreadyDeleted.length > 0) return alert("이미 탈퇴한 회원이 포함되어 있습니다.");
+    if (!window.confirm(`선택한 ${selectedIds.length}명의 회원을 탈퇴 처리 할까요?`)) return;
     try {
       await Promise.all(selectedIds.map(id => adminDeleteMember(id)));
       alert("처리되었습니다.");
       setSelectedIds([]);
       loadData(currentPage);
     } catch (error) {
-      alert("삭제 중 오류가 발생했습니다.");
+      alert("탈퇴 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -75,11 +79,7 @@ const AdminMemberListPage = () => {
     loadData(1, keyword, value);
   };
 
-  const formatGender = (gender) => {
-    if (gender === 1) return '남';
-    if (gender === 2) return '여';
-    return '-';
-  };
+  const formatGender = fmtGender;
 
   return (
     <AdminLayout>
@@ -90,7 +90,6 @@ const AdminMemberListPage = () => {
           {/* 페이지 헤더 */}
           <div>
             <h2 className="text-2xl font-bold text-gray-900">일반회원 관리</h2>
-            <p className="text-sm text-gray-400 mt-1">총 {totalItems}명의 일반 회원이 있습니다.</p>
           </div>
 
           {/* 검색 + 필터 */}
@@ -131,7 +130,7 @@ const AdminMemberListPage = () => {
             <div className="flex gap-2 ml-auto">
               <button onClick={handleDelete} disabled={selectedIds.length === 0}
                 className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>
-                {selectedIds.length > 0 ? `${selectedIds.length}명 삭제` : '삭제'}
+                {selectedIds.length > 0 ? `${selectedIds.length}명 탈퇴` : '탈퇴'}
               </button>
               <button onClick={() => navigate('/admin/members/new')} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
                 등록
@@ -150,7 +149,7 @@ const AdminMemberListPage = () => {
                     <th className="pl-5 pr-2 py-4 w-10"><input type="checkbox" onChange={handleSelectAll} checked={selectedIds.length === members.length && members.length > 0} className="rounded border-gray-300" /></th>
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
-                    <th className="px-4 py-4 w-28 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-36 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디(이메일)</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>
                     <th className="px-4 py-4 w-16 text-center font-semibold">성별</th>
@@ -184,7 +183,7 @@ const AdminMemberListPage = () => {
                           </td>
                           <td className="px-4 py-4 text-center font-medium text-gray-800">{member.mname}</td>
                           <td className="px-4 py-4 text-left text-gray-600">{member.loginId}</td>
-                          <td className="px-4 py-4 text-center text-gray-500 text-xs">{member.tel}</td>
+                          <td className="px-4 py-4 text-center text-gray-500 text-xs">{fmtTel(member.tel)}</td>
                           <td className="px-4 py-4 text-center text-gray-500">{formatGender(member.gender)}</td>
                           <td className="px-4 py-4 text-center text-gray-400 text-xs">{member.createdAt?.split('T')[0]}</td>
                         </tr>

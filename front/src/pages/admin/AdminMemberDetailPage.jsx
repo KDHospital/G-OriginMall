@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import { adminGetMember, adminGetMemberOrders, adminDeleteMember } from '../../api/memberApi';
+import { fmtGender, fmtDateTime } from '../../util/adminFormatUtil';
 
 const AdminMemberDetailPage = () => {
   const { memberId } = useParams();
@@ -37,16 +38,8 @@ const AdminMemberDetailPage = () => {
       .finally(() => setOrderLoading(false));
   }, [memberId, orderPage]);
 
-  const formatGender = (gender) => {
-    if (gender === 1) return '남성';
-    if (gender === 2) return '여성';
-    return '미지정';
-  };
-
-  const formatDateTime = (dt) => {
-    if (!dt) return '-';
-    return dt.replace('T', ' ').slice(0, 16);
-  };
+  const formatGender = fmtGender;
+  const formatDateTime = fmtDateTime;
 
   const formatPrice = (price) => {
     if (!price) return '0';
@@ -102,8 +95,8 @@ const AdminMemberDetailPage = () => {
               <h2 className="text-2xl font-bold text-gray-900">회원 상세</h2>
             </div>
             <div className="flex gap-2">
-              <button onClick={async () => { if (!window.confirm("이 회원을 비활성화하시겠습니까?")) return; try { await adminDeleteMember(memberId); alert("처리되었습니다."); navigate('/admin/members'); } catch { alert("삭제에 실패했습니다."); } }}
-                className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors">삭제</button>
+              <button onClick={async () => { if (member.isDeleted) return alert("이미 탈퇴한 회원입니다."); if (!window.confirm("해당 회원을 탈퇴 처리 할까요?")) return; try { await adminDeleteMember(memberId); alert("탈퇴 처리되었습니다."); navigate('/admin/members'); } catch { alert("탈퇴 처리에 실패했습니다."); } }}
+                className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors">탈퇴</button>
               <button onClick={() => navigate(`/admin/members/${memberId}/modify`)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">수정</button>
             </div>
           </div>
@@ -127,15 +120,11 @@ const AdminMemberDetailPage = () => {
                 )}
               </div>
               <h3 className="text-xl font-bold text-gray-900">{member.mname}</h3>
-              <p className="text-sm text-gray-400 mt-1">{member.loginId}</p>
+              <p className="text-sm text-gray-400 mt-1">회원ID : {member.id}</p>
             </div>
 
             <div className="px-6 py-5">
               <div className="grid grid-cols-2 gap-x-12 gap-y-5">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">회원번호</label>
-                  <p className="text-sm text-gray-800">{member.id}</p>
-                </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">아이디</label>
                   <p className="text-sm text-gray-800">{member.loginId}</p>

@@ -37,6 +37,7 @@ import AdminMemberDetailPage from './pages/admin/AdminMemberDetailPage';
 import AdminMemberAddPage from './pages/admin/AdminMemberAddPage';
 import AdminMemberModifyPage from './pages/admin/AdminMemberModifyPage';
 import AdminSellerListPage from './pages/admin/AdminSellerListPage';
+import AdminSellerAddPage from './pages/admin/AdminSellerAddPage';
 import AdminSellerDetailPage from './pages/admin/AdminSellerDetailPage';
 import AdminSettingListPage from './pages/admin/AdminSettingListPage';
 import AdminSettingAddPage from './pages/admin/AdminSettingAddPage';
@@ -105,51 +106,63 @@ function App() {
           <Route path="/orders" element={<ProtectedRoute allowRole={0}><MyOrders /></ProtectedRoute>} /> 
           <Route path="/orders/:orderId" element={<ProtectedRoute allowRole={0}><MyOrderDetail /></ProtectedRoute>} />
 
-        {/* 게시판 - 신시온 담당*/}
-        <Route path="/board" element={<BoardPage />} />
-        <Route path="/board/read/:postId" element={<BoardReadPage />} />
-        <Route path="/inquiry" element={<InquiryPage />} />
-        <Route path="/inquiry/add" element={<InquiryAddModal />} />
-        <Route path="/faq" element={<FaqPage />} />
+          {/* 게시판 - 신시온 담당*/}
+          <Route path="/board" element={<BoardPage />} />
+          <Route path="/board/read/:postId" element={<BoardReadPage />} />
+          <Route path="/inquiry" element={<InquiryPage />} />
+          <Route path="/inquiry/add" element={<InquiryAddModal />} />
+          <Route path="/faq" element={<FaqPage />} />
 
 
 
 
-        {/* 어드민 */}
-        <Route path="/admin" element={<ProtectedRoute allowRole={2}><AdminDashboardPage /></ProtectedRoute>} />
-        <Route path="/admin/orders" element={<ProtectedRoute allowRole={2}><AdminOrders /></ProtectedRoute>} />
-        <Route path="/admin/orders/:orderId" element={<ProtectedRoute allowRole={2}><AdminOrderDetail /></ProtectedRoute>} />
+          {/* 어드민 */}
+          <Route path="/admin" element={<ProtectedRoute allowRole={2}><AdminDashboardPage /></ProtectedRoute>} />
+          <Route path="/admin/orders" element={<ProtectedRoute allowRole={2}><AdminOrders /></ProtectedRoute>} />
+          <Route path="/admin/orders/:orderId" element={<ProtectedRoute allowRole={2}><AdminOrderDetail /></ProtectedRoute>} />
 
-        {/* 어드민-회원관리 - 신시온 담당*/}
-        <Route path="/admin/members" element={<ProtectedRoute allowRole={2}><AdminMemberListPage /></ProtectedRoute>} />
-        <Route path="/admin/members/new" element={<ProtectedRoute allowRole={2}><AdminMemberAddPage /></ProtectedRoute>} />
-        <Route path="/admin/members/:memberId" element={<ProtectedRoute allowRole={2}><AdminMemberDetailPage /></ProtectedRoute>} />
-        <Route path="/admin/members/:memberId/modify" element={<ProtectedRoute allowRole={2}><AdminMemberModifyPage /></ProtectedRoute>} />
+          {/* 어드민-회원관리>일반회원 - 신시온 담당*/}
+          <Route path="/admin/members" element={<ProtectedRoute allowRole={2}><AdminMemberListPage /></ProtectedRoute>} />
+          <Route path="/admin/members/new" element={<ProtectedRoute allowRole={2}><AdminMemberAddPage /></ProtectedRoute>} />
+          <Route path="/admin/members/:memberId" element={<ProtectedRoute allowRole={2}><AdminMemberDetailPage /></ProtectedRoute>} />
+          <Route path="/admin/members/:memberId/modify" element={<ProtectedRoute allowRole={2}><AdminMemberModifyPage /></ProtectedRoute>} />
 
-        {/* 판매자 */}
-        <Route path="/seller" element={<ProtectedRoute allowRole={1}><SellerDashboardPage /></ProtectedRoute>} />
-        <Route path="/seller/products/new" element={<ProtectedRoute allowRole={1}><SellerProductNewPage /></ProtectedRoute>} />
-        <Route path="/seller/products" element={<ProtectedRoute allowRole={1}><SellerProductListPage /></ProtectedRoute>} />
-        <Route path="/seller/orders" element={<ProtectedRoute allowRole={1}><SellerOrders /></ProtectedRoute>} />
-        <Route path="/seller/orders/:orderId" element={<ProtectedRoute allowRole={1}><SellerOrderDetail /></ProtectedRoute>} />
+          {/* 어드민-회원관리>판매회원 - 신시온 담당*/}
+          <Route path="/admin/sellers" element={<ProtectedRoute allowRole={2}><AdminSellerListPage /></ProtectedRoute>} />
+          <Route path="/admin/sellers/new" element={<ProtectedRoute allowRole={2}><AdminSellerAddPage /></ProtectedRoute>} />
+          <Route path="/admin/sellers/:memberId" element={<ProtectedRoute allowRole={2}><AdminSellerDetailPage /></ProtectedRoute>} />
+
+          {/* 어드민-회원관리>관리자 - 신시온 담당*/}
+          <Route path="/admin/admins" element={<ProtectedRoute allowRole={2}><AdminSettingListPage /></ProtectedRoute>} />
+          <Route path="/admin/admins/new" element={<ProtectedRoute allowRole={2}><AdminSettingAddPage /></ProtectedRoute>} />
+          <Route path="/admin/admins/:memberId" element={<ProtectedRoute allowRole={2}><AdminSettingDetailPage /></ProtectedRoute>} />
+
+          {/* 어드민-게시판>공지사항 - 신시온 담당*/}
+          <Route path="/admin/board" element={<ProtectedRoute allowRole={2}><AdminBoardListPage /></ProtectedRoute>} />
+          <Route path="/admin/board/new" element={<ProtectedRoute allowRole={2}><AdminBoardAddPage /></ProtectedRoute>} />
+          <Route path="/admin/board/read/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardReadPage /></ProtectedRoute>} />
+          <Route path="/admin/board/modify/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardModifyPage /></ProtectedRoute>} />
+
+          {/* 어드민-게시판>고객문의 - 신시온 담당*/}
+          <Route path="/admin/inquiry" element={<ProtectedRoute allowRole={2}><AdminInquiryPage /></ProtectedRoute>} />
+          <Route path="/admin/inquiry/new" element={<ProtectedRoute allowRole={2}><AdminBoardAddPage /></ProtectedRoute>} />
+          <Route path="/admin/inquiry/read/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardReadPage /></ProtectedRoute>} />
+          <Route path="/admin/inquiry/modify/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardModifyPage /></ProtectedRoute>} />
+
+          {/* 판매자 */}
+          <Route path="/seller" element={<ProtectedRoute allowRole={1}><SellerDashboardPage /></ProtectedRoute>} />
+          <Route path="/seller/products/new" element={<ProtectedRoute allowRole={1}><SellerProductNewPage /></ProtectedRoute>} />
+          <Route path="/seller/products" element={<ProtectedRoute allowRole={1}><SellerProductListPage /></ProtectedRoute>} />
+          <Route path="/seller/orders" element={<ProtectedRoute allowRole={1}><SellerOrders /></ProtectedRoute>} />
+          <Route path="/seller/orders/:orderId" element={<ProtectedRoute allowRole={1}><SellerOrderDetail /></ProtectedRoute>} />
 
 
-        {/* 어드민-상품등록 */}
-        <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
+          {/* 어드민-상품등록 */}
+          <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
 
 
 
-        {/* 어드민-게시판>공지사항 - 신시온 담당*/}
-        <Route path="/admin/board" element={<ProtectedRoute allowRole={2}><AdminBoardListPage /></ProtectedRoute>} />
-        <Route path="/admin/board/new" element={<ProtectedRoute allowRole={2}><AdminBoardAddPage /></ProtectedRoute>} />
-        <Route path="/admin/board/read/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardReadPage /></ProtectedRoute>} />
-        <Route path="/admin/board/modify/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardModifyPage /></ProtectedRoute>} />
 
-        {/* 어드민-게시판>고객문의 - 신시온 담당*/}
-        <Route path="/admin/inquiry" element={<ProtectedRoute allowRole={2}><AdminInquiryPage /></ProtectedRoute>} />
-        <Route path="/admin/inquiry/new" element={<ProtectedRoute allowRole={2}><AdminBoardAddPage /></ProtectedRoute>} />
-        <Route path="/admin/inquiry/read/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardReadPage /></ProtectedRoute>} />
-        <Route path="/admin/inquiry/modify/:postId" element={<ProtectedRoute allowRole={2}><AdminBoardModifyPage /></ProtectedRoute>} />
 
 
 

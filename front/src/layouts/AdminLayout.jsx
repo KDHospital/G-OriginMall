@@ -18,7 +18,7 @@ const menuGroups = [
                 children: [
                     { path: '/admin/members', label: '일반회원' },
                     { path: '/admin/sellers', label: '판매회원' },
-                    { path: '/admin/admins', label: '관리자설정' },
+                    { path: '/admin/admins', label: '관리자' },
                 ],
             },
             { path: '/admin/products', label: '상품 목록', icon: '🛍️' },

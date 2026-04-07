@@ -22,6 +22,7 @@ import com.example.gmall.domain.Member;
 import com.example.gmall.domain.Orders;
 import com.example.gmall.repository.MemberRepository;
 import com.example.gmall.repository.OrdersRepository;
+import com.example.gmall.repository.ProductRepository;
 import com.example.gmall.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,11 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @Log4j2
 @Transactional
-public class AdminController {
+public class AdminMemberController {
 
 	private final MemberService memberService;
 	private final MemberRepository memberRepository;
+	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
 	private final PasswordEncoder passwordEncoder;
 
@@ -210,6 +212,45 @@ public class AdminController {
 		return ResponseEntity.ok(Map.of("message", "회원 정보가 수정되었습니다."));
 	}
 
+	// [관리자] 판매회원 등록
+	@PostMapping("/sellers")
+	public ResponseEntity<?> createSeller(@RequestBody Map<String, Object> body) {
+		String loginId = (String) body.get("loginId");
+		String mname = (String) body.get("mname");
+		String mpwd = (String) body.get("mpwd");
+		String tel = (String) body.get("tel");
+		String email = (String) body.get("email");
+
+		if (loginId == null || mname == null || mpwd == null || tel == null || email == null) {
+			throw new IllegalArgumentException("필수 항목을 모두 입력해주세요.");
+		}
+		if (memberRepository.existsByLoginId(loginId)) {
+			throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+		}
+
+		Number genderNum = (Number) body.getOrDefault("gender", 0);
+		String businessNo = (String) body.getOrDefault("businessNo", "");
+		Boolean taxInvoice = (Boolean) body.getOrDefault("taxInvoice", false);
+		String cashReceiptNo = (String) body.getOrDefault("cashReceiptNo", "");
+		String settlementName = (String) body.getOrDefault("settlementName", "");
+		String settlementBank = (String) body.getOrDefault("settlementBank", "");
+		String bankAccount = (String) body.getOrDefault("bankAccount", "");
+		Boolean isVerified = (Boolean) body.getOrDefault("isVerified", false);
+
+		Member seller = Member.builder()
+				.loginId(loginId).mname(mname).mpwd(passwordEncoder.encode(mpwd))
+				.tel(tel).email(email).gender(genderNum.byteValue())
+				.role((byte) 1).emailVerified(true)
+				.businessNo(businessNo).businessVerified(false)
+				.taxInvoice(taxInvoice != null && taxInvoice)
+				.cashReceiptNo(cashReceiptNo)
+				.settlementName(settlementName).settlementBank(settlementBank).bankAccount(bankAccount)
+				.build();
+
+		Member saved = memberRepository.save(seller);
+		return ResponseEntity.ok(Map.of("message", "판매회원이 등록되었습니다.", "id", saved.getId()));
+	}
+
 	// [관리자] 판매회원 수정
 	@PutMapping("/sellers/{memberId}")
 	public ResponseEntity<?> updateSeller(
@@ -227,6 +268,16 @@ public class AdminController {
 				seller.changePassword(passwordEncoder.encode(newPwd));
 			}
 		}
+		// 사업자 정보
+		if (body.containsKey("businessNo")) seller.changeBusinessNo((String) body.get("businessNo"));
+		if (body.containsKey("taxInvoice")) seller.changeTaxInvoice((Boolean) body.get("taxInvoice"));
+		if (body.containsKey("cashReceiptNo")) seller.changeCashReceiptNo((String) body.get("cashReceiptNo"));
+		if (body.containsKey("description")) seller.changeDescription((String) body.get("description"));
+		if (body.containsKey("isVerified")) seller.changeIsVerified((Boolean) body.get("isVerified"));
+		// 정산 정보
+		if (body.containsKey("settlementName")) seller.changeSettlementName((String) body.get("settlementName"));
+		if (body.containsKey("settlementBank")) seller.changeSettlementBank((String) body.get("settlementBank"));
+		if (body.containsKey("bankAccount")) seller.changeBankAccount((String) body.get("bankAccount"));
 
 		return ResponseEntity.ok(Map.of("message", "판매회원 정보가 수정되었습니다."));
 	}
@@ -255,7 +306,7 @@ public class AdminController {
 	@PostMapping("/reject-seller/{memberId}")
 	public ResponseEntity<?> reject(@PathVariable("memberId") Long memberId){
 
-		log.info("판재마 거절 요청 -ID: {}",memberId);
+		log.info("판매자 거절 요청 - ID: {}", memberId);
 
 		memberService.rejectSeller(memberId);
 		return ResponseEntity.ok(Map.of("message","판매자 입점 신청이 거절되었습니다."));
@@ -281,15 +332,56 @@ public class AdminController {
 			@RequestParam(name = "size", defaultValue = "10") int size) {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+		Page<Member> result;
 
-		// 기본 role=1 조건으로 전체 조회 후 동적 필터링
-		Page<Member> result = memberRepository.findSellersByFilters(
-				(byte) 1,
-				keyword != null && !keyword.trim().isEmpty() ? keyword.trim() : null,
-				verified,
-				"active".equals(status) ? false : ("withdrawn".equals(status) ? true : null),
-				pageable
-		);
+		boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+		String kw = hasKeyword ? keyword.trim() : null;
+		boolean filterActive = "active".equals(status);
+		boolean filterWithdrawn = "withdrawn".equals(status);
+
+		if (verified != null && filterActive) {
+			// 승인여부 + 활성
+			if (hasKeyword) {
+				result = memberRepository.findByRoleAndBusinessVerifiedAndIsDeletedAndKeyword((byte) 1, verified, false, kw, pageable);
+			} else {
+				result = memberRepository.findByRoleAndBusinessVerifiedAndIsDeleted((byte) 1, verified, false, pageable);
+			}
+		} else if (verified != null && filterWithdrawn) {
+			// 승인여부 + 탈퇴
+			if (hasKeyword) {
+				result = memberRepository.findByRoleAndBusinessVerifiedAndIsDeletedAndKeyword((byte) 1, verified, true, kw, pageable);
+			} else {
+				result = memberRepository.findByRoleAndBusinessVerifiedAndIsDeleted((byte) 1, verified, true, pageable);
+			}
+		} else if (verified != null) {
+			// 승인여부만 필터
+			if (hasKeyword) {
+				result = memberRepository.findByRoleAndBusinessVerifiedAndKeyword((byte) 1, verified, kw, pageable);
+			} else {
+				result = memberRepository.findByRoleAndBusinessVerified((byte) 1, verified, pageable);
+			}
+		} else if (filterActive) {
+			// 활성만 필터
+			if (hasKeyword) {
+				result = memberRepository.findByRoleAndIsDeletedAndKeyword((byte) 1, false, kw, pageable);
+			} else {
+				result = memberRepository.findByRoleAndIsDeletedFalse((byte) 1, pageable);
+			}
+		} else if (filterWithdrawn) {
+			// 탈퇴만 필터
+			if (hasKeyword) {
+				result = memberRepository.findByRoleAndIsDeletedAndKeyword((byte) 1, true, kw, pageable);
+			} else {
+				result = memberRepository.findByRoleAndIsDeletedTrue((byte) 1, pageable);
+			}
+		} else {
+			// 필터 없음 - 전체 조회
+			if (hasKeyword) {
+				result = memberRepository.findByRoleAndKeyword((byte) 1, kw, pageable);
+			} else {
+				result = memberRepository.findByRole((byte) 1, pageable);
+			}
+		}
 
 		var dtoList = result.getContent().stream().map(m -> {
 			java.util.Map<String, Object> map = new java.util.HashMap<>();
@@ -330,7 +422,14 @@ public class AdminController {
 		result.put("settlementBank", m.getSettlementBank() != null ? m.getSettlementBank() : "");
 		result.put("bankAccount", m.getBankAccount() != null ? m.getBankAccount() : "");
 		result.put("description", m.getDescription() != null ? m.getDescription() : "");
+		result.put("isDeleted", m.isDeleted());
 		result.put("createdAt", m.getCreatedAt() != null ? m.getCreatedAt().toString() : "");
+		result.put("updatedAt", m.getUpdatedAt() != null ? m.getUpdatedAt().toString() : "");
+		result.put("withdrawAt", m.getWithdrawAt() != null ? m.getWithdrawAt().toString() : "");
+
+		// 판매자 통계
+		result.put("productCount", productRepository.countBySellerId(memberId));
+		result.put("orderCount", ordersRepository.countBySellerId(memberId));
 
 		return ResponseEntity.ok(result);
 	}
@@ -394,8 +493,10 @@ public class AdminController {
 		result.put("mname", m.getMname());
 		result.put("tel", m.getTel());
 		result.put("email", m.getEmail());
+		result.put("isDeleted", m.isDeleted());
 		result.put("createdAt", m.getCreatedAt() != null ? m.getCreatedAt().toString() : "");
 		result.put("updatedAt", m.getUpdatedAt() != null ? m.getUpdatedAt().toString() : "");
+		result.put("withdrawAt", m.getWithdrawAt() != null ? m.getWithdrawAt().toString() : "");
 
 		return ResponseEntity.ok(result);
 	}

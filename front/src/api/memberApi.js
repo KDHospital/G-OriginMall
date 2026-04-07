@@ -130,6 +130,11 @@ export const adminGetSellerDetail = async (memberId) => {
     return response.data;
 };
 
+export const adminCreateSeller = async (data) => {
+    const response = await axiosInstance.post('/admin/sellers', data);
+    return response.data;
+};
+
 export const adminUpdateSeller = async (memberId, data) => {
     const response = await axiosInstance.put(`/admin/sellers/${memberId}`, data);
     return response.data;

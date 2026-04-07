@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import { adminGetAdminDetail, adminUpdateAdmin, adminDeleteAdmin } from '../../api/memberApi';
+import { fmtDateTime } from '../../util/adminFormatUtil';
 
 const AdminSettingDetailPage = () => {
   const { memberId } = useParams();
@@ -36,11 +37,22 @@ const AdminSettingDetailPage = () => {
     setForm({ ...form, [name]: name === 'tel' ? formatTel(value) : value });
   };
 
+  const [editSubmitted, setEditSubmitted] = useState(false);
+  const pwdRegex = /^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*]).{8,20}$/;
+  const editErrs = {
+    mname: !form.mname?.trim() ? '이름을 입력해주세요.' : '',
+    tel: !form.tel?.trim() ? '연락처를 입력해주세요.' : '',
+    mpwd: form.mpwd && !pwdRegex.test(form.mpwd) ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : '',
+    mpwdConfirm: form.mpwd && form.mpwd !== form.mpwdConfirm ? '비밀번호가 일치하지 않습니다.' : '',
+  };
+  const editHasErr = (f) => editSubmitted && editErrs[f];
+  const editLiveErr = (f) => { if (f === 'mpwd') return form.mpwd && !pwdRegex.test(form.mpwd); if (f === 'mpwdConfirm') return form.mpwdConfirm && form.mpwd !== form.mpwdConfirm; return false; };
+  const editCls = (f) => `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${editHasErr(f) || editLiveErr(f) ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100'}`;
+  const editErrMsg = (f) => (editHasErr(f) || editLiveErr(f)) ? (editErrs[f] || '') : '';
+
   const handleSave = async () => {
-    if (!form.mname.trim()) return alert("이름을 입력해주세요.");
-    if (!form.tel.trim()) return alert("연락처를 입력해주세요.");
-    if (form.mpwd && form.mpwd.length < 8) return alert("비밀번호는 8자 이상이어야 합니다.");
-    if (form.mpwd && form.mpwd !== form.mpwdConfirm) return alert("비밀번호가 일치하지 않습니다.");
+    setEditSubmitted(true);
+    if (editErrs.mname || editErrs.tel || editErrs.mpwd || editErrs.mpwdConfirm) return;
 
     setSaving(true);
     try {
@@ -70,7 +82,7 @@ const AdminSettingDetailPage = () => {
     }
   };
 
-  const formatDateTime = (dt) => dt ? dt.replace('T', ' ').slice(0, 16) : '-';
+  const formatDateTime = fmtDateTime;
 
   if (loading) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div></div></AdminLayout>;
   if (!admin) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">관리자 정보를 찾을 수 없습니다.</div></div></AdminLayout>;
@@ -78,7 +90,7 @@ const AdminSettingDetailPage = () => {
   return (
     <AdminLayout>
       <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
-        <div className="mb-4 text-sm text-gray-400">회원 관리 &gt; 관리자설정 &gt; <span className="text-gray-600 font-semibold">관리자 상세</span></div>
+        <div className="mb-4 text-sm text-gray-400">회원 관리 &gt; 관리자 &gt; <span className="text-gray-600 font-semibold">관리자 상세</span></div>
 
         <div className="space-y-5">
           <div className="flex justify-between items-end">
@@ -91,7 +103,7 @@ const AdminSettingDetailPage = () => {
                 <button onClick={() => setEditing(true)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">수정</button>
               ) : (
                 <>
-                  <button onClick={() => { setEditing(false); setForm({ mname: admin.mname, tel: admin.tel, mpwd: '', mpwdConfirm: '' }); }} className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">취소</button>
+                  <button onClick={() => { if (!window.confirm("변경사항이 저장되지 않습니다. 취소하시겠습니까?")) return; setEditing(false); setEditSubmitted(false); setForm({ mname: admin.mname, tel: admin.tel, mpwd: '', mpwdConfirm: '' }); }} className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">취소</button>
                   <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">{saving ? '저장 중...' : '저장'}</button>
                 </>
               )}
@@ -102,7 +114,7 @@ const AdminSettingDetailPage = () => {
             <div className="px-6 py-5 border-b border-gray-100">
               <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600 mb-3">관리자</span>
               <h3 className="text-xl font-bold text-gray-900">{admin.mname}</h3>
-              <p className="text-sm text-gray-400 mt-1">{admin.loginId}</p>
+              <p className="text-sm text-gray-400 mt-1">회원ID : {admin.id}</p>
             </div>
 
             <div className="px-6 py-5 space-y-5">
@@ -125,13 +137,19 @@ const AdminSettingDetailPage = () => {
                     <p className="text-sm text-gray-800">{admin.tel}</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">등록일</label>
+                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">가입일</label>
                     <p className="text-sm text-gray-800">{formatDateTime(admin.createdAt)}</p>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">최근 수정일</label>
                     <p className="text-sm text-gray-800">{formatDateTime(admin.updatedAt)}</p>
                   </div>
+                  {admin.isDeleted && (
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">탈퇴일</label>
+                      <p className="text-sm text-red-500 font-medium">{formatDateTime(admin.withdrawAt)}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -141,12 +159,14 @@ const AdminSettingDetailPage = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">이름</label>
-                      <input name="mname" value={form.mname} onChange={handleChange} type="text" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all" />
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">이름<span className="text-red-500 ml-0.5">*</span></label>
+                      <input name="mname" value={form.mname} onChange={handleChange} type="text" className={editCls('mname')} />
+                      {editErrMsg('mname') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mname')}</p>}
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">연락처</label>
-                      <input name="tel" value={form.tel} onChange={handleChange} type="text" placeholder="010-0000-0000" maxLength={13} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all" />
+                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">연락처<span className="text-red-500 ml-0.5">*</span></label>
+                      <input name="tel" value={form.tel} onChange={handleChange} type="text" placeholder="010-0000-0000" maxLength={13} className={editCls('tel')} />
+                      {editErrMsg('tel') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('tel')}</p>}
                     </div>
                   </div>
                   <div className="border-t border-gray-100 pt-5">
@@ -154,11 +174,13 @@ const AdminSettingDetailPage = () => {
                     <div className="grid grid-cols-2 gap-6">
                       <div>
                         <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">새 비밀번호</label>
-                        <input name="mpwd" value={form.mpwd} onChange={handleChange} type="password" placeholder="8~20자, 영문+숫자 또는 특수문자 포함" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all" />
+                        <input name="mpwd" value={form.mpwd} onChange={handleChange} type="password" placeholder="8~20자, 영문+숫자 또는 특수문자 포함" className={editCls('mpwd')} />
+                        {editErrMsg('mpwd') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mpwd')}</p>}
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">새 비밀번호 확인</label>
-                        <input name="mpwdConfirm" value={form.mpwdConfirm} onChange={handleChange} type="password" placeholder="비밀번호 재입력" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all" />
+                        <input name="mpwdConfirm" value={form.mpwdConfirm} onChange={handleChange} type="password" placeholder="비밀번호 재입력" className={editCls('mpwdConfirm')} />
+                        {editErrMsg('mpwdConfirm') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mpwdConfirm')}</p>}
                       </div>
                     </div>
                   </div>
