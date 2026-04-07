@@ -108,3 +108,73 @@ export const adminUpdateMember = async (memberId, data) => {
     const response = await axiosInstance.put(`/admin/members/${memberId}`, data);
     return response.data;
 };
+
+// [관리자] 회원 삭제 (비활성화)
+export const adminDeleteMember = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/members/${memberId}/delete`);
+    return response.data;
+};
+
+// ===== 판매회원 관리 =====
+export const adminGetSellers = async (page = 0, size = 10, keyword = '', verified = null, status = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (verified !== null) params.verified = verified;
+    if (status) params.status = status;
+    const response = await axiosInstance.get('/admin/sellers', { params });
+    return response.data;
+};
+
+export const adminGetSellerDetail = async (memberId) => {
+    const response = await axiosInstance.get(`/admin/sellers/${memberId}`);
+    return response.data;
+};
+
+export const adminCreateSeller = async (data) => {
+    const response = await axiosInstance.post('/admin/sellers', data);
+    return response.data;
+};
+
+export const adminUpdateSeller = async (memberId, data) => {
+    const response = await axiosInstance.put(`/admin/sellers/${memberId}`, data);
+    return response.data;
+};
+
+export const adminApproveSeller = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/approve-seller/${memberId}`);
+    return response.data;
+};
+
+export const adminRejectSeller = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/reject-seller/${memberId}`);
+    return response.data;
+};
+
+// ===== 관리자 설정 =====
+export const adminGetAdmins = async (page = 0, size = 10, keyword = '', status = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (status) params.status = status;
+    const response = await axiosInstance.get('/admin/admins', { params });
+    return response.data;
+};
+
+export const adminGetAdminDetail = async (memberId) => {
+    const response = await axiosInstance.get(`/admin/admins/${memberId}`);
+    return response.data;
+};
+
+export const adminCreateAdmin = async (data) => {
+    const response = await axiosInstance.post('/admin/admins', data);
+    return response.data;
+};
+
+export const adminUpdateAdmin = async (memberId, data) => {
+    const response = await axiosInstance.put(`/admin/admins/${memberId}`, data);
+    return response.data;
+};
+
+export const adminDeleteAdmin = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/admins/${memberId}/delete`);
+    return response.data;
+};
