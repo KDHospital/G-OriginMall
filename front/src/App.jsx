@@ -57,7 +57,7 @@ import InquiryPage from './pages/support/InquiryPage';
 import InquiryAddModal from './pages/support/InquiryAddModal';
 import FaqPage from './pages/support/FaqPage';
 
-import ProtectedRoute from './components/support/ProtectedRoute';
+import ProtectedRoute from './components/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
