@@ -104,6 +104,11 @@ export default function AddressSection({
 
     // 삭제
     const handleDelete = (addressId) => {
+        const target = addresses.find(a => a.addressId === addressId);
+        if (target?.default) {
+            alert("기본 배송지는 삭제할 수 없습니다.\n다른 배송지를 기본으로 설정 후 삭제해주세요.");
+            return;
+        }
         if (!window.confirm("배송지를 삭제하시겠습니까?")) return;
 
         axiosInstance.delete(`/members/addresses/${addressId}`)
@@ -192,9 +197,16 @@ export default function AddressSection({
             {/* 헤더 */}
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-gray-800">배송지</h3>
+                {/* 추가 버튼 비활성화 */}
                 {!showNewForm && !editTarget && (
                     <button
-                        onClick={() => setShowNewForm(true)}
+                        onClick={() => {
+                            if (addresses.length >= 5) {
+                                alert("배송지는 최대 5개까지 등록할 수 있습니다.");
+                                return;
+                            }
+                            setShowNewForm(true);
+                        }}
                         className="text-xs px-3 py-1.5 border border-gray-300 rounded text-gray-600 hover:bg-gray-50 transition-colors"
                     >
                         + 새 배송지 추가
