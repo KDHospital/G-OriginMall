@@ -93,9 +93,28 @@ const AdminMemberDetailPage = () => {
               <h2 className="text-2xl font-bold text-gray-900">회원 상세</h2>
             </div>
             <div className="flex gap-2">
-              <button onClick={async () => { if (member.isDeleted) return alert("이미 탈퇴한 회원입니다."); if (!window.confirm("해당 회원을 탈퇴 처리 할까요?")) return; try { await adminDeleteMember(memberId); alert("탈퇴 처리되었습니다."); navigate('/admin/members'); } catch { alert("탈퇴 처리에 실패했습니다."); } }}
-                className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors">탈퇴</button>
-              <button onClick={() => navigate(`/admin/members/${memberId}/modify`)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">수정</button>
+              <button
+                onClick={async () => {
+                  if (member.isDeleted) return alert("이미 탈퇴한 회원입니다.");
+                  if (!window.confirm("해당 회원을 탈퇴 처리 할까요?")) return;
+                  try {
+                    await adminDeleteMember(memberId);
+                    alert("탈퇴 처리되었습니다.");
+                    navigate('/admin/members');
+                  } catch {
+                    alert("탈퇴 처리에 실패했습니다.");
+                  }
+                }}
+                className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                탈퇴
+              </button>
+              <button
+                onClick={() => navigate(`/admin/members/${memberId}/modify`)}
+                className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                수정
+              </button>
             </div>
           </div>
 

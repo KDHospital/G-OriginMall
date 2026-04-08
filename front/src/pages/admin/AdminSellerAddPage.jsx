@@ -24,8 +24,20 @@ const AdminSellerAddPage = () => {
     settlementName: '', settlementBank: '', bankAccount: '', isVerified: false, description: ''
   });
 
-  const formatTel = (v) => { const n = v.replace(/[^0-9]/g, '').slice(0, 11); if (n.length <= 3) return n; if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`; return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`; };
-  const formatBizNo = (v) => { const n = v.replace(/[^0-9]/g, '').slice(0, 10); if (n.length <= 3) return n; if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`; return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`; };
+  // 입력 포맷
+  const formatTel = (v) => {
+    const n = v.replace(/[^0-9]/g, '').slice(0, 11);
+    if (n.length <= 3) return n;
+    if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`;
+    return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`;
+  };
+
+  const formatBizNo = (v) => {
+    const n = v.replace(/[^0-9]/g, '').slice(0, 10);
+    if (n.length <= 3) return n;
+    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
+    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
