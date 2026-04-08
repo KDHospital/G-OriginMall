@@ -63,7 +63,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 	
 		if(cookies != null) {
 			for (jakarta.servlet.http.Cookie cookie : cookies) {
-				if("accessToken".equals(cookie.getName())) {
+				if("refreshToken".equals(cookie.getName())) {
 					accessToken = cookie.getValue();
 					break;
 				}
