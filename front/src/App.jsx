@@ -44,6 +44,7 @@ import AdminBoardModifyPage from './pages/admin/AdminBoardModifyPage';
 import AdminInquiryPage from './pages/admin/AdminInquiryPage';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
+import AdminProductListPage from './pages/admin/AdminProductListPage';
 
 import BoardPage from './pages/support/BoardPage';
 import BoardReadPage from './pages/support/BoardReadPage';
@@ -132,6 +133,7 @@ function App() {
 
         {/* 어드민-상품등록 */}
         <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
+        <Route path="/admin/products" element={<ProtectedRoute allowRole={2}><AdminProductListPage /></ProtectedRoute>} />
 
 
 
