@@ -65,7 +65,7 @@ export default function MyPageSidebar({ member }) {
             <nav className="space-y-1 text-sm">
                 <div className="font-bold text-gray-400 mb-2 mt-4 text-xs uppercase">주문</div>
                 {navItem("/orders", "주문 내역")}
-                {navItem("/delivery", "배송 조회")}
+                {navItem("/cart", "장바구니")}
 
                 <div className="font-bold text-gray-400 mb-2 mt-4 text-xs uppercase">계정</div>
                 {navItem("/modifypage", "회원 정보 수정")}

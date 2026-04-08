@@ -19,6 +19,7 @@ import OrderSuccessPage from './pages/orders/OrderSuccessPage';
 import OrderFailPage from './pages/orders/OrderFailPage';
 import MyOrders from './pages/member/MyOrders';
 import MyOrderDetail from './pages/member/MyOrderDetail';
+import MyAddresses from './pages/member/MyAddresses';
 
 import ModifyPage from './pages/member/ModifyPage';
 import Mypapge from './pages/member/MyPage';
@@ -60,6 +61,7 @@ import FaqPage from './pages/support/FaqPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
 
+
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
 // import JoinPage from './pages/member/JoinPage';
@@ -85,8 +87,9 @@ function App() {
           <Route path='/modifypage' element={<ProtectedRoute><ModifyPage /></ProtectedRoute>} />
           <Route path='/findid' element={<FindIdPage />} />
           <Route path='/findpwd' element={<FindPwdPage />} />
+          <Route path='/addresses' element={<ProtectedRoute allowRole={0}><MyAddresses/></ProtectedRoute>} />
+
           {/* 회원(판매자) - 유재영 담당 */}
-          {/* <Route path="/sellerjoin" element={<SellerJoinPage />} /> */}
           <Route path='/sellersignup' element={<SellerSingupPage />} />
           {/* 장바구니 - 김슬기 담당 */}
           <Route path="/cart" element={<ProtectedRoute allowRole={0}><CartPage /></ProtectedRoute>} />

@@ -46,6 +46,7 @@ const AdminProductNewPage = () => {
     deliveryFee: "",
     soldStatus: 0,
     isCertified: false,
+    isExhibition: false
   });
 
   // 판매가 자동 계산 (정가 - 할인금액)
@@ -134,16 +135,16 @@ const AdminProductNewPage = () => {
     formData.append("stock", form.stock);
     formData.append("deliveryFee", parsePrice(form.deliveryFee));
     formData.append("soldStatus", form.soldStatus);
-    formData.append("isCertified", form.isCertified);
-    formData.append("isExhibition", false); // 판매자는 기획전 불가
+    formData.append("certified", form.isCertified);
+    formData.append("exhibition", form.isExhibition); // 판매자는 기획전 불가
     images.forEach((img) => formData.append("images", img.file));
 
     try {
-        await axiosInstance.post("/seller/products", formData, {
+        await axiosInstance.post("/admin/products", formData, {
             headers: { "Content-Type": "multipart/form-data" }
         });
         alert("상품이 등록되었습니다.");
-        navigate("/seller/products");
+        navigate("/admin/products");
     } catch (err) {
         console.error(err);
         alert("상품 등록에 실패했습니다.");
