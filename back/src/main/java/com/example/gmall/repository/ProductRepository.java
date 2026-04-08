@@ -66,6 +66,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	//상품 수정
 	boolean existsByProductIdAndSeller_Id(Long productId, Long sellerId);
 	
+	// 관리자 대시보드 => 판매중 상품 수
+	long countBySoldStatus(Byte soldStatus);
 	//어드민- 상품목록 조회
 	Page<Product> findAllByOrderByProductIdDesc(Pageable pageable);
 	

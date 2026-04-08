@@ -58,4 +58,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 	
 	// 주문 그룹핑
 	List<Orders> findByOrderGroupId(String orderGroupId);
+	
+	// 오늘 주문 수
+	long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+	// 오늘 매출 합계
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.createdAt BETWEEN :start AND :end AND o.status != 4")
+	Long sumTotalPriceByCreatedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }
