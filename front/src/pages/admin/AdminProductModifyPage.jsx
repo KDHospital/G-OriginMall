@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import SellerLayout from "../../layouts/SellerLayout";
-import axiosInstance from "../../api/axios";
-import { BASE_URL } from "../../util/imagesUtil";
+import { useState, useRef,useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import AdminLayout from "../../layouts/AdminLayout"
+import axiosInstance from "../../api/axios"
+import { BASE_URL } from "../../util/imagesUtil"
 
 const formatPrice = (n) => {
     if (!n && n !== 0) return "";
@@ -10,11 +10,12 @@ const formatPrice = (n) => {
 };
 const parsePrice = (str) => parseInt(String(str).replace(/[^0-9]/g, ""), 10) || 0;
 
-export default function SellerProductModifyPage() {
+const AdminProductModifyPage = () => {
+
     //주소 저장용
     const navigate = useNavigate();
     //파라미터 저장용
-    const { productId } = useParams(); // /seller/products/:productId/edit
+    const { productId } = useParams(); // /admin/products/:productId/edit
     //React에서 렌더링을 유발하지 않고 지속되는 값을 저장하거나, DOM 요소에 직접 접근할 때 사용하는 훅
     const imageInputRef = useRef(null);
     //카테고리 저장
@@ -23,7 +24,7 @@ export default function SellerProductModifyPage() {
     const [selectedParentId, setSelectedParentId] = useState(null);
     //셀렉트의 부모(2뎁스) 저장
     const [selectedCategoryId, setSelectedCategoryId] = useState("");
-    //
+
     const parentCategories = categories.filter((c) => c.parentId === null);
     const childCategories = categories.filter((c) => c.parentId === selectedParentId);
     //기본 폼(입력필요값)
@@ -36,6 +37,7 @@ export default function SellerProductModifyPage() {
         deliveryFee: "",
         soldStatus: 0,
         isCertified: false,
+        isExhibition: false
     });
     //price 계산
     const price = parsePrice(form.listPrice) - parsePrice(form.discountPrice);
@@ -67,7 +69,8 @@ export default function SellerProductModifyPage() {
                     stock: String(p.stock ?? ""),
                     deliveryFee: String(p.deliveryFee ?? ""),
                     soldStatus: p.soldStatus ?? 0,
-                    isCertified: p.certified ?? false,
+                    isCertified: !!p.certified, 
+                    isExhibition: !!p.exhibition,
                 });
                 
                 // 카테고리 선택 상태 복원
@@ -171,7 +174,7 @@ export default function SellerProductModifyPage() {
         formData.append("deliveryFee",   parsePrice(form.deliveryFee));
         formData.append("soldStatus", Number(form.soldStatus));
         formData.append("certified", form.isCertified); 
-        formData.append("exhibition", false);
+        formData.append("exhibition", form.isExhibition);
 
         // 기존 이미지 중 남긴 것들의 URL 전달 (백엔드에서 기존 이미지 유지 판단용)
         existingImages.forEach((img) => formData.append("existingImageUrls", img.imageUrl));
@@ -180,11 +183,11 @@ export default function SellerProductModifyPage() {
         newImages.forEach((img) => formData.append("images", img.file));
 
         try {
-            await axiosInstance.put(`/seller/products/${productId}`, formData, {
+            await axiosInstance.put(`/admin/products/${productId}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             alert("상품이 수정되었습니다.");
-            navigate("/seller/products");
+            navigate("/admin/products");
         } catch (err) {
             console.error(err);
             alert("상품 수정에 실패했습니다.");
@@ -194,12 +197,14 @@ export default function SellerProductModifyPage() {
     // 전체 이미지 수 (기존 + 신규)
     const totalImageCount = existingImages.length + newImages.length;
 
-    return (
-        <SellerLayout>
-            <h2 className="text-lg font-bold text-gray-700 border-l-4 border-green-500 pl-3 mb-5">
-                상품 수정
-            </h2>
 
+
+    return(
+        <AdminLayout>
+            {/* 헤더 */}
+                <h2 className="text-lg font-bold text-gray-700 border-l-4 border-blue-500 pl-3 mb-5">
+                    상품 수정
+                </h2>
             <div className="space-y-5">
 
                 {/* ── 기본 정보 ── */}
@@ -404,25 +409,61 @@ export default function SellerProductModifyPage() {
                             ))}
                         </div>
                     </section>
-
+                    {/* 금빛나루 인증 */}
                     <section className="bg-white rounded-md p-5 shadow-sm">
-                        <h3 className="text-sm font-bold text-gray-700 mb-1">금빛나루 인증</h3>
-                        <p className="text-xs text-gray-400 mb-4">is_certified - BOOLEAN</p>
-                        <label className="flex items-start gap-2 cursor-pointer">
-                            <input type="checkbox" name="isCertified" checked={form.isCertified}
-                                onChange={handleChange} className="mt-0.5 w-4 h-4 accent-green-600" />
-                            <div>
+                        <div className="mb-4">
+                            <h3 className="text-sm font-bold text-gray-700 mb-1">금빛나루 인증</h3>
+                            <p className="text-xs text-gray-400 mb-4">is_certified - BOOLEAN</p>
+                            <label className="flex items-start gap-2 cursor-pointer">
+                                <input
+                                type="checkbox"
+                                name="isCertified"
+                                checked={form.isCertified}
+                                onChange={handleChange}
+                                className="mt-0.5 w-4 h-4 accent-green-600"
+                                />
+                                <div>
                                 <span className="text-sm text-gray-700">김포시 인증 상품</span>
-                                <p className="text-xs text-gray-400 mt-0.5">금빛나루 전용관에 노출</p>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                    체크 시 대표 페이지 상단 노출
+                                </p>
+                                <p className="text-xs text-gray-300 mt-0.5">
+                                    금빛나루 전용관에 노출
+                                </p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {/* 기획전 등록 */}
+                        <div>
+                            <h3 className="text-sm font-bold text-gray-700 mb-1">기획전 등록</h3>
+                            <p className="text-xs text-gray-400 mb-4">is_exhibition - BOOLEAN</p>
+                            <label className="flex items-start gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="isExhibition"
+                                checked={form.isExhibition}
+                                onChange={handleChange}
+                                className="mt-0.5 w-4 h-4 accent-green-600"
+                            />
+                            <div>
+                                <span className="text-sm text-gray-700">기획전 등록 상품</span>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                체크 시 대표 페이지 상단 노출
+                                </p>
+                                <p className="text-xs text-gray-300 mt-0.5">
+                                기획전 전용관에 노출
+                                </p>
                             </div>
-                        </label>
-                    </section>
+                            </label>
+                        </div>            
+                    </section>                    
                 </div>
 
                 {/* ── 버튼 ── */}
                 <div className="flex justify-end gap-3 pb-6">
                     <button
-                        onClick={() => navigate("/seller/products")}
+                        onClick={() => navigate("/admin/products")}
                         className="px-6 py-2.5 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50"
                     >
                         취소
@@ -435,6 +476,8 @@ export default function SellerProductModifyPage() {
                     </button>
                 </div>
             </div>
-        </SellerLayout>
-    );
+
+        </AdminLayout>
+    )
 }
+export default AdminProductModifyPage

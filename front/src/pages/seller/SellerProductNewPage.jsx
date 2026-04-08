@@ -135,7 +135,7 @@ export default function SellerProductNewPage() {
     formData.append("deliveryFee", parsePrice(form.deliveryFee));
     formData.append("soldStatus", form.soldStatus);
     formData.append("certified", form.isCertified);
-    formData.append("isExhibition", false); // 판매자는 기획전 불가
+    formData.append("exhibition", false); // 판매자는 기획전 불가
     images.forEach((img) => formData.append("images", img.file));
 
     try {

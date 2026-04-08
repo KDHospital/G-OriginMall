@@ -156,7 +156,7 @@ const AdminProductNewPage = () => {
     return(
         <AdminLayout>
             {/* 페이지 타이틀 */}
-            <h2 className="text-lg font-bold text-gray-700 border-l-4 border-green-500 pl-3 mb-5">
+            <h2 className="text-lg font-bold text-gray-700 border-l-4 border-blue-500 pl-3 mb-5">
                 상품 등록
             </h2>
 
@@ -444,51 +444,51 @@ const AdminProductNewPage = () => {
                 {/* 금빛나루 인증 */}
                 <section className="bg-white rounded-md p-5 shadow-sm">
                     <div className="mb-4">
-                    <h3 className="text-sm font-bold text-gray-700 mb-1">금빛나루 인증</h3>
-                    <p className="text-xs text-gray-400 mb-4">is_certified - BOOLEAN</p>
-                    <label className="flex items-start gap-2 cursor-pointer">
-                        <input
-                        type="checkbox"
-                        name="isCertified"
-                        checked={form.isCertified}
-                        onChange={handleChange}
-                        className="mt-0.5 w-4 h-4 accent-green-600"
-                        />
-                        <div>
-                        <span className="text-sm text-gray-700">김포시 인증 상품</span>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                            체크 시 대표 페이지 상단 노출
-                        </p>
-                        <p className="text-xs text-gray-300 mt-0.5">
-                            금빛나루 전용관에 노출
-                        </p>
-                        </div>
-                    </label>
+                        <h3 className="text-sm font-bold text-gray-700 mb-1">금빛나루 인증</h3>
+                        <p className="text-xs text-gray-400 mb-4">is_certified - BOOLEAN</p>
+                        <label className="flex items-start gap-2 cursor-pointer">
+                            <input
+                            type="checkbox"
+                            name="isCertified"
+                            checked={form.isCertified}
+                            onChange={handleChange}
+                            className="mt-0.5 w-4 h-4 accent-green-600"
+                            />
+                            <div>
+                            <span className="text-sm text-gray-700">김포시 인증 상품</span>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                                체크 시 대표 페이지 상단 노출
+                            </p>
+                            <p className="text-xs text-gray-300 mt-0.5">
+                                금빛나루 전용관에 노출
+                            </p>
+                            </div>
+                        </label>
                     </div>
 
-                {/* 기획전 등록 */}
-                <div>
-                    <h3 className="text-sm font-bold text-gray-700 mb-1">기획전 등록</h3>
-                    <p className="text-xs text-gray-400 mb-4">is_exhibition - BOOLEAN</p>
-                    <label className="flex items-start gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        name="isExhibition"
-                        checked={form.isExhibition}
-                        onChange={handleChange}
-                        className="mt-0.5 w-4 h-4 accent-green-600"
-                    />
+                    {/* 기획전 등록 */}
                     <div>
-                        <span className="text-sm text-gray-700">기획전 등록 상품</span>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                        체크 시 대표 페이지 상단 노출
-                        </p>
-                        <p className="text-xs text-gray-300 mt-0.5">
-                        기획전 전용관에 노출
-                        </p>
-                    </div>
-                    </label>
-                </div>            
+                        <h3 className="text-sm font-bold text-gray-700 mb-1">기획전 등록</h3>
+                        <p className="text-xs text-gray-400 mb-4">is_exhibition - BOOLEAN</p>
+                        <label className="flex items-start gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            name="isExhibition"
+                            checked={form.isExhibition}
+                            onChange={handleChange}
+                            className="mt-0.5 w-4 h-4 accent-green-600"
+                        />
+                        <div>
+                            <span className="text-sm text-gray-700">기획전 등록 상품</span>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                            체크 시 대표 페이지 상단 노출
+                            </p>
+                            <p className="text-xs text-gray-300 mt-0.5">
+                            기획전 전용관에 노출
+                            </p>
+                        </div>
+                        </label>
+                    </div>            
                 </section>
 
                 </div>
