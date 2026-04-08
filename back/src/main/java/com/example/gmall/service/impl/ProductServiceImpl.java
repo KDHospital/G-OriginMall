@@ -190,7 +190,7 @@ public class ProductServiceImpl implements ProductService {
 	            .map(ProductResponseDTO::new);
 	}
 	
-	//상품 수정
+	//상품 수정 (셀러, 어드민 공통)
 	@Override
 	@Transactional
 	public ProductResponseDTO modify(Long productId, ProductRequestDTO dto) {

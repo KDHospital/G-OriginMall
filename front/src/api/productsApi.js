@@ -58,3 +58,8 @@ export const deleteProducts = (productIds) => {
   // 주의: delete는 { data: ... } 형식으로 넘겨야 바디에 들어감
   return axiosInstance.delete('/admin/products', { data: productIds });
 };
+
+//어드민-상품 수정
+export const putProductsAdminModify = (productId) => {
+  return axiosInstance.put(`/admin/products/${productId}`);
+}
