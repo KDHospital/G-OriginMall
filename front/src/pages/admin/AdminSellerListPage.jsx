@@ -47,13 +47,13 @@ const AdminSellerListPage = () => {
 
   const handleBulkApprove = async () => {
     if (selectedIds.length === 0) return alert("승인할 판매자를 선택해주세요.");
-    if (!window.confirm(`${selectedIds.length}명을 일괄 승인하시겠습니까?`)) return;
+    if (!window.confirm("선택한 판매자를 일괄 승인하시겠습니까?")) return;
     try { await Promise.all(selectedIds.map(id => adminApproveSeller(id))); alert("일괄 승인되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("승인 처리 중 오류가 발생했습니다."); }
   };
 
   const handleBulkPending = async () => {
     if (selectedIds.length === 0) return alert("대기 처리할 판매자를 선택해주세요.");
-    if (!window.confirm(`선택한 ${selectedIds.length}명의 승인여부를 대기로 변경할까요?`)) return;
+    if (!window.confirm("선택한 판매자의 승인여부를 대기로 변경할까요?")) return;
     try { await Promise.all(selectedIds.map(id => adminUpdateSeller(id, { businessVerified: false }))); alert("일괄 대기 처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("대기 처리 중 오류가 발생했습니다."); }
   };
 
@@ -61,7 +61,7 @@ const AdminSellerListPage = () => {
     if (selectedIds.length === 0) return alert("탈퇴 처리할 판매자를 선택해주세요.");
     const alreadyDeleted = sellers.filter(s => selectedIds.includes(s.id) && s.isDeleted);
     if (alreadyDeleted.length > 0) return alert("이미 탈퇴한 회원이 포함되어 있습니다.");
-    if (!window.confirm(`선택한 ${selectedIds.length}명의 판매자를 탈퇴 처리 할까요?`)) return;
+    if (!window.confirm("선택한 판매자를 탈퇴 처리 할까요?")) return;
     try { await Promise.all(selectedIds.map(id => adminDeleteMember(id))); alert("처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("탈퇴 처리 중 오류가 발생했습니다."); }
   };
 
@@ -123,7 +123,7 @@ const AdminSellerListPage = () => {
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
                     <th className="px-4 py-4 w-24 text-center font-semibold">승인여부</th>
-                    <th className="px-4 py-4 w-36 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-40 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">사업자번호</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>

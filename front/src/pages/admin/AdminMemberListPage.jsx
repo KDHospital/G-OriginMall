@@ -26,7 +26,7 @@ const AdminMemberListPage = () => {
     if (selectedIds.length === 0) return alert("탈퇴 처리할 회원을 선택해주세요.");
     const alreadyDeleted = members.filter(m => selectedIds.includes(m.id) && m.isDeleted);
     if (alreadyDeleted.length > 0) return alert("이미 탈퇴한 회원이 포함되어 있습니다.");
-    if (!window.confirm(`선택한 ${selectedIds.length}명의 회원을 탈퇴 처리 할까요?`)) return;
+    if (!window.confirm("선택한 회원을 탈퇴 처리 할까요?")) return;
     try {
       await Promise.all(selectedIds.map(id => adminDeleteMember(id)));
       alert("처리되었습니다.");
@@ -79,7 +79,6 @@ const AdminMemberListPage = () => {
     loadData(1, keyword, value);
   };
 
-  const formatGender = fmtGender;
 
   return (
     <AdminLayout>
@@ -99,7 +98,7 @@ const AdminMemberListPage = () => {
               onChange={(e) => handleFilterStatus(e.target.value)}
               className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none bg-white focus:border-blue-300 text-gray-700"
             >
-              <option value="">상태 전체</option>
+              <option value="">회원상태 전체</option>
               <option value="active">활성</option>
               <option value="withdrawn">탈퇴</option>
             </select>
@@ -130,7 +129,7 @@ const AdminMemberListPage = () => {
             <div className="flex gap-2 ml-auto">
               <button onClick={handleDelete} disabled={selectedIds.length === 0}
                 className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>
-                {selectedIds.length > 0 ? `${selectedIds.length}명 탈퇴` : '탈퇴'}
+                탈퇴
               </button>
               <button onClick={() => navigate('/admin/members/new')} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
                 등록
@@ -149,10 +148,10 @@ const AdminMemberListPage = () => {
                     <th className="pl-5 pr-2 py-4 w-10"><input type="checkbox" onChange={handleSelectAll} checked={selectedIds.length === members.length && members.length > 0} className="rounded border-gray-300" /></th>
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
-                    <th className="px-4 py-4 w-36 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-40 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디(이메일)</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>
-                    <th className="px-4 py-4 w-16 text-center font-semibold">성별</th>
+                    <th className="px-4 py-4 w-20 text-center font-semibold">성별</th>
                     <th className="px-4 py-4 w-28 text-center font-semibold">가입일</th>
                   </tr>
                 </thead>
@@ -184,7 +183,7 @@ const AdminMemberListPage = () => {
                           <td className="px-4 py-4 text-center font-medium text-gray-800">{member.mname}</td>
                           <td className="px-4 py-4 text-left text-gray-600">{member.loginId}</td>
                           <td className="px-4 py-4 text-center text-gray-500 text-xs">{fmtTel(member.tel)}</td>
-                          <td className="px-4 py-4 text-center text-gray-500">{formatGender(member.gender)}</td>
+                          <td className="px-4 py-4 text-center text-gray-500">{fmtGender(member.gender)}</td>
                           <td className="px-4 py-4 text-center text-gray-400 text-xs">{member.createdAt?.split('T')[0]}</td>
                         </tr>
                       );
