@@ -314,5 +314,30 @@ public class ProductServiceImpl implements ProductService {
 	    }
 	}
 	
-	
+	//어드민- 상품 목록 조회
+	@Override
+	public Page<ProductListResponseDTO> getAdminProducts(Pageable pageable) {
+	    return productRepository.findAllByOrderByProductIdDesc(pageable)
+	            .map(ProductListResponseDTO::new);
+	}
+	//어드민- 상품 목록 조회,검색
+	@Override
+	public Page<ProductListResponseDTO> searchAdminProducts(
+	        String keyword, Integer categoryId, String sellerName,
+	        Byte soldStatus, Boolean certified, Boolean exhibition,
+	        int page, int size) {
+
+	    Pageable pageable = PageRequest.of(page, size,
+	            Sort.by(Sort.Direction.DESC, "productId"));
+
+	    return productRepository.searchAdminProducts(
+	            (keyword    != null && !keyword.isBlank())    ? keyword    : null,
+	            categoryId,
+	            (sellerName != null && !sellerName.isBlank()) ? sellerName : null,
+	            soldStatus,
+	            certified,
+	            exhibition,
+	            pageable
+	    ).map(ProductListResponseDTO::new);
+	}
 }

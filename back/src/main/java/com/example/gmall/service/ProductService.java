@@ -32,4 +32,12 @@ public interface ProductService {
     
     //재고처리
     void decreaseStock(Long productId, int quantity);
+    
+    //어드민- 상품 목록 조회
+    Page<ProductListResponseDTO> getAdminProducts(Pageable pageable);
+    Page<ProductListResponseDTO> searchAdminProducts(
+        String keyword, Integer categoryId, String sellerName,
+        Byte soldStatus, Boolean certified, Boolean exhibition,
+        int page, int size
+    );
 }
