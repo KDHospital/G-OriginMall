@@ -38,8 +38,6 @@ const AdminMemberDetailPage = () => {
       .finally(() => setOrderLoading(false));
   }, [memberId, orderPage]);
 
-  const formatGender = fmtGender;
-  const formatDateTime = fmtDateTime;
 
   const formatPrice = (price) => {
     if (!price) return '0';
@@ -143,20 +141,20 @@ const AdminMemberDetailPage = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">성별</label>
-                  <p className="text-sm text-gray-800">{formatGender(member.gender)}</p>
+                  <p className="text-sm text-gray-800">{fmtGender(member.gender)}</p>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">가입일</label>
-                  <p className="text-sm text-gray-800">{formatDateTime(member.createdAt)}</p>
+                  <p className="text-sm text-gray-800">{fmtDateTime(member.createdAt)}</p>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">최근 수정일</label>
-                  <p className="text-sm text-gray-800">{formatDateTime(member.updatedAt)}</p>
+                  <p className="text-sm text-gray-800">{fmtDateTime(member.updatedAt)}</p>
                 </div>
                 {member.isDeleted && (
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">탈퇴일</label>
-                    <p className="text-sm text-red-500 font-medium">{formatDateTime(member.withdrawAt)}</p>
+                    <p className="text-sm text-red-500 font-medium">{fmtDateTime(member.withdrawAt)}</p>
                   </div>
                 )}
               </div>
@@ -209,7 +207,7 @@ const AdminMemberDetailPage = () => {
                           {order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}
                         </td>
                         <td className="px-4 py-4 text-right font-medium text-gray-800">{formatPrice(order.totalPrice)}원</td>
-                        <td className="px-6 py-4 text-center text-gray-400 text-xs">{formatDateTime(order.createdAt)}</td>
+                        <td className="px-6 py-4 text-center text-gray-400 text-xs">{fmtDateTime(order.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>

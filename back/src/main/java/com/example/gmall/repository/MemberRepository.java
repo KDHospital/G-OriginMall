@@ -101,4 +101,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m WHERE m.role = :role AND m.businessVerified = :verified AND m.isDeleted = :isDeleted AND (m.mname LIKE %:keyword% OR m.loginId LIKE %:keyword% OR m.businessNo LIKE %:keyword%)")
     Page<Member> findByRoleAndBusinessVerifiedAndIsDeletedAndKeyword(@Param("role") Byte role, @Param("verified") boolean verified, @Param("isDeleted") boolean isDeleted, @Param("keyword") String keyword, Pageable pageable);
+    
+    // 관리자 대시보드 => 오늘 가입 회원 수
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    // 관리자 대시보드 => 전체 회원 수 (탈퇴 제외)
+    long countByIsDeletedFalse();
+
+    // 관리자 대시보드 => 최근 가입 회원 5명
+    List<Member> findTop5ByIsDeletedFalseOrderByCreatedAtDesc();
 }

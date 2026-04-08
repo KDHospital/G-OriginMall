@@ -26,7 +26,7 @@ const AdminSettingListPage = () => {
     if (selectedIds.length === 0) return alert("탈퇴 처리할 관리자를 선택해주세요.");
     const alreadyDeleted = admins.filter(a => selectedIds.includes(a.id) && a.isDeleted);
     if (alreadyDeleted.length > 0) return alert("이미 탈퇴한 회원이 포함되어 있습니다.");
-    if (!window.confirm(`선택한 ${selectedIds.length}명의 관리자를 탈퇴 처리 할까요?`)) return;
+    if (!window.confirm("선택한 관리자를 탈퇴 처리 할까요?")) return;
     try {
       await Promise.all(selectedIds.map(id => adminDeleteAdmin(id)));
       alert("처리되었습니다.");
@@ -89,7 +89,7 @@ const AdminSettingListPage = () => {
             <div className="flex gap-2 ml-auto">
               <button onClick={handleDelete} disabled={selectedIds.length === 0}
                 className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>
-                {selectedIds.length > 0 ? `${selectedIds.length}명 탈퇴` : '탈퇴'}
+                탈퇴
               </button>
               <button onClick={() => navigate('/admin/admins/new')} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">등록</button>
             </div>
@@ -105,7 +105,7 @@ const AdminSettingListPage = () => {
                     <th className="pl-5 pr-2 py-4 w-10"><input type="checkbox" onChange={handleSelectAll} checked={selectedIds.length === admins.length && admins.length > 0} className="rounded border-gray-300" /></th>
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
-                    <th className="px-4 py-4 w-36 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-40 text-center font-semibold">이름</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디(이메일)</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>
                     <th className="px-4 py-4 w-28 text-center font-semibold">등록일</th>

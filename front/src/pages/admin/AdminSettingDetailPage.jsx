@@ -82,7 +82,6 @@ const AdminSettingDetailPage = () => {
     }
   };
 
-  const formatDateTime = fmtDateTime;
 
   if (loading) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div></div></AdminLayout>;
   if (!admin) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">관리자 정보를 찾을 수 없습니다.</div></div></AdminLayout>;
@@ -138,16 +137,16 @@ const AdminSettingDetailPage = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">가입일</label>
-                    <p className="text-sm text-gray-800">{formatDateTime(admin.createdAt)}</p>
+                    <p className="text-sm text-gray-800">{fmtDateTime(admin.createdAt)}</p>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">최근 수정일</label>
-                    <p className="text-sm text-gray-800">{formatDateTime(admin.updatedAt)}</p>
+                    <p className="text-sm text-gray-800">{fmtDateTime(admin.updatedAt)}</p>
                   </div>
                   {admin.isDeleted && (
                     <div>
                       <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">탈퇴일</label>
-                      <p className="text-sm text-red-500 font-medium">{formatDateTime(admin.withdrawAt)}</p>
+                      <p className="text-sm text-red-500 font-medium">{fmtDateTime(admin.withdrawAt)}</p>
                     </div>
                   )}
                 </div>

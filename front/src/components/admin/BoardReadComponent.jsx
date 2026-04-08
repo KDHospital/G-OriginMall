@@ -43,7 +43,8 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
     setAnswerLoading(true);
     try {
       await addAnswer(postId, answerText.trim());
-      alert(hasAnswer ? "답변이 수정되었습니다." : "답변이 등록되었습니다.");
+      const hadAnswer = post.answers && post.answers.length > 0;
+      alert(hadAnswer ? "답변이 수정되었습니다." : "답변이 등록되었습니다.");
       loadPost();
     } catch (error) {
       console.error("답변 처리 실패:", error.response?.status, error.response?.data);
