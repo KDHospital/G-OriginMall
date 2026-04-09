@@ -198,6 +198,7 @@ const AdminMemberDetailPage = () => {
                       <th className="px-6 py-3 w-40 text-left font-semibold">주문번호</th>
                       <th className="px-4 py-3 w-32 text-center font-semibold">상태</th>
                       <th className="px-4 py-3 text-left font-semibold">상품명</th>
+                      <th className="px-4 py-3 w-40 text-center font-semibold">판매처</th>
                       <th className="px-4 py-3 w-16 text-center font-semibold">수량</th>
                       <th className="px-4 py-3 w-28 text-right font-semibold">결제금액</th>
                       <th className="px-6 py-3 w-36 text-center font-semibold">주문일</th>
@@ -207,7 +208,9 @@ const AdminMemberDetailPage = () => {
                     {orders.map(order => (
                       <tr key={order.orderId} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
                         <td className="px-6 py-4 text-left text-gray-700 font-medium text-xs">
-                          {order.tossOrderId || `ORDER_${order.orderId}`}
+                          {order.tossOrderId
+                            ? order.tossOrderId.split('_').slice(0, 2).join('_')
+                            : `ORDER_${order.orderId}`}
                         </td>
                         <td className="px-4 py-4 text-center">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${statusStyle(order.status)}`}>
@@ -221,6 +224,9 @@ const AdminMemberDetailPage = () => {
                               {order.items.length > 1 && <span className="text-gray-400 ml-1">외 {order.items.length - 1}건</span>}
                             </>
                           ) : '-'}
+                        </td>
+                        <td className="px-4 py-4 text-center text-gray-500 text-xs">
+                          {order.sellerName || '-'}
                         </td>
                         <td className="px-4 py-4 text-center text-gray-600">
                           {order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}

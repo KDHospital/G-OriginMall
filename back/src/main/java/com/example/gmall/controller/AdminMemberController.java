@@ -125,8 +125,8 @@ public class AdminMemberController {
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "5") int size) {
 
-		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-		Page<Orders> result = ordersRepository.findByMemberIdOrderByCreatedAtDesc(memberId, pageable);
+		Pageable pageable = PageRequest.of(page, size, Sort.by("orderId").descending());
+		Page<Orders> result = ordersRepository.findByMemberIdWithSeller(memberId, pageable);
 
 		var dtoList = result.getContent().stream().map(o -> {
 			Map<String, Object> map = new HashMap<>();
@@ -137,6 +137,7 @@ public class AdminMemberController {
 			map.put("createdAt", o.getCreatedAt() != null ? o.getCreatedAt().toString() : "");
 			map.put("receiverName", o.getReceiverName());
 			map.put("sellerId", o.getSeller() != null ? o.getSeller().getId() : null);
+			map.put("sellerName", o.getSeller() != null ? o.getSeller().getMname() : "-");
 
 			var items = o.getOrderItems();
 			if (items != null && !items.isEmpty()) {
