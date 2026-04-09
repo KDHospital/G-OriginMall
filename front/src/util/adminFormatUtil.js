@@ -51,4 +51,43 @@ export const pwdRegex = /^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*]).{8,20}$/;
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // 비밀번호 에러 메시지
-export const PWD_ERROR_MSG = '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.';
+export const PWD_ERROR_MSG =
+  '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.';
+
+// ===== 공통 CSS 클래스 =====
+
+// input 기본
+export const INPUT_BASE =
+  "w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all";
+
+// input 에러/정상 상태
+export const INPUT_ERR =
+  "border-red-300 focus:border-red-300 focus:ring-red-100";
+export const INPUT_OK =
+  "border-gray-200 focus:border-blue-300 focus:ring-blue-100";
+
+// 검색 input
+export const INPUT_SEARCH =
+  "w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all bg-white";
+
+// 버튼
+export const BTN_PRIMARY =
+  "px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors";
+export const BTN_SECONDARY =
+  "px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
+export const BTN_DANGER =
+  "px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors";
+
+// 삭제/탈퇴 버튼 (활성/비활성)
+export const BTN_DELETE_ACTIVE =
+  "bg-red-50 text-red-600 border-red-200 hover:bg-red-100";
+export const BTN_DELETE_DISABLED =
+  "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed";
+
+// 뒤로가기 링크
+export const LINK_BACK =
+  "text-sm text-gray-400 hover:text-gray-600 transition-colors mb-1 flex items-center gap-1";
+
+// 검색 X 버튼
+export const BTN_SEARCH_CLEAR =
+  "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm";

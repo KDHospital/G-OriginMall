@@ -46,8 +46,18 @@ const AdminSettingDetailPage = () => {
     mpwdConfirm: form.mpwd && form.mpwd !== form.mpwdConfirm ? '비밀번호가 일치하지 않습니다.' : '',
   };
   const editHasErr = (f) => editSubmitted && editErrs[f];
-  const editLiveErr = (f) => { if (f === 'mpwd') return form.mpwd && !pwdRegex.test(form.mpwd); if (f === 'mpwdConfirm') return form.mpwdConfirm && form.mpwd !== form.mpwdConfirm; return false; };
-  const editCls = (f) => `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${editHasErr(f) || editLiveErr(f) ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100'}`;
+  const editLiveErr = (f) => {
+    if (f === 'mpwd') return form.mpwd && !pwdRegex.test(form.mpwd);
+    if (f === 'mpwdConfirm') return form.mpwdConfirm && form.mpwd !== form.mpwdConfirm;
+    return false;
+  };
+  const editCls = (f) => {
+    const isErr = editHasErr(f) || editLiveErr(f);
+    const state = isErr
+      ? 'border-red-300 focus:border-red-300 focus:ring-red-100'
+      : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100';
+    return `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${state}`;
+  };
   const editErrMsg = (f) => (editHasErr(f) || editLiveErr(f)) ? (editErrs[f] || '') : '';
 
   const handleSave = async () => {
@@ -83,8 +93,21 @@ const AdminSettingDetailPage = () => {
   };
 
 
-  if (loading) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div></div></AdminLayout>;
-  if (!admin) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">관리자 정보를 찾을 수 없습니다.</div></div></AdminLayout>;
+  if (loading) return (
+    <AdminLayout>
+      <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
+        <div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div>
+      </div>
+    </AdminLayout>
+  );
+
+  if (!admin) return (
+    <AdminLayout>
+      <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
+        <div className="py-24 text-center text-gray-400">관리자 정보를 찾을 수 없습니다.</div>
+      </div>
+    </AdminLayout>
+  );
 
   return (
     <AdminLayout>

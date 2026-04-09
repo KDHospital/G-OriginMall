@@ -49,8 +49,20 @@ const AdminSellerDetailPage = () => {
 
   useEffect(() => { loadSeller(); }, [memberId]);
 
-  const formatTel = (v) => { const n = v.replace(/[^0-9]/g, '').slice(0, 11); if (n.length <= 3) return n; if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`; return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`; };
-  const formatBizNo = (v) => { const n = v.replace(/[^0-9]/g, '').slice(0, 10); if (n.length <= 3) return n; if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`; return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`; };
+  // 입력 포맷
+  const formatTel = (v) => {
+    const n = v.replace(/[^0-9]/g, '').slice(0, 11);
+    if (n.length <= 3) return n;
+    if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`;
+    return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`;
+  };
+
+  const formatBizNo = (v) => {
+    const n = v.replace(/[^0-9]/g, '').slice(0, 10);
+    if (n.length <= 3) return n;
+    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
+    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -72,14 +84,21 @@ const AdminSellerDetailPage = () => {
   const editErrs = {
     mname: !form.mname?.trim() ? '이름을 입력해주세요.' : '',
     tel: !form.tel?.trim() ? '연락처를 입력해주세요.' : '',
-    mpwd: form.mpwd && !pwdRegex.test(form.mpwd) ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : '',
+    mpwd: form.mpwd && !pwdRegex.test(form.mpwd)
+      ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : '',
     settlementName: !form.settlementName?.trim() ? '예금주를 입력해주세요.' : '',
     settlementBank: !form.settlementBank?.trim() ? '은행을 입력해주세요.' : '',
     bankAccount: !form.bankAccount?.trim() ? '계좌번호를 입력해주세요.' : '',
   };
   const editHasErr = (f) => editSubmitted && editErrs[f];
   const editLiveErr = (f) => f === 'mpwd' && form.mpwd && !pwdRegex.test(form.mpwd);
-  const editCls = (f) => `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${editHasErr(f) || editLiveErr(f) ? 'border-red-300 focus:border-red-300 focus:ring-red-100' : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100'}`;
+  const editCls = (f) => {
+    const isErr = editHasErr(f) || editLiveErr(f);
+    const state = isErr
+      ? 'border-red-300 focus:border-red-300 focus:ring-red-100'
+      : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100';
+    return `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${state}`;
+  };
   const editErrMsg = (f) => (editHasErr(f) || editLiveErr(f)) ? (editErrs[f] || '') : '';
 
   const handleSave = async () => {
@@ -114,23 +133,54 @@ const AdminSellerDetailPage = () => {
 
   const handleApprove = async () => {
     if (!window.confirm("승인하시겠습니까?")) return;
-    try { await adminApproveSeller(memberId); alert("승인되었습니다."); loadSeller(); } catch { alert("승인 실패"); }
+    try {
+      await adminApproveSeller(memberId);
+      alert("승인되었습니다.");
+      loadSeller();
+    } catch {
+      alert("승인 실패");
+    }
   };
 
   const handleReject = async () => {
     if (!window.confirm("거절하시겠습니까? 계정이 삭제됩니다.")) return;
-    try { await adminRejectSeller(memberId); alert("거절되었습니다."); navigate('/admin/sellers'); } catch { alert("거절 실패"); }
+    try {
+      await adminRejectSeller(memberId);
+      alert("거절되었습니다.");
+      navigate('/admin/sellers');
+    } catch {
+      alert("거절 실패");
+    }
   };
 
   const handleDelete = async () => {
     if (seller.isDeleted) return alert("이미 탈퇴한 회원입니다.");
     if (!window.confirm("해당 판매자를 탈퇴 처리 할까요?")) return;
-    try { await adminDeleteMember(memberId); alert("탈퇴 처리되었습니다."); navigate('/admin/sellers'); } catch { alert("탈퇴 처리에 실패했습니다."); }
+    try {
+      await adminDeleteMember(memberId);
+      alert("탈퇴 처리되었습니다.");
+      navigate('/admin/sellers');
+    } catch {
+      alert("탈퇴 처리에 실패했습니다.");
+    }
   };
 
 
-  if (loading) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div></div></AdminLayout>;
-  if (!seller) return <AdminLayout><div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen"><div className="py-24 text-center text-gray-400">판매회원 정보를 찾을 수 없습니다.</div></div></AdminLayout>;
+  if (loading) return (
+    <AdminLayout>
+      <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
+        <div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div>
+      </div>
+    </AdminLayout>
+  );
+
+  if (!seller) return (
+    <AdminLayout>
+      <div className="flex-1 p-8 bg-[#f8f9fa] min-h-screen">
+        <div className="py-24 text-center text-gray-400">판매회원 정보를 찾을 수 없습니다.</div>
+      </div>
+    </AdminLayout>
+  );
 
   return (
     <AdminLayout>

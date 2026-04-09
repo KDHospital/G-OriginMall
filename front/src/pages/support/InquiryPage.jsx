@@ -125,7 +125,11 @@ const InquiryPage = () => {
                       >
                         <td className="py-5 text-gray-400 font-light">{virtualNumber}</td>
                         <td className="py-5 px-2">
-                          <span className={`px-2 py-1 rounded-sm text-[11px] border block ${item.hasAnswer ? 'border-[#4CAF50] text-[#4CAF50]' : 'border-[#FF9800] text-[#FF9800]'}`}>
+                          <span className={`px-2 py-1 rounded-sm text-[11px] border block ${
+                            item.hasAnswer
+                              ? 'border-[#4CAF50] text-[#4CAF50]'
+                              : 'border-[#FF9800] text-[#FF9800]'
+                          }`}>
                             {item.hasAnswer ? '답변완료' : '답변대기'}
                           </span>
                         </td>
