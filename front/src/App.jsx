@@ -52,6 +52,7 @@ import AdminInquiryPage from './pages/admin/AdminInquiryPage';
 import AdminOrders from './pages/admin/AdminOrders';
 import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 import AdminProductListPage from './pages/admin/AdminProductListPage';
+import AdminProductModifyPage from './pages/admin/AdminProductModifyPage';
 
 import BoardPage from './pages/support/BoardPage';
 import BoardReadPage from './pages/support/BoardReadPage';
@@ -162,10 +163,10 @@ function App() {
           <Route path="/seller/orders/:orderId" element={<ProtectedRoute allowRole={1}><SellerOrderDetail /></ProtectedRoute>} />
           <Route path="/seller/products/:productId/edit" element={<ProtectedRoute allowRole={1}><SellerProductModifyPage /></ProtectedRoute>} />
 
-        {/* 어드민-상품등록 */}
+        {/* 어드민-상품관리,목록 */}
         <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute allowRole={2}><AdminProductListPage /></ProtectedRoute>} />
-
+        <Route path="/admin/products/:productId/edit" element={<ProtectedRoute allowRole={2}><AdminProductModifyPage /></ProtectedRoute>} />
 
 
 

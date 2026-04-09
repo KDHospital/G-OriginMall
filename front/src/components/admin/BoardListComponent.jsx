@@ -15,9 +15,10 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
   // 검색 + 필터
   const [searchInput, setSearchInput] = useState('');
   const [keyword, setKeyword] = useState('');
-  const [filterAnswer, setFilterAnswer] = useState(null);   // null=전체, true=답변완료, false=대기중
-  const [filterPublic, setFilterPublic] = useState(null);   // null=전체, true=공개, false=비공개
+  const [filterAnswer, setFilterAnswer] = useState(null);
+  const [filterPublic, setFilterPublic] = useState(null);
 
+  // 데이터 로드
   const loadData = async (page, searchKeyword = keyword, answerFilter = filterAnswer, publicFilter = filterPublic) => {
     setLoading(true);
     try {
@@ -34,6 +35,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     }
   };
 
+  // boardId 변경 시 초기화
   useEffect(() => {
     setSelectedIds([]);
     setSearchInput('');
@@ -44,11 +46,13 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     setCurrentPage(1);
   }, [boardId]);
 
+  // 페이지 변경 시
   useEffect(() => {
     setSelectedIds([]);
     loadData(currentPage);
   }, [currentPage]);
 
+  // 검색 핸들러
   const handleSearch = () => {
     setKeyword(searchInput);
     setCurrentPage(1);
@@ -68,6 +72,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     loadData(1, '', null, null);
   };
 
+  // 필터 핸들러
   const handleFilterAnswer = (value) => {
     setFilterAnswer(value);
     setCurrentPage(1);
@@ -80,6 +85,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     loadData(1, keyword, filterAnswer, value);
   };
 
+  // 선택 핸들러
   const handleSelectAll = (e) => {
     setSelectedIds(e.target.checked ? posts.map(p => p.postId) : []);
   };
@@ -90,6 +96,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     );
   };
 
+  // 삭제 핸들러
   const handleDelete = async () => {
     if (selectedIds.length === 0) return alert("삭제할 게시글을 선택해주세요.");
     if (!window.confirm("선택한 게시글을 삭제하시겠습니까?")) return;
@@ -103,21 +110,50 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     }
   };
 
+  // 공통 스타일
+  const selectClass = "px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none bg-white focus:border-blue-300 text-gray-700";
+  const btnPrimary = "px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors";
+  const thClass = "px-4 py-4 text-center font-semibold";
+  const tdClass = "px-4 py-4 text-center";
+
+  // 삭제 버튼 스타일
+  const deleteBtnClass = selectedIds.length > 0
+    ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
+    : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed';
+
+  // 상태 뱃지 스타일
+  const statusBadge = (hasAnswer) => {
+    const style = hasAnswer
+      ? 'bg-emerald-50 text-emerald-600'
+      : 'bg-amber-50 text-amber-600';
+    const label = hasAnswer ? '답변완료' : '대기중';
+    return (
+      <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${style}`}>
+        {label}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-5">
+
       {/* 페이지 헤더 */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">{isNotice ? '공지사항 관리' : '고객문의 관리'}</h2>
+        <h2 className="text-2xl font-bold text-gray-900">
+          {isNotice ? '공지사항 관리' : '고객문의 관리'}
+        </h2>
       </div>
 
-      {/* 검색 + 필터 + 삭제 + 등록 (한 줄) */}
+      {/* 검색 + 필터 + 액션 버튼 */}
       <div className="flex items-center gap-2">
+
+        {/* 고객문의 전용 필터 */}
         {!isNotice && (
           <>
             <select
               value={filterAnswer === null ? '' : String(filterAnswer)}
               onChange={(e) => handleFilterAnswer(e.target.value === '' ? null : e.target.value === 'true')}
-              className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none bg-white focus:border-blue-300 text-gray-700"
+              className={selectClass}
             >
               <option value="">답변 상태 전체</option>
               <option value="false">답변 대기</option>
@@ -126,7 +162,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
             <select
               value={filterPublic === null ? '' : String(filterPublic)}
               onChange={(e) => handleFilterPublic(e.target.value === '' ? null : e.target.value === 'true')}
-              className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none bg-white focus:border-blue-300 text-gray-700"
+              className={selectClass}
             >
               <option value="">공개 전체</option>
               <option value="true">공개</option>
@@ -134,6 +170,8 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
             </select>
           </>
         )}
+
+        {/* 검색 입력 */}
         <div className="relative flex-1 max-w-sm">
           <input
             type="text"
@@ -144,34 +182,45 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
             className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all bg-white"
           />
           {searchInput && (
-            <button onClick={handleSearchClear} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">
+            <button
+              onClick={handleSearchClear}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
+            >
               ✕
             </button>
           )}
         </div>
-        <button onClick={handleSearch} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
+
+        <button onClick={handleSearch} className={btnPrimary}>
           검색
         </button>
+
+        {/* 검색 결과 표시 */}
         {keyword && (
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span>검색결과: <strong className="text-gray-800">"{keyword}"</strong> ({totalItems}건)</span>
-            <button onClick={handleSearchClear} className="text-blue-600 hover:text-blue-800 font-semibold">전체보기</button>
+            <span>
+              검색결과: <strong className="text-gray-800">"{keyword}"</strong> ({totalItems}건)
+            </span>
+            <button
+              onClick={handleSearchClear}
+              className="text-blue-600 hover:text-blue-800 font-semibold"
+            >
+              전체보기
+            </button>
           </div>
         )}
+
+        {/* 액션 버튼 */}
         <div className="flex gap-2 ml-auto">
           <button
             onClick={handleDelete}
             disabled={selectedIds.length === 0}
-            className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${
-              selectedIds.length > 0
-                ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
-                : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'
-            }`}
+            className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${deleteBtnClass}`}
           >
             삭제
           </button>
           {isNotice && (
-            <button onClick={onMoveToAdd} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">
+            <button onClick={onMoveToAdd} className={btnPrimary}>
               등록
             </button>
           )}
@@ -187,20 +236,30 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
             <thead>
               <tr className="border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
                 <th className="pl-5 pr-2 py-4 w-10">
-                  <input type="checkbox" onChange={handleSelectAll} checked={selectedIds.length === posts.length && posts.length > 0} className="rounded border-gray-300" />
+                  <input
+                    type="checkbox"
+                    onChange={handleSelectAll}
+                    checked={selectedIds.length === posts.length && posts.length > 0}
+                    className="rounded border-gray-300"
+                  />
                 </th>
-                <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
-                {!isNotice && <th className="px-3 py-4 w-24 text-center font-semibold">상태</th>}
+                <th className={`px-3 py-4 w-14 ${thClass}`}>No.</th>
+                {!isNotice && <th className={`px-3 py-4 w-24 ${thClass}`}>상태</th>}
                 <th className="px-4 py-4 text-left font-semibold">제목</th>
-                <th className="px-4 py-4 w-40 text-center font-semibold">작성자</th>
-                <th className="px-4 py-4 w-28 text-center font-semibold">작성일</th>
-                <th className="px-4 py-4 w-16 text-center font-semibold">조회</th>
+                <th className={`w-40 ${thClass}`}>작성자</th>
+                <th className={`w-28 ${thClass}`}>작성일</th>
+                <th className={`w-16 ${thClass}`}>조회</th>
               </tr>
             </thead>
             <tbody>
               {posts.length === 0 ? (
                 <tr>
-                  <td colSpan={isNotice ? 6 : 7} className="py-24 text-center text-gray-400">등록된 게시글이 없습니다.</td>
+                  <td
+                    colSpan={isNotice ? 6 : 7}
+                    className="py-24 text-center text-gray-400"
+                  >
+                    등록된 게시글이 없습니다.
+                  </td>
                 </tr>
               ) : (
                 posts.map((post, idx) => {
@@ -211,26 +270,52 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
                       className="border-b border-gray-50 transition-colors cursor-pointer hover:bg-gray-50/70"
                       onClick={() => onMoveToRead(post.postId)}
                     >
+                      {/* 체크박스 */}
                       <td className="pl-5 pr-2 py-4" onClick={e => e.stopPropagation()}>
-                        <input type="checkbox" checked={selectedIds.includes(post.postId)} onChange={() => handleSelect(post.postId)} className="rounded border-gray-300" />
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(post.postId)}
+                          onChange={() => handleSelect(post.postId)}
+                          className="rounded border-gray-300"
+                        />
                       </td>
-                      <td className="px-3 py-4 text-center text-gray-400 font-mono text-xs">{virtualNo}</td>
+
+                      {/* 번호 */}
+                      <td className="px-3 py-4 text-center text-gray-400 font-mono text-xs">
+                        {virtualNo}
+                      </td>
+
+                      {/* 상태 (고객문의만) */}
                       {!isNotice && (
                         <td className="px-3 py-4 text-center">
-                          <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${post.hasAnswer ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                            {post.hasAnswer ? '답변완료' : '대기중'}
-                          </span>
+                          {statusBadge(post.hasAnswer)}
                         </td>
                       )}
+
+                      {/* 제목 */}
                       <td className="px-4 py-4 text-left">
                         <div className="flex items-center gap-2">
                           {!post.isPublic && <span className="text-xs text-gray-400">🔒</span>}
-                          <span className="text-gray-800 font-medium truncate">{post.title}</span>
+                          <span className="text-gray-800 font-medium truncate">
+                            {post.title}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-center text-gray-500">{post.mName || '관리자'}</td>
-                      <td className="px-4 py-4 text-center text-gray-400 text-xs">{post.createdAt?.split('T')[0]}</td>
-                      <td className="px-4 py-4 text-center text-gray-400 text-xs">{post.viewCount || 0}</td>
+
+                      {/* 작성자 */}
+                      <td className={`${tdClass} text-gray-500`}>
+                        {post.mName || '관리자'}
+                      </td>
+
+                      {/* 작성일 */}
+                      <td className={`${tdClass} text-gray-400 text-xs`}>
+                        {post.createdAt?.split('T')[0]}
+                      </td>
+
+                      {/* 조회수 */}
+                      <td className={`${tdClass} text-gray-400 text-xs`}>
+                        {post.viewCount || 0}
+                      </td>
                     </tr>
                   );
                 })

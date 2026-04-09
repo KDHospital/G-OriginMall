@@ -224,7 +224,7 @@ const AdminProductListPage = () => {
                                 onChange={handleParentCategoryChange}
                                 className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gray-400 bg-white"
                             >
-                                <option value="">1뎁스</option>
+                                <option value="">상위 카테고리</option>
                                 {parentCategories.map((c) => (
                                     <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
                                 ))}
@@ -235,7 +235,7 @@ const AdminProductListPage = () => {
                                 disabled={!selectedParentId || childCategories.length === 0}
                                 className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-gray-400 bg-white disabled:opacity-40"
                             >
-                                <option value="">2뎁스</option>
+                                <option value="">하위 카테고리</option>
                                 {childCategories.map((c) => (
                                     <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
                                 ))}

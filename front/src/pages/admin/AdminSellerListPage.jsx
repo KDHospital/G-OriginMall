@@ -34,13 +34,41 @@ const AdminSellerListPage = () => {
     }
   };
 
-  useEffect(() => { setSelectedIds([]); loadData(currentPage); }, [currentPage]);
+  useEffect(() => {
+    setSelectedIds([]);
+    loadData(currentPage);
+  }, [currentPage]);
 
-  const handleSearch = () => { setKeyword(searchInput); setCurrentPage(1); loadData(1, searchInput, filterVerified, filterStatus); };
-  const handleSearchKeyDown = (e) => { if (e.key === 'Enter') handleSearch(); };
-  const handleSearchClear = () => { setSearchInput(''); setKeyword(''); setFilterVerified(null); setFilterStatus(''); setCurrentPage(1); loadData(1, '', null, ''); };
-  const handleFilterVerified = (v) => { setFilterVerified(v); setCurrentPage(1); loadData(1, keyword, v, filterStatus); };
-  const handleFilterStatus = (v) => { setFilterStatus(v); setCurrentPage(1); loadData(1, keyword, filterVerified, v); };
+  const handleSearch = () => {
+    setKeyword(searchInput);
+    setCurrentPage(1);
+    loadData(1, searchInput, filterVerified, filterStatus);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') handleSearch();
+  };
+
+  const handleSearchClear = () => {
+    setSearchInput('');
+    setKeyword('');
+    setFilterVerified(null);
+    setFilterStatus('');
+    setCurrentPage(1);
+    loadData(1, '', null, '');
+  };
+
+  const handleFilterVerified = (v) => {
+    setFilterVerified(v);
+    setCurrentPage(1);
+    loadData(1, keyword, v, filterStatus);
+  };
+
+  const handleFilterStatus = (v) => {
+    setFilterStatus(v);
+    setCurrentPage(1);
+    loadData(1, keyword, filterVerified, v);
+  };
 
   const handleSelectAll = (e) => setSelectedIds(e.target.checked ? sellers.map(s => s.id) : []);
   const handleSelect = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -48,13 +76,29 @@ const AdminSellerListPage = () => {
   const handleBulkApprove = async () => {
     if (selectedIds.length === 0) return alert("승인할 판매자를 선택해주세요.");
     if (!window.confirm("선택한 판매자를 일괄 승인하시겠습니까?")) return;
-    try { await Promise.all(selectedIds.map(id => adminApproveSeller(id))); alert("일괄 승인되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("승인 처리 중 오류가 발생했습니다."); }
+    try {
+      await Promise.all(selectedIds.map(id => adminApproveSeller(id)));
+      alert("일괄 승인되었습니다.");
+      setSelectedIds([]);
+      loadData(currentPage);
+    } catch {
+      alert("승인 처리 중 오류가 발생했습니다.");
+    }
   };
 
   const handleBulkPending = async () => {
     if (selectedIds.length === 0) return alert("대기 처리할 판매자를 선택해주세요.");
     if (!window.confirm("선택한 판매자의 승인여부를 대기로 변경할까요?")) return;
-    try { await Promise.all(selectedIds.map(id => adminUpdateSeller(id, { businessVerified: false }))); alert("일괄 대기 처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("대기 처리 중 오류가 발생했습니다."); }
+    try {
+      await Promise.all(selectedIds.map(id =>
+        adminUpdateSeller(id, { businessVerified: false })
+      ));
+      alert("일괄 대기 처리되었습니다.");
+      setSelectedIds([]);
+      loadData(currentPage);
+    } catch {
+      alert("대기 처리 중 오류가 발생했습니다.");
+    }
   };
 
   const handleDelete = async () => {
@@ -62,7 +106,14 @@ const AdminSellerListPage = () => {
     const alreadyDeleted = sellers.filter(s => selectedIds.includes(s.id) && s.isDeleted);
     if (alreadyDeleted.length > 0) return alert("이미 탈퇴한 회원이 포함되어 있습니다.");
     if (!window.confirm("선택한 판매자를 탈퇴 처리 할까요?")) return;
-    try { await Promise.all(selectedIds.map(id => adminDeleteMember(id))); alert("처리되었습니다."); setSelectedIds([]); loadData(currentPage); } catch { alert("탈퇴 처리 중 오류가 발생했습니다."); }
+    try {
+      await Promise.all(selectedIds.map(id => adminDeleteMember(id)));
+      alert("처리되었습니다.");
+      setSelectedIds([]);
+      loadData(currentPage);
+    } catch {
+      alert("탈퇴 처리 중 오류가 발생했습니다.");
+    }
   };
 
   return (
