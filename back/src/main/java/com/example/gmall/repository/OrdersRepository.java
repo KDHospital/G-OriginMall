@@ -65,4 +65,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 	// 오늘 매출 합계
 	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.createdAt BETWEEN :start AND :end AND o.status != 4")
 	Long sumTotalPriceByCreatedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+	
+	// 판매자 페이지 - 판매자 오늘 주문 수
+	long countBySellerIdAndCreatedAtBetween(Long sellerId, LocalDateTime start, LocalDateTime end);
+
+	// 판매자 페이지 - 판매자 오늘 매출
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.seller.id = :sellerId AND o.createdAt BETWEEN :start AND :end AND o.status != 4")
+	Long sumTotalPriceBySellerIdAndCreatedAtBetween(@Param("sellerId") Long sellerId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

@@ -91,4 +91,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	    Pageable pageable
 	);	
 	
+	// 판매자별 판매상태별 상품 수
+	long countBySellerIdAndSoldStatus(Long sellerId, Byte soldStatus);
+	
 }
