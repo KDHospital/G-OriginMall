@@ -25,6 +25,7 @@ public class ProductListResponseDTO {
 	private Integer categoryId;
 	private String categoryName;
 	private LocalDateTime createdAt;
+	private String sellerName;
 	
 	public ProductListResponseDTO(Product p) {
 		this.productId = p.getProductId();
@@ -41,6 +42,7 @@ public class ProductListResponseDTO {
 		this.categoryId = p.getCategory().getCategoryId();
 		this.categoryName = p.getCategory().getCategoryName();
 		this.createdAt = p.getCreatedAt();
+		this.sellerName = p.getSeller().getMname();
 	}
 	
 }
