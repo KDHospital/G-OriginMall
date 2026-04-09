@@ -13,6 +13,7 @@ const STATUS_STYLE = {
     2: "bg-yellow-100 text-yellow-600",
     3: "bg-green-100 text-green-600",
     4: "bg-red-100 text-red-500",
+    5: "bg-orange-100 text-orange-500",
 };
 
 function StatusBadge({ status, label }) {

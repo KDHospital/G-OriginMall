@@ -815,25 +815,30 @@ public class OrderServiceImpl implements OrderService {
             log.warn("결제실패 처리 불가 - 이미 처리된 주문 orderId: {}, status: {}", orderId, orders.getStatus());
             return;
         }
+        
+     // 같은 그룹 전체 주문 실패 처리
+        List<Orders> groupOrders = ordersRepository.findByOrderGroupId(orders.getOrderGroupId());
 
-        // 재고 복구
-        orders.getOrderItems().stream()
-                .filter(item -> !item.isCancelled())
-                .forEach(item -> item.getProduct().restoreStock(item.getQuantity()));
+        groupOrders.forEach(o -> {
+            // 재고 복구
+            o.getOrderItems().stream()
+                    .filter(item -> !item.isCancelled())
+                    .forEach(item -> item.getProduct().restoreStock(item.getQuantity()));
 
-        // 상태 이력 저장
-        OrderStatusHistory history = OrderStatusHistory.builder()
-                .orders(orders)
-                .seller(orders.getSeller())
-                .fromStatus(orders.getStatus())
-                .toStatus((byte) 5)
-                .memo("결제 실패")
-                .build();
+            // 상태 이력 저장
+            OrderStatusHistory history = OrderStatusHistory.builder()
+                    .orders(o)
+                    .seller(o.getSeller())
+                    .fromStatus(o.getStatus())
+                    .toStatus((byte) 5)
+                    .memo("결제 실패")
+                    .build();
 
-        orderStatusHistoryRepository.save(history);
-        orders.updateStatus((byte) 5);
+            orderStatusHistoryRepository.save(history);
+            o.updateStatus((byte) 5);
+        });
 
-        log.info("결제 실패 처리 완료 - orderId: {}", orderId);
+        log.info("결제 실패 처리 완료 - orderGroupId: {}", orders.getOrderGroupId());
     }
-    
+
 }

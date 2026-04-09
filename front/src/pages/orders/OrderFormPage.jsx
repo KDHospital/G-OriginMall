@@ -359,7 +359,7 @@ export default function OrderFormPage() {
         orderName: orderItems[0]?.pname +
           (orderItems.length > 1 ? ` 외 ${orderItems.length - 1}건` : ""),
         successUrl: `${window.location.origin}/orders/success?source=${source ?? "direct"}`,
-        failUrl: `${window.location.origin}/orders/fail`,
+        failUrl: `${window.location.origin}/orders/fail?orderId=${orderId}`,
         customerEmail: "",                  // 선택값
         customerName: selectedAddress.recipientName,
       });
