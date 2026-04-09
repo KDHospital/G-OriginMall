@@ -139,6 +139,7 @@ const AdminMemberAddPage = () => {
                   onChange={handleChange}
                   type="text"
                   placeholder="example@email.com"
+                  autoComplete="off"
                   className={`${cls('loginId')} max-w-md`}
                 />
                 <ErrorMsg msg={errMsg('loginId')} />
@@ -166,6 +167,7 @@ const AdminMemberAddPage = () => {
                     onChange={handleChange}
                     type="email"
                     placeholder="example@email.com"
+                    autoComplete="off"
                     className={cls('email')}
                   />
                   <ErrorMsg msg={errMsg('email')} />
@@ -182,6 +184,7 @@ const AdminMemberAddPage = () => {
                     onChange={handleChange}
                     type="password"
                     placeholder="8~20자, 영문+숫자 또는 특수문자 포함"
+                    autoComplete="new-password"
                     className={cls('mpwd')}
                   />
                   <ErrorMsg msg={errMsg('mpwd')} />
@@ -194,6 +197,7 @@ const AdminMemberAddPage = () => {
                     onChange={handleChange}
                     type="password"
                     placeholder="비밀번호 재입력"
+                    autoComplete="new-password"
                     className={cls('mpwdConfirm')}
                   />
                   <ErrorMsg msg={errMsg('mpwdConfirm')} />

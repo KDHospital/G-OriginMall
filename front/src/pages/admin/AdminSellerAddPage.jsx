@@ -107,11 +107,11 @@ const AdminSellerAddPage = () => {
           </div>
 
           {/* 기본 정보 */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden" autoComplete="off">
             <div className="px-6 py-4 border-b border-gray-100"><h4 className="font-bold text-gray-800">기본 정보</h4></div>
-            <div className="p-6 grid grid-cols-2 gap-6">
+            <div className="p-6 grid grid-cols-2 gap-6" autoComplete="off">
               <Field label="아이디 (로그인 ID)" span2 required>
-                <input name="loginId" value={form.loginId} onChange={handleChange} type="text" placeholder="example@email.com" className={`${inputClass} max-w-md${errorClass('loginId')}`} />
+                <input name="loginId" value={form.loginId} onChange={handleChange} type="text" placeholder="example@email.com" autoComplete="off" className={`${inputClass} max-w-md${errorClass('loginId')}`} />
                 {hasError('loginId') && <p className="text-xs text-red-500 mt-1.5">{errors.loginId}</p>}
               </Field>
               <Field label="이름" required>
@@ -119,16 +119,16 @@ const AdminSellerAddPage = () => {
                 {hasError('mname') && <p className="text-xs text-red-500 mt-1.5">{errors.mname}</p>}
               </Field>
               <Field label="이메일" required>
-                <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="example@email.com" className={`${inputClass}${errorClass('email')}`} />
+                <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="example@email.com" autoComplete="off" className={`${inputClass}${errorClass('email')}`} />
                 {hasError('email') && <p className="text-xs text-red-500 mt-1.5">{errors.email}</p>}
               </Field>
               <Field label="비밀번호" required>
-                <input name="mpwd" value={form.mpwd} onChange={handleChange} type="password" placeholder="8~20자, 영문+숫자 또는 특수문자"
+                <input name="mpwd" value={form.mpwd} onChange={handleChange} type="password" placeholder="8~20자, 영문+숫자 또는 특수문자" autoComplete="new-password"
                   className={`${inputClass}${errorClass('mpwd') || (form.mpwd && !pwdRegex.test(form.mpwd) ? ' border-red-300' : '')}`} />
                 {(hasError('mpwd') || (form.mpwd && !pwdRegex.test(form.mpwd))) && <p className="text-xs text-red-500 mt-1.5">{errors.mpwd || '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.'}</p>}
               </Field>
               <Field label="비밀번호 확인" required>
-                <input name="mpwdConfirm" value={form.mpwdConfirm} onChange={handleChange} type="password" placeholder="비밀번호 재입력"
+                <input name="mpwdConfirm" value={form.mpwdConfirm} onChange={handleChange} type="password" placeholder="비밀번호 재입력" autoComplete="new-password"
                   className={`${inputClass}${errorClass('mpwdConfirm') || (form.mpwdConfirm && form.mpwd !== form.mpwdConfirm ? ' border-red-300' : '')}`} />
                 {(hasError('mpwdConfirm') || (form.mpwdConfirm && form.mpwd !== form.mpwdConfirm)) && <p className="text-xs text-red-500 mt-1.5">{errors.mpwdConfirm || '비밀번호가 일치하지 않습니다.'}</p>}
               </Field>
