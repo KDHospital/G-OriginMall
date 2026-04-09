@@ -69,4 +69,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	// 관리자 대시보드 => 판매중 상품 수
 	long countBySoldStatus(Byte soldStatus);
 	
+	// 판매자별 판매상태별 상품 수
+	long countBySellerIdAndSoldStatus(Long sellerId, Byte soldStatus);
+	
 }
