@@ -227,7 +227,18 @@ return(
                     {/* 사업자 정보 섹션 */}
                     <div className="space-y-4">
                         <h3 className="font-bold text-indigo-700 border-b border-indigo-100 pb-2">사업자 정보</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-bold">
+                       <div className="space-y-4">
+                           <label className="ml-1 text-sm font-bold text-gray-600">상호명</label>
+                                <input
+                                    name="description"
+                                    value={form.description}
+                                    onChange={handleChange}
+                                    placeholder="상호명과 업체에 대한 설명을 간략하게 입력해 주시기 바랍니다"
+                                    className="w-full p-3 bg-gray-50 rounded-lg text-sm border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400"
+                                />
+                           
+                         </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-bold"> 
                             <div className="flex flex-col gap-2">
                                 <label className="ml-1 text-gray-600">담당자명</label>
                                 <input name="mname" value={form.mname} placeholder="이름" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
@@ -323,20 +334,12 @@ return(
 
                         {/* 금빛나루 인증 */}
                         <div className="bg-white p-4 rounded-xl border border-indigo-100">
-                            <label className="flex items-center gap-2 cursor-pointer mb-3">
+                            <label className="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" name="isVerified" checked={form.isVerified} onChange={handleChange} className="w-5 h-5 accent-indigo-600" />
                                 <span className="text-sm font-bold text-gray-700">금빛나루 인증 업체입니까?</span>
                             </label>
-                            {form.isVerified && (
-                                <input
-                                    name="description"
-                                    value={form.description}
-                                    onChange={handleChange}
-                                    placeholder="인증번호 또는 관련 정보를 입력하세요"
-                                    className="w-full p-3 bg-gray-50 rounded-lg text-sm border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400"
-                                />
-                            )}
                         </div>
+                        
                     </div>
 
                     {/* 정산 계좌 정보 섹션 */}
