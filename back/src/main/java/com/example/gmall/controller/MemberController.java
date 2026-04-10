@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.gmall.dto.member.MemberAuthDTO;
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
+import com.example.gmall.service.KakaoService;
 import com.example.gmall.service.MemberService;
 
 import jakarta.servlet.http.Cookie;
@@ -35,6 +37,7 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final EmailService emailService;
+	public final KakaoService kakaoService;
 	
 	//아이디 중복확인
 	@GetMapping("/check-id")
@@ -47,7 +50,9 @@ public class MemberController {
 	@PostMapping("/email/send")
 	public ResponseEntity<String> sendEmailCode(@RequestBody Map<String, String> request){
 		String email = request.get("email");
-		emailService.sendCode(email);
+		String tyep = request.get("type");
+		
+		emailService.sendCode(email,tyep);
 		return ResponseEntity.ok("인증 코드가 발송되었습니다.");
 	}
 	
@@ -105,7 +110,7 @@ public class MemberController {
 		MemberDTO dto = memberService.getMemberId(memberId);
 		return ResponseEntity.ok(dto);
 	}
-	
+	//회원정보 수정
 	@PutMapping("/modify")
 	public ResponseEntity<?> modifyMember(@RequestBody MemberDTO memberDTO){
 		log.info("회원 수정 요청 {}", memberDTO);
@@ -120,7 +125,7 @@ public class MemberController {
 					.body(Map.of("message",e.getMessage()));
 		}
 	}
-		
+		//아이디 찾기
 		@PostMapping("/find-id")
 		public ResponseEntity<?> findId(@RequestBody Map<String, String> request){
 		try {
@@ -136,6 +141,7 @@ public class MemberController {
 		}
 		
 	}
+		//비밀번호 변경
 		@PostMapping("/reset-password")
 		public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request){
 			try {
@@ -150,11 +156,11 @@ public class MemberController {
 						.body(Map.of("message",e.getMessage()));
 			}
 		}
-		
+		//회원탈퇴
 		@PostMapping("/withdraw")
 		public ResponseEntity<?> withdraw(@RequestBody Map<String, String> request) {
 			
-				String memberId = request.get("id");
+				String memberId = request.get("memberId");
 				String mpwd = request.get("mpwd");
 				
 				log.info("회원 탈퇴 요청 - ID:{}", memberId);
@@ -174,6 +180,8 @@ public class MemberController {
 						.body(Map.of("message","서버에 오류가 발생했습니다."));
 			}
 		}
+		
+		//판매자 가입신청
 		@PostMapping("/register-seller")
 		public ResponseEntity<?> registerSeller(@Valid @RequestBody SellerSignupDTO dto) {
 		    log.info("판매자 가입 신청 시작: " + dto.getLoginId());
@@ -184,7 +192,36 @@ public class MemberController {
 		        "message", "판매자 가입 신청이 완료되었습니다. 관리자 승인을 기다려주세요."
 		    ));
 		}
-		
+		//카카오 로그인
+		@GetMapping("/kakao")
+		public ResponseEntity<MemberAuthDTO> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
+			log.info("---Kakao Login Process Start----");
+			log.info("Authorization Code: {}",code);
+			
+			MemberAuthDTO authDTO = kakaoService.processKakaoLogin(code);
+			
+			
+			
+			
+			String refreshToken =authDTO.getRefreshToken();
+			log.info("발급된 리프레시 토큰: {}", refreshToken);
+			if(refreshToken !=null) {
+				Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+				refreshCookie.setHttpOnly(true);
+				refreshCookie.setPath("/");
+				refreshCookie.setMaxAge(60 * 60 * 24 * 7 );
+				
+				refreshCookie.setSecure(false);
+				response.addCookie(refreshCookie);
+		        log.info("Refresh Token 쿠키 저장 완료");
+				
+			}
+			
+			log.info("Login User: {}",authDTO.getLoginId());
+			log.info("Extra Info Required: {}",authDTO.isNeedsExtraInfo());
+			
+			return ResponseEntity.ok(authDTO);
+		}
 		
 		
 		

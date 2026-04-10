@@ -6,7 +6,7 @@ public interface EmailService {
 	// 이메일 인증코드 발송
 	// POST /api/member/email/send
 	//@param email 인증코드를 받을 이메일 주소
-	void sendCode(String email);
+	void sendCode(String email, String tyep);
 	
 	//이메일 인증코드 확인
 	//POST /api/member/email/verify
