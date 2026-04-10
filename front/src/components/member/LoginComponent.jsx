@@ -2,6 +2,7 @@ import { useState } from "react";
 import { login } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
+import { KAKAO_AUTH_URL } from "../../api/kakaoApi";
 
 const initState = {
     loginId:'',
@@ -106,6 +107,18 @@ const LoginComponent = () => {
                 onClick={() => navigate("/findpwd")}>
                      비밀번호 찾기
                 </span>
+            </div>
+            <div className="space-y-4">
+                <div className="text-center text-sm text-green-600 font-bold">소셜 로그인</div>
+                <div className="flex justify-center">
+                    <a href={KAKAO_AUTH_URL} className="hover:opacity-90 transition-opacity">
+                        <img 
+                             src="\public\assets\images\kakao_login_large_wide.png"
+                              alt="카카오 로그인" 
+                              className="shadow-sm rounded" />
+                    </a>
+
+                </div>
             </div>
         </form>
         </div>

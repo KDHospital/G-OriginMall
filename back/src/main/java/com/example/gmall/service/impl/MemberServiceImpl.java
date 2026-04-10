@@ -74,7 +74,7 @@ public class MemberServiceImpl implements MemberService {
    memberRepository.save(member);
 		   
  }
- 	
+ 	//회원 로그인
  	@Override
  	public Map<String, Object> login(MemberLoginDTO loginDTO, HttpServletResponse response) {
  		
@@ -90,26 +90,27 @@ public class MemberServiceImpl implements MemberService {
  	 	if(!passwordEncoder.matches(loginDTO.getMpwd(), member.getMpwd())) {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
  	 	}
+ 	 	//사용자 정보조회
  	 	Map<String, Object> claims = member.getClaims();
  	 	
- 	 	
+ 	 	// JWT 토큰 생성 (Access: 60분, Refresh: 7일)
  	 	String accessToken = jwtUtil.generateToken(claims, 60);
- 	 	
  	 	String refreshToken = jwtUtil.generateToken(claims, 60*24*7);
- 	 	
+ 	    //  Refresh Token을 보안 쿠키(HttpOnly)에 저장
  	 	Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
  	 	refreshCookie.setHttpOnly(true);
  	 	refreshCookie.setPath("/");
  	 	refreshCookie.setMaxAge(60*60*24*7);
  	 	refreshCookie.setSecure(true);
- 	 	
  	 	response.addCookie(refreshCookie);
- 	 	
+ 	    // 응답 데이터 구성 및 반환
  	 	claims.put("accessToken" , accessToken);
  	 	claims.put("result", "success");
  	 	
  	 	return claims;
  	}
+ 	
+ 	//로그인ID로 회원조회
  	@Override
  	public MemberDTO getMemberLoginId(String loginId) {
  		Member member = memberRepository.findByLoginId(loginId)
@@ -125,6 +126,7 @@ public class MemberServiceImpl implements MemberService {
  				.build();
  	}
  	
+ 	//ID로 회원조회
  	@Override
  	public MemberDTO getMemberId(Long memberId) {
  		Member member = memberRepository.findById(memberId)
@@ -138,84 +140,98 @@ public class MemberServiceImpl implements MemberService {
  				.gender(member.getGender())
  				.build();
  	}
- 	
+ 	//회원정보 수정
  	@Override
  	public void modifyMember(MemberDTO memberDTO) {
+ 		//회원 존재여부 확인
  		Member member = memberRepository.findById(memberDTO.getId())
  				.orElseThrow(()-> new RuntimeException("해당 회원을 찾을 수 없습니다."));
- 		
+ 		//현재 비밀번호 일치 여부 검증
  		if(!passwordEncoder.matches(memberDTO.getCurrentMpwd(),member.getMpwd() )) {
  			throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
  		
  		}
+ 		
+ 		//회원의 일반정보 변경
  		member.changeName(memberDTO.getMname());
  		member.changeTel(memberDTO.getTel());
  		member.changeGender(memberDTO.getGender());
  		
+ 		//비밀번호 변경 처리
  		if(memberDTO.getMpwd() != null && !memberDTO.getMpwd().trim().isEmpty()) {
- 			
+ 			//기존 비밀번호와 동일한지 확인
  			if(passwordEncoder.matches(memberDTO.getMpwd(), member.getMpwd())) {
  				throw new RuntimeException("새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다.");
  			}
- 			
+ 			//새 비밀번호 암호화 및 반영
  			String encodedPassword = passwordEncoder.encode(memberDTO.getMpwd());
  			member.changePassword(encodedPassword);
  			
  		}
+ 		//최종 변경사항 저장
  		memberRepository.save(member);
  	}
- 	
+ 	//아이디 찾기
  	@Override
  	public String findLoginId(String mname, String tel) {
+ 		//아이디와 전화번로가 일치하는 회원찾기
  		Member member = memberRepository.findByMnameAndTel(mname, tel)
  				.orElseThrow(() -> new IllegalArgumentException("일치하는 회원 정보가 없습니다."));
  		
  		String loginId = member.getLoginId();
  		
+ 		//이메일 형식인 경우 마스킹 처리
  		if(loginId.contains("@")) {
  			String[] parts = loginId.split("@");
  			String idPart = parts[0];
  			String domainPart = parts[1];
- 			
+ 		// 아이디 길이에 따른 마스킹 전략 분기
  			if(idPart.length() > 3) {
+ 			// 3글자 이후부터 모두 마스킹
  				String maskedId= idPart.substring(0,3) + "*".repeat(idPart.length());
  				return maskedId + "@" + domainPart;
  			}else {
+ 			// 아이디가 너무 짧은 경우(3자 이하) 앞 1글자만 공개
  				return idPart.substring(0,1) + "**@" + domainPart;
  			}
  		}
  		return loginId.substring(0,3) + "***";
  	}
- 	
+ 	//비밀번호 재설정
  	@Override
  	public void resetPassword(String loginId, String nmpwd) {
- 		
+    
  		Member member = memberRepository.findByLoginId(loginId)
  				.orElseThrow(() -> new RuntimeException("해당 이메일로 가입된 회원이 없습니다."));
  	
  	String encodedePassword = passwordEncoder.encode(nmpwd);
+   
  	member.changePassword(encodedePassword);
- 	
+    
  	memberRepository.save(member);
  	
  	
  	}
+ 	//회원탈퇴
  	@Override
  	public void withdraw(String memberId, String mpwd) {
+ 		
  		Long id = Long.parseLong(memberId);
  		
+ 		//  회원 존재 여부 확인
  		Member  member = memberRepository.findById(id)
  				.orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
- 	
+ 		//비밀번호 검증
  		if(!passwordEncoder.matches(mpwd, member.getMpwd())) {
  			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");	
  		}
- 		
+ 		//탈퇴 상태 변경 (Soft Delete)
  		member.changeDeleteStatus(true);
  		
  		log.info("회원 탈퇴 완료: ID {}", id);
  	
  	}
+ 	//판매자 회원가입
 public void registerSeller(SellerSignupDTO dto) {
         
        
@@ -244,7 +260,8 @@ public void registerSeller(SellerSignupDTO dto) {
                 .settlementName(dto.getSettlementName())
                 .settlementBank(dto.getSettlementBank())
                 .bankAccount(dto.getBankAccount())
-                .businessVerified(false)    
+                .businessVerified(false)   
+                .description(dto.getDescription())
                 .build();
 
         memberRepository.save(seller);
