@@ -2,6 +2,7 @@ package com.example.gmall.service.impl;
 
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,9 +15,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.gmall.domain.Member;
+import com.example.gmall.domain.Sns;
 import com.example.gmall.dto.member.KakaoDTO;
 import com.example.gmall.dto.member.MemberAuthDTO;
 import com.example.gmall.repository.MemberRepository;
+import com.example.gmall.repository.SnsRepository;
 import com.example.gmall.service.KakaoService;
 import com.example.gmall.util.JWTUtil;
 
@@ -31,6 +34,7 @@ import lombok.extern.log4j.Log4j2;
 public class KakaoServiceImpl implements KakaoService{
 	
 	private final MemberRepository memberRepository;
+	private final SnsRepository snsRepository;
 	private final JWTUtil jwtUtil;
 	
 	@Value("${kakao.client_id}")
@@ -51,29 +55,45 @@ public class KakaoServiceImpl implements KakaoService{
 		//Access Token으로 카카오 유저정보 받기
 		KakaoDTO kakaoDTO = getKakaoUserInfo(accessToken);
 		
+		String providerUserId = String.valueOf(kakaoDTO.getId());
 		String email = kakaoDTO.getKakao_account().getEmail();
-		String loginId = "K_" + kakaoDTO.getId();
 		
-		Member member = memberRepository.findByLoginId(email).orElse(null);
+		Optional<Sns> snsResult = snsRepository.findByProviderAndProviderUserId("kakao", providerUserId);
 		
-		if(member == null) {
-			//아이디 중복검사
-			if(memberRepository.existsByLoginId(loginId)) {
-				throw new IllegalArgumentException("이미 사용 중인 소셜 계정입니다.");
-			}
+			Member member;
+			if (snsResult.isPresent()) {
+	          
+	            member = snsResult.get().getMember();
+	        } else {   
+	          member = memberRepository.findByLoginId(email).orElse(null);
 			
+	         if(member == null) {
 			member = Member.builder()
-					.loginId(loginId)
+					.loginId(email)
 					.mname("카카오회원")
-					.tel("010-0000-0000")// 전화번호 임시저장
-					.email(loginId)
+					.tel("010-0000-0000")
+					.email(email)
 					.emailVerified(true)
 					.role((byte) 0)
 					.isDeleted(false)
 					.build();
-			
 			memberRepository.save(member);
 		}
+	         
+		Sns sns = Sns.builder()
+				.member(member)
+				.provider("kakao")
+				.providerUserId(providerUserId)
+				.build();
+		snsRepository.save(sns);
+	  }
+		if(member.getRole() == 1 && !member.isBusinessVerified()) {
+			throw new IllegalArgumentException("관리자 승인 대기 중인 판매자 계정입니다. 승인 완료 후 로그인 가능합니다.");
+		}
+		if (member.isDeleted()) {
+		    throw new IllegalArgumentException("탈퇴 처리된 계정입니다. 고객센터에 문의하세요.");
+		}
+		
 		// 추가 정보 입력 필요 여부 판단(이름/번호가 임시값이면 true)
 		boolean needsExtraInfo = member.getMname().equals("카카오회원") || member.getTel().equals("010-0000-0000");
 		Map<String, Object> claims = member.getClaims();
@@ -106,7 +126,7 @@ public class KakaoServiceImpl implements KakaoService{
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", "authorization_code");
 		params.add("client_id", clientId);
-		params.add("redirect_uei", redirectUri);
+		params.add("redirect_uri", redirectUri);
 		params.add("code",code);
 		params.add("client_secret", clientSecret);
 		

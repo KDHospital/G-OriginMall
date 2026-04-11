@@ -90,6 +90,10 @@ public class MemberServiceImpl implements MemberService {
  	 	if(!passwordEncoder.matches(loginDTO.getMpwd(), member.getMpwd())) {
  	 		throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
  	 	}
+ 	 	//관리자 승인전 로그인 안되게하는 메소드
+ 	 	if (member.getRole() == 1 && !member.isBusinessVerified()) {
+ 	 	    throw new IllegalArgumentException("관리자 승인 대기 중인 판매자 계정입니다. 승인 완료 후 로그인 가능합니다.");
+ 	 	}
  	 	//사용자 정보조회
  	 	Map<String, Object> claims = member.getClaims();
  	 	
