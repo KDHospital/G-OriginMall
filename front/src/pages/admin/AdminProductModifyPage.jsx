@@ -2,7 +2,7 @@ import { useState, useRef,useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import AdminLayout from "../../layouts/AdminLayout"
 import axiosInstance from "../../api/axios"
-import { BASE_URL } from "../../util/imagesUtil"
+import { BASE_URL,getImageUrl } from "../../util/imagesUtil"
 
 const formatPrice = (n) => {
     if (!n && n !== 0) return "";
@@ -340,7 +340,7 @@ const AdminProductModifyPage = () => {
                             {existingImages.map((img, index) => (
                                 <div key={`existing-${index}`} className={`relative w-20 h-20 rounded border-2 overflow-hidden
                                     ${index === 0 && newImages.length === 0 ? "border-green-500" : "border-gray-200"}`}>
-                                    <img src={`${BASE_URL}${img.imageUrl}`} alt="" className="w-full h-full object-cover" />
+                                    <img src={`${getImageUrl(img.imageUrl)}`} alt="" className="w-full h-full object-cover" />
                                     {index === 0 && newImages.length === 0 && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-green-500 text-white text-center text-xs py-0.5">대표</div>
                                     )}

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -117,4 +118,13 @@ public class GlobalExceptionHandler {
 				.status(HttpStatus.INTERNAL_SERVER_ERROR)
 				.body(Map.of("message","서버 오류가 발생했습니다."));
 	}
+	
+	//배너 오류 캐치 추가
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<String> handleNotFound(EntityNotFoundException e) {
+	    return ResponseEntity
+	            .status(HttpStatus.NOT_FOUND)
+	            .body(e.getMessage());
+	}
+
 }
