@@ -34,13 +34,17 @@ const LoginComponent = () => {
         .then( (data) => {
             console.log("로그인 성공:", data)
             const memberObj = {
-        role: data.role,
-        mname: data.mname,
-        memberId: data.memberId,
-        result: data.result
+            id: data.memberId,  
+            loginId: data.loginId,
+            mname: data.mname,
+            role: Number(data.role), 
+            businessVerified: data.businessVerified,
+            result: data.result,
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken
     }
     
-            localStorage.setItem("member",JSON.stringify(data))
+            localStorage.setItem("member",JSON.stringify(memberObj))
 
             if(data.refreshToken || data.accessToken){
                 axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.refreshToken || data.accessToken}`
