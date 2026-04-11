@@ -39,6 +39,7 @@ import lombok.extern.log4j.Log4j2;
 public class AdminMemberController {
 
 	private final MemberService memberService;
+	private final com.example.gmall.service.EmailService emailService;
 	private final MemberRepository memberRepository;
 	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
@@ -125,8 +126,8 @@ public class AdminMemberController {
 			@RequestParam(name = "page", defaultValue = "0") int page,
 			@RequestParam(name = "size", defaultValue = "5") int size) {
 
-		Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-		Page<Orders> result = ordersRepository.findByMemberIdOrderByCreatedAtDesc(memberId, pageable);
+		Pageable pageable = PageRequest.of(page, size, Sort.by("orderId").descending());
+		Page<Orders> result = ordersRepository.findByMemberIdWithSeller(memberId, pageable);
 
 		var dtoList = result.getContent().stream().map(o -> {
 			Map<String, Object> map = new HashMap<>();
@@ -137,6 +138,7 @@ public class AdminMemberController {
 			map.put("createdAt", o.getCreatedAt() != null ? o.getCreatedAt().toString() : "");
 			map.put("receiverName", o.getReceiverName());
 			map.put("sellerId", o.getSeller() != null ? o.getSeller().getId() : null);
+			map.put("sellerName", o.getSeller() != null ? o.getSeller().getMname() : "-");
 
 			var items = o.getOrderItems();
 			if (items != null && !items.isEmpty()) {
@@ -264,7 +266,21 @@ public class AdminMemberController {
 
 		if (body.containsKey("mname")) seller.changeName((String) body.get("mname"));
 		if (body.containsKey("tel")) seller.changeTel((String) body.get("tel"));
-		if (body.containsKey("businessVerified")) seller.updateBusinessVerify((Boolean) body.get("businessVerified"));
+		if (body.containsKey("businessVerified")) {
+			boolean oldVerified = seller.isBusinessVerified();
+			boolean newVerified = (Boolean) body.get("businessVerified");
+			seller.updateBusinessVerify(newVerified);
+
+			// 승인여부가 변경된 경우 메일 발송
+			if (oldVerified != newVerified && seller.getEmail() != null) {
+				try {
+					emailService.sendSellerStatusNotice(seller.getEmail(), seller.getMname(), newVerified);
+					log.info("판매자 승인여부 변경 메일 발송 - ID: {}, 승인: {}", memberId, newVerified);
+				} catch (Exception e) {
+					log.warn("판매자 승인여부 변경 메일 발송 실패 - ID: {}, 에러: {}", memberId, e.getMessage());
+				}
+			}
+		}
 		if (body.containsKey("mpwd")) {
 			String newPwd = (String) body.get("mpwd");
 			if (newPwd != null && !newPwd.trim().isEmpty()) {

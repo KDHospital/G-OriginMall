@@ -86,18 +86,18 @@ const AdminSellerListPage = () => {
     }
   };
 
-  const handleBulkPending = async () => {
-    if (selectedIds.length === 0) return alert("대기 처리할 판매자를 선택해주세요.");
-    if (!window.confirm("선택한 판매자의 승인여부를 대기로 변경할까요?")) return;
+  const handleBulkReject = async () => {
+    if (selectedIds.length === 0) return alert("미승인할 판매자를 선택해주세요.");
+    if (!window.confirm("선택한 판매자를 미승인 처리하시겠습니까?")) return;
     try {
       await Promise.all(selectedIds.map(id =>
         adminUpdateSeller(id, { businessVerified: false })
       ));
-      alert("일괄 대기 처리되었습니다.");
+      alert("일괄 미승인 처리되었습니다.");
       setSelectedIds([]);
       loadData(currentPage);
     } catch {
-      alert("대기 처리 중 오류가 발생했습니다.");
+      alert("미승인 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -136,7 +136,7 @@ const AdminSellerListPage = () => {
             <select value={filterVerified === null ? '' : String(filterVerified)} onChange={(e) => handleFilterVerified(e.target.value === '' ? null : e.target.value === 'true')}
               className="px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none bg-white focus:border-blue-300 text-gray-700">
               <option value="">승인여부 전체</option>
-              <option value="false">대기</option>
+              <option value="false">미승인</option>
               <option value="true">승인</option>
             </select>
             <div className="relative flex-1 max-w-sm">
@@ -155,8 +155,8 @@ const AdminSellerListPage = () => {
             <div className="flex gap-2 ml-auto">
               <button onClick={handleBulkApprove} disabled={selectedIds.length === 0}
                 className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>일괄승인</button>
-              <button onClick={handleBulkPending} disabled={selectedIds.length === 0}
-                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>일괄대기</button>
+              <button onClick={handleBulkReject} disabled={selectedIds.length === 0}
+                className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>일괄미승인</button>
               <button onClick={handleDelete} disabled={selectedIds.length === 0}
                 className={`px-4 py-2.5 text-sm font-semibold rounded-lg border transition-colors ${selectedIds.length > 0 ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'}`}>탈퇴</button>
               <button onClick={() => navigate('/admin/sellers/new')} className="px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors">등록</button>
@@ -200,7 +200,7 @@ const AdminSellerListPage = () => {
                         </td>
                         <td className="px-4 py-4 text-center">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${seller.businessVerified ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
-                            {seller.businessVerified ? '승인' : '대기'}
+                            {seller.businessVerified ? '승인' : '미승인'}
                           </span>
                         </td>
                         <td className="px-4 py-4 text-center font-medium text-gray-800">{seller.mname}</td>

@@ -195,38 +195,64 @@ const AdminMemberDetailPage = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
-                      <th className="px-6 py-3 w-40 text-left font-semibold">주문번호</th>
-                      <th className="px-4 py-3 w-32 text-center font-semibold">상태</th>
-                      <th className="px-4 py-3 text-left font-semibold">상품명</th>
-                      <th className="px-4 py-3 w-16 text-center font-semibold">수량</th>
+                      <th className="px-4 py-3 w-32 text-left font-semibold">주문번호</th>
+                      <th className="px-4 py-3 w-40 text-center font-semibold">판매자</th>
+                      <th className="px-4 py-3 text-left font-semibold">주문상품</th>
                       <th className="px-4 py-3 w-28 text-right font-semibold">결제금액</th>
-                      <th className="px-6 py-3 w-36 text-center font-semibold">주문일</th>
+                      <th className="px-4 py-3 w-28 text-center font-semibold">상태</th>
+                      <th className="px-4 py-3 w-36 text-center font-semibold">주문일시</th>
+                      <th className="px-4 py-3 w-20 text-center font-semibold">관리</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.map(order => (
                       <tr key={order.orderId} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                        <td className="px-6 py-4 text-left text-gray-700 font-medium text-xs">
-                          {order.tossOrderId || `ORDER_${order.orderId}`}
+                        {/* 주문번호 */}
+                        <td className="px-4 py-4 text-left text-gray-700 font-medium text-xs">
+                          {order.tossOrderId
+                            ? order.tossOrderId.split('_').slice(0, 2).join('_')
+                            : `ORDER_${order.orderId}`}
                         </td>
+                        {/* 판매자 */}
+                        <td className="px-4 py-4 text-center text-gray-500 text-xs">
+                          {order.sellerName || '-'}
+                        </td>
+                        {/* 주문상품 */}
+                        <td className="px-4 py-4 text-left text-gray-800">
+                          {order.items && order.items.length > 0 ? (
+                            <>
+                              {order.items[0].productName}
+                              {order.items.length > 1 && (
+                                <span className="text-gray-400 ml-1">
+                                  외 {order.items.length - 1}건
+                                </span>
+                              )}
+                            </>
+                          ) : '-'}
+                        </td>
+                        {/* 결제금액 */}
+                        <td className="px-4 py-4 text-right font-medium text-gray-800">
+                          {formatPrice(order.totalPrice)}원
+                        </td>
+                        {/* 상태 */}
                         <td className="px-4 py-4 text-center">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${statusStyle(order.status)}`}>
                             {statusLabel(order.status)}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-left text-gray-800">
-                          {order.items && order.items.length > 0 ? (
-                            <>
-                              {order.items[0].productName}
-                              {order.items.length > 1 && <span className="text-gray-400 ml-1">외 {order.items.length - 1}건</span>}
-                            </>
-                          ) : '-'}
+                        {/* 주문일시 */}
+                        <td className="px-4 py-4 text-center text-gray-400 text-xs">
+                          {fmtDateTime(order.createdAt)}
                         </td>
-                        <td className="px-4 py-4 text-center text-gray-600">
-                          {order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}
+                        {/* 관리 */}
+                        <td className="px-4 py-4 text-center">
+                          <button
+                            onClick={() => window.open(`/admin/orders/${order.orderId}`, '_blank')}
+                            className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded hover:bg-gray-50 transition-colors whitespace-nowrap"
+                          >
+                            상세
+                          </button>
                         </td>
-                        <td className="px-4 py-4 text-right font-medium text-gray-800">{formatPrice(order.totalPrice)}원</td>
-                        <td className="px-6 py-4 text-center text-gray-400 text-xs">{fmtDateTime(order.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>

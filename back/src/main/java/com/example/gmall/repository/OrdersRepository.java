@@ -15,6 +15,10 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 	
 	// 회원별 주문 목록 조회 (최신순)
 	Page<Orders> findByMemberIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+
+	// 회원별 주문 목록 조회 (seller fetch join)
+	@Query("SELECT o FROM Orders o JOIN FETCH o.seller WHERE o.member.id = :memberId")
+	Page<Orders> findByMemberIdWithSeller(@Param("memberId") Long memberId, Pageable pageable);
 	
 	// 판매자별 주문 목록 조회 (최신순)
 	List<Orders> findBySellerIdOrderByCreatedAtDesc(Long sellerId);
