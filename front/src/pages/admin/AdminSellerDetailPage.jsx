@@ -143,13 +143,13 @@ const AdminSellerDetailPage = () => {
   };
 
   const handleReject = async () => {
-    if (!window.confirm("거절하시겠습니까? 계정이 삭제됩니다.")) return;
+    if (!window.confirm("미승인 처리하시겠습니까?")) return;
     try {
       await adminRejectSeller(memberId);
-      alert("거절되었습니다.");
+      alert("미승인되었습니다.");
       navigate('/admin/sellers');
     } catch {
-      alert("거절 실패");
+      alert("미승인 실패");
     }
   };
 
@@ -215,12 +215,12 @@ const AdminSellerDetailPage = () => {
                 {editing ? (
                   <select name="businessVerified" value={String(form.businessVerified)} onChange={handleChange}
                     className="px-3 py-1.5 border border-blue-300 rounded-lg text-[11px] font-semibold outline-none bg-white focus:ring-2 focus:ring-blue-100">
-                    <option value="false">대기</option>
+                    <option value="false">미승인</option>
                     <option value="true">승인</option>
                   </select>
                 ) : (
                   <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${seller.businessVerified ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                    {seller.businessVerified ? '승인' : '대기'}
+                    {seller.businessVerified ? '승인' : '미승인'}
                   </span>
                 )}
                 <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600">판매회원</span>

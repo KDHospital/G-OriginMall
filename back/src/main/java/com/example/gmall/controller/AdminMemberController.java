@@ -39,6 +39,7 @@ import lombok.extern.log4j.Log4j2;
 public class AdminMemberController {
 
 	private final MemberService memberService;
+	private final com.example.gmall.service.EmailService emailService;
 	private final MemberRepository memberRepository;
 	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
@@ -265,7 +266,21 @@ public class AdminMemberController {
 
 		if (body.containsKey("mname")) seller.changeName((String) body.get("mname"));
 		if (body.containsKey("tel")) seller.changeTel((String) body.get("tel"));
-		if (body.containsKey("businessVerified")) seller.updateBusinessVerify((Boolean) body.get("businessVerified"));
+		if (body.containsKey("businessVerified")) {
+			boolean oldVerified = seller.isBusinessVerified();
+			boolean newVerified = (Boolean) body.get("businessVerified");
+			seller.updateBusinessVerify(newVerified);
+
+			// 승인여부가 변경된 경우 메일 발송
+			if (oldVerified != newVerified && seller.getEmail() != null) {
+				try {
+					emailService.sendSellerStatusNotice(seller.getEmail(), seller.getMname(), newVerified);
+					log.info("판매자 승인여부 변경 메일 발송 - ID: {}, 승인: {}", memberId, newVerified);
+				} catch (Exception e) {
+					log.warn("판매자 승인여부 변경 메일 발송 실패 - ID: {}, 에러: {}", memberId, e.getMessage());
+				}
+			}
+		}
 		if (body.containsKey("mpwd")) {
 			String newPwd = (String) body.get("mpwd");
 			if (newPwd != null && !newPwd.trim().isEmpty()) {
