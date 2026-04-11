@@ -17,8 +17,7 @@ public class MemberAuthDTO extends User{
     private String loginId;
     private String mname;
     private Byte role;
-    
-    
+    private boolean businessVerified;
     private String accessToken;
     private String refreshToken;
     private boolean needsExtraInfo;

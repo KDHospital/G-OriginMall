@@ -50,7 +50,7 @@ const LoginComponent = () => {
             window.location.href = "/"
         })
         .catch( err => {
-           const errorMsg = err.response?.data?.message || "아이디 또는 비밀번호를 확인해주세요."
+           const errorMsg = err.response?.data ||"아이디 또는 비밀번호를 확인해주세요."
            alert(errorMsg)
            console.error("로그인 에러:",errorMsg)
         })
