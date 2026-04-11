@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "banner")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Banner {
  
     @Id
@@ -42,13 +46,21 @@ public class Banner {
         this.createdAt = LocalDateTime.now();
     }
     
-    public void updateBanner(String linkUrl, Integer sortOrder, boolean isActive) {
-        this.linkUrl   = linkUrl;
+    public void updateBanner(String imageUrl, String linkUrl, Integer sortOrder, boolean isActive) {
+        this.imageUrl = imageUrl;
+    	this.linkUrl   = linkUrl;
         this.sortOrder = sortOrder;
         this.isActive  = isActive;
     }
 
     public void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+    
+    public void updateSortOrder(Integer sortOrder) {
+    	this.sortOrder = sortOrder;
+    }
+    public void updateActive(boolean isActive) {
+    	this.isActive = isActive;
     }
 }

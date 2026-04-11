@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import AdminLayout from "../../layouts/AdminLayout"
 import axiosInstance from "../../api/axios"
-import { BASE_URL } from "../../util/imagesUtil"
+import { BASE_URL,getImageUrl } from "../../util/imagesUtil"
 
 // ── 배지 컴포넌트 ────────────────────────────────
 const SOLD_STATUS_STYLE = {
@@ -353,7 +353,7 @@ const AdminProductListPage = () => {
                                         <div className="w-12 h-12 bg-gray-100 rounded border border-gray-200 overflow-hidden mx-auto">
                                             {product.thumbnailImageUrl ? (
                                                 <img
-                                                    src={`${BASE_URL}${product.thumbnailImageUrl}`}
+                                                    src={`${getImageUrl(product.thumbnailImageUrl)}`}
                                                     alt={product.pname}
                                                     className="w-full h-full object-cover"
                                                 />
