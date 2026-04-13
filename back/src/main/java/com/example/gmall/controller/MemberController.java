@@ -22,6 +22,7 @@ import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
 import com.example.gmall.service.KakaoService;
 import com.example.gmall.service.MemberService;
+import com.example.gmall.service.NaverService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,6 +39,7 @@ public class MemberController {
 	private final MemberService memberService;
 	private final EmailService emailService;
 	public final KakaoService kakaoService;
+	public final NaverService naverService;
 	
 	//아이디 중복확인
 	@GetMapping("/check-id")
@@ -223,6 +225,37 @@ public class MemberController {
 			return ResponseEntity.ok(authDTO);
 		}
 		
-		
+		//네이버 로그인
+		@GetMapping("/naver")
+		public ResponseEntity<MemberAuthDTO> naverLogin(@RequestParam("code") String code,@RequestParam("state") String state, HttpServletResponse response){
+			
+			log.info("---Naver Login Process Start---");
+			log.info("Authorization Code : {}", code);
+			log.info("State: {}",state);
+			
+			// 네이버 서비스 호출
+			MemberAuthDTO authDTO = naverService.processNaverLogin(code, state);
+			
+			// 리프레시 토큰 쿠키 설정
+			String refreshToken = authDTO.getRefreshToken();
+			log.info("발급된 네이버 리프레시 토느: {}",refreshToken);
+			
+			if(refreshToken != null) {
+				Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+				refreshCookie.setHttpOnly(true);
+				refreshCookie.setPath("/");
+				refreshCookie.setMaxAge(60 * 60 * 24 * 7);
+				
+				// 개발 환경이면 false , 배포 환경(HTTPS)이면 true
+				refreshCookie.setSecure(false);
+				
+				response.addCookie(refreshCookie);
+				log.info("Naver Refresh Token 쿠키 저장 완료");	
+			}
+			log.info("Login User: {}",authDTO.getLoginId());
+			log.info("Extra Info Required: {}",authDTO.isNeedsExtraInfo());
+			
+			return ResponseEntity.ok(authDTO);
+		}
 		
 }

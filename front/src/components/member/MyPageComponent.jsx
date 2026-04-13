@@ -9,7 +9,12 @@ export default function MyPageSidebar({ member }) {
     const navigate = useNavigate();
     const [showWithdrawInput, setShowWithdrawInput] = useState(false);
     const [withdrawPw, setWithdrawPw] = useState("");
-
+    
+    const localData = JSON.parse(localStorage.getItem("member"))
+    const effectiveRole = member?.role !== null ? member?.role : localData?.role
+    const isSeller = Number(effectiveRole) === 1;
+    const isAdmin = Number(effectiveRole) === 2
+    
     const navItem = (to, label) => (
         <Link
             to={to}
@@ -63,13 +68,27 @@ export default function MyPageSidebar({ member }) {
 
             {/* 네비게이션 */}
             <nav className="space-y-1 text-sm">
+                {isAdmin && (<>
+                    <div className="font-bold text-red-500 mb-2 mt-4 text-xs uppercase">시스템 관리</div>
+                    {navItem("/admin","대시보드")}
+                    {navItem("/admin/members", "일반 회원 관리")}
+                    {navItem("/admin/sellers", "판매자 관리")}
+                 
+               </> )}
+                {isSeller && (<>
+                    <div className="font-bold text- gray-400 mb-2 mt-4 text-xs uppercase">판매 관리</div>
+                    {navItem("/seller","대시보드")}
+                    {navItem("/seller/products","내 상품 목록")}
+                 
+               </> )}
+               {!isSeller && !isAdmin && ( <>
                 <div className="font-bold text-gray-400 mb-2 mt-4 text-xs uppercase">주문</div>
                 {navItem("/orders", "주문 내역")}
                 {navItem("/cart", "장바구니")}
-
+                 </> )}
                 <div className="font-bold text-gray-400 mb-2 mt-4 text-xs uppercase">계정</div>
                 {navItem("/modifypage", "회원 정보 수정")}
-                {navItem("/addresses", "배송지 관리")}
+                {!isSeller && !isAdmin && navItem("/addresses", "배송지 관리")}
 
                 {/* 탈퇴하기 */}
                 {!showWithdrawInput ? (

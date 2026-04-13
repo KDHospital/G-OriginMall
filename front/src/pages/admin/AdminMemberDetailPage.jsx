@@ -209,9 +209,7 @@ const AdminMemberDetailPage = () => {
                       <tr key={order.orderId} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
                         {/* 주문번호 */}
                         <td className="px-4 py-4 text-left text-gray-700 font-medium text-xs">
-                          {order.tossOrderId
-                            ? order.tossOrderId.split('_').slice(0, 2).join('_')
-                            : `ORDER_${order.orderId}`}
+                          ORDER_{order.orderId}
                         </td>
                         {/* 판매자 */}
                         <td className="px-4 py-4 text-center text-gray-500 text-xs">

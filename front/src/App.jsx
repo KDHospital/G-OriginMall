@@ -26,6 +26,7 @@ import Mypapge from './pages/member/MyPage';
 import FindIdPage from './pages/member/FindIdPage';
 import FindPwdPage from './pages/member/FindPwdPage';
 import KakaoRedirectHandler from './handler/KakaoRedirectHandler';
+import NaverRedirectHandler from './handler/NaverRedirectHandler';
 
 import SellerDashboardPage from './pages/seller/SellerDashboardPage';
 import SellerProductNewPage from './pages/seller/SellerProductNewPage';
@@ -93,6 +94,7 @@ function App() {
           <Route path='/findpwd' element={<FindPwdPage />} />
           <Route path='/addresses' element={<ProtectedRoute allowRole={0}><MyAddresses/></ProtectedRoute>} />
           <Route path='/oauth/kakao' element={<KakaoRedirectHandler />} />
+          <Route path='/oauth/naver' element={<NaverRedirectHandler />} />
 
           {/* 회원(판매자) - 유재영 담당 */}
           <Route path='/sellersignup' element={<SellerSingupPage />} />
