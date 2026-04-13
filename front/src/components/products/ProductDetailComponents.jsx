@@ -50,6 +50,7 @@ const ProductDetailComponents = ({productId}) => {
         0: '구매 가능',
         1: '판매 중지',
         2: '품절',
+        3: '삭제됨'
     }[product.soldStatus] ?? '알 수 없음'
 
     const handleBackToList = () => {
