@@ -92,7 +92,7 @@ const AdminMemberModifyPage = () => {
     try {
       const data = {
         mname: form.mname.trim(),
-        tel: form.tel.trim(),
+        tel: form.tel.replace(/-/g, '').trim(),
         gender: form.gender
       };
       if (form.mpwd) data.mpwd = form.mpwd;

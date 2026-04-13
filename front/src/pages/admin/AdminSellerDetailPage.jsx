@@ -108,16 +108,16 @@ const AdminSellerDetailPage = () => {
     try {
       const data = {
         mname: form.mname.trim(),
-        tel: form.tel.trim(),
+        tel: form.tel.replace(/-/g, '').trim(),
         businessVerified: form.businessVerified,
         businessNo: form.businessNo?.replace(/-/g, '').trim() || '',
         isVerified: form.isVerified || false,
         taxInvoice: form.taxInvoice || false,
-        cashReceiptNo: form.cashReceiptNo?.trim() || '',
+        cashReceiptNo: form.cashReceiptNo?.replace(/-/g, '').trim() || '',
         description: form.description?.trim() || '',
         settlementName: form.settlementName?.trim() || '',
         settlementBank: form.settlementBank?.trim() || '',
-        bankAccount: form.bankAccount?.trim() || ''
+        bankAccount: form.bankAccount?.replace(/-/g, '').trim() || ''
       };
       if (form.mpwd) data.mpwd = form.mpwd;
       await adminUpdateSeller(memberId, data);
@@ -272,7 +272,7 @@ const AdminSellerDetailPage = () => {
                 <DetailField label="세금계산서 발행">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="taxInvoice" type="checkbox" checked={form.taxInvoice} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">발행 가능</span></label> : <DetailText value={seller.taxInvoice ? '가능' : '불가'} />}</DetailField>
                 <DetailField label="현금영수증 번호">{editing ? <input name="cashReceiptNo" value={form.cashReceiptNo} onChange={handleChange} type="text" placeholder="선택 입력" className={editCls('_')} /> : <DetailText value={seller.cashReceiptNo} />}</DetailField>
                 <DetailField label="특산물 인증">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label> : <DetailText value={seller.isVerified ? '인증됨' : '미인증'} />}</DetailField>
-                <div className="col-span-2"><DetailField label="소개">{editing ? <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="판매자 소개 (선택)" className={editCls('_') + ' resize-y'} /> : <DetailText value={seller.description} />}</DetailField></div>
+                <div className="col-span-2"><DetailField label="상호명">{editing ? <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="상호명 (선택)" className={editCls('_') + ' resize-y'} /> : <DetailText value={seller.description} />}</DetailField></div>
               </div>
             </div>
           </div>

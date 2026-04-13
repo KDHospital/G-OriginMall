@@ -77,8 +77,8 @@ const AdminSellerAddPage = () => {
         loginId: form.loginId.trim(), mname: form.mname.trim(), mpwd: form.mpwd,
         tel: form.tel.replace(/-/g, ''), email: form.email.trim(), gender: form.gender,
         businessNo: form.businessNo.replace(/-/g, '').trim(), taxInvoice: form.taxInvoice,
-        cashReceiptNo: form.cashReceiptNo.trim(), settlementName: form.settlementName.trim(),
-        settlementBank: form.settlementBank.trim(), bankAccount: form.bankAccount.trim(),
+        cashReceiptNo: form.cashReceiptNo.replace(/-/g, '').trim(), settlementName: form.settlementName.trim(),
+        settlementBank: form.settlementBank.trim(), bankAccount: form.bankAccount.replace(/-/g, '').trim(),
         isVerified: form.isVerified, description: form.description.trim()
       });
       alert("판매회원이 등록되었습니다.");
@@ -159,7 +159,7 @@ const AdminSellerAddPage = () => {
               <Field label="특산물 인증">
                 <label className="flex items-center gap-2 cursor-pointer"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label>
               </Field>
-              <Field label="소개" span2><textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="판매자 소개 (선택)" className={inputClass + " resize-y"} /></Field>
+              <Field label="상호명" span2><textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="상호명 (선택)" className={inputClass + " resize-y"} /></Field>
             </div>
           </div>
 
