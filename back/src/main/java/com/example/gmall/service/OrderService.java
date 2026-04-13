@@ -72,6 +72,9 @@ public interface OrderService {
 	
 	// 결제 실패 처리
 	void failOrder(Long orderId);
+	
+	// 관리자 페이지 - 판매자별 매출
+	Map<String, Long> getSellerRevenue(Long sellerId);
 
 	
 }

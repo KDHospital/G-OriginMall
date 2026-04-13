@@ -289,4 +289,12 @@ public class OrderController {
 	    return ResponseEntity.noContent().build();
 	}
 	
+	// 관리자 페이지 - 판매자별 매출
+	@GetMapping("/admin/sellers/{sellerId}/revenue")
+	public ResponseEntity<Map<String, Long>> getSellerRevenue(
+	        @PathVariable("sellerId") Long sellerId
+	) {
+	    return ResponseEntity.ok(orderService.getSellerRevenue(sellerId));
+	}
+	
 }

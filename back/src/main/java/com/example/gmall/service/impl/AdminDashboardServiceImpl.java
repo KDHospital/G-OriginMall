@@ -1,5 +1,6 @@
 package com.example.gmall.service.impl;
 
+import com.example.gmall.domain.Member;
 import com.example.gmall.dto.manage.AdminDashboardResponseDTO;
 import com.example.gmall.dto.manage.AdminDashboardResponseDTO.RecentMemberDTO;
 import com.example.gmall.dto.manage.AdminDashboardResponseDTO.RecentOrderDTO;
@@ -43,6 +44,19 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
         // 품절 상품 수
         long soldOutProducts = productRepository.countBySoldStatus((byte) 2);
+        
+        // 전체 판매자 목록 조회
+        List<Member> sellers = memberRepository.findAllByRoleAndBusinessVerified((byte) 1, true);
+
+        // 판매자별 총 매출액 합산
+        long totalRevenue = sellers.stream()
+                .mapToLong(s -> ordersRepository.sumTotalRevenueBySellerId(s.getId()))
+                .sum();
+
+        // 판매자별 실 매출액 합산
+        long realRevenue = sellers.stream()
+                .mapToLong(s -> ordersRepository.sumRealRevenueBySellerId(s.getId()))
+                .sum();
 
         // 최근 주문 5건
         List<RecentOrderDTO> recentOrders = ordersRepository
@@ -86,6 +100,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .soldOutProducts(soldOutProducts)
                 .recentOrders(recentOrders)
                 .recentMembers(recentMembers)
+                .totalRevenue(totalRevenue)
+                .realRevenue(realRevenue)
                 .build();
     }
 }

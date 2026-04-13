@@ -840,5 +840,14 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("결제 실패 처리 완료 - orderGroupId: {}", orders.getOrderGroupId());
     }
+    
+    // 관리자 페이지 - 판매자별 매출
+    @Override
+    public Map<String, Long> getSellerRevenue(Long sellerId) {
+        Map<String, Long> revenue = new HashMap<>();
+        revenue.put("totalRevenue", ordersRepository.sumTotalRevenueBySellerId(sellerId));
+        revenue.put("realRevenue", ordersRepository.sumRealRevenueBySellerId(sellerId));
+        return revenue;
+    }
 
 }
