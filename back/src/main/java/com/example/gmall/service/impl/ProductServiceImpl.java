@@ -48,7 +48,19 @@ public class ProductServiceImpl implements ProductService {
     
     //웹-상품 목록 조회
 	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int minPrice, int maxPrice, String sort, int page, int size){
-	    // sort 값에 따라 정렬 기준 결정
+		//salesHigh / salesLow는 DB 레벨 정렬이므로 별도 분기
+		if ("salesHigh".equals(sort)) {
+		    Pageable pageable = PageRequest.of(page, size);
+		    return productRepository.findActiveProductsOrderBySalesDesc(categoryId, minPrice, maxPrice, pageable)
+		            .map(ProductListResponseDTO::new);
+		}
+		if ("salesLow".equals(sort)) {
+		    Pageable pageable = PageRequest.of(page, size);
+		    return productRepository.findActiveProductsOrderBySalesAsc(categoryId, minPrice, maxPrice, pageable)
+		            .map(ProductListResponseDTO::new);
+		}	    
+		
+		// sort 값에 따라 정렬 기준 결정
 	    Sort sorting = switch (sort) {
 	        case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
 	        case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
@@ -73,6 +85,18 @@ public class ProductServiceImpl implements ProductService {
     // ──────────────────────────────────────────
     public Page<ProductListResponseDTO> getCertifiedProducts(Integer categoryId,int minPrice, int maxPrice, String sort, int page, int size) {
 	    
+    	//salesHigh / salesLow는 DB 레벨 정렬이므로 별도 분기
+    	if ("salesHigh".equals(sort)) {
+    	    Pageable pageable = PageRequest.of(page, size);
+    	    return productRepository.findActiveProductsOrderBySalesDesc(categoryId, minPrice, maxPrice, pageable)
+    	            .map(ProductListResponseDTO::new);
+    	}
+    	if ("salesLow".equals(sort)) {
+    	    Pageable pageable = PageRequest.of(page, size);
+    	    return productRepository.findActiveProductsOrderBySalesAsc(categoryId, minPrice, maxPrice, pageable)
+    	            .map(ProductListResponseDTO::new);
+    	}    	
+    	
     	Sort sorting = switch (sort) {
         case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
         case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
@@ -88,6 +112,18 @@ public class ProductServiceImpl implements ProductService {
     // GET /api/products/exhibition?page=0&size=12&categoryId=1
     // ──────────────────────────────────────────    
     public Page<ProductListResponseDTO> getExhibitionProducts(Integer categoryId,int minPrice, int maxPrice, String sort, int page, int size) {
+    	//salesHigh / salesLow는 DB 레벨 정렬이므로 별도 분기
+    	if ("salesHigh".equals(sort)) {
+    	    Pageable pageable = PageRequest.of(page, size);
+    	    return productRepository.findActiveProductsOrderBySalesDesc(categoryId, minPrice, maxPrice, pageable)
+    	            .map(ProductListResponseDTO::new);
+    	}
+    	if ("salesLow".equals(sort)) {
+    	    Pageable pageable = PageRequest.of(page, size);
+    	    return productRepository.findActiveProductsOrderBySalesAsc(categoryId, minPrice, maxPrice, pageable)
+    	            .map(ProductListResponseDTO::new);
+    	}    	
+    	
     	Sort sorting = switch (sort) {
         case "priceLow"  -> Sort.by(Sort.Direction.ASC,  "price");
         case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
