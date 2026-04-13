@@ -44,7 +44,7 @@ const MainBanner = () => {
                         ${idx === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
 
                     <img
-                    src={banner.imageUrl}
+                    src={`${getImageUrl(banner.imageUrl)}`}
                     alt={`배너 ${idx + 1}`}
                     className="w-full h-full object-cover"
                     />

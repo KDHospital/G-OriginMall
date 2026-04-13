@@ -334,9 +334,9 @@ export default function SellerProductModifyPage() {
                             {/* 기존 이미지 */}
                             {existingImages.map((img, index) => (
                                 <div key={`existing-${index}`} className={`relative w-20 h-20 rounded border-2 overflow-hidden
-                                    ${index === 0 && newImages.length === 0 ? "border-green-500" : "border-gray-200"}`}>
+                                    ${index === 0 ? "border-green-500" : "border-gray-200"}`}>  {/* ← 조건 단순화 */}
                                     <img src={`${BASE_URL}${img.imageUrl}`} alt="" className="w-full h-full object-cover" />
-                                    {index === 0 && newImages.length === 0 && (
+                                    {index === 0 && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-green-500 text-white text-center text-xs py-0.5">대표</div>
                                     )}
                                     <button
