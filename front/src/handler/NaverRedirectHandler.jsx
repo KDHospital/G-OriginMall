@@ -21,7 +21,7 @@ const NaverRedirectHandler = () => {
                 //추가 정보 입력 여부에 따른 페이지 이동
                 if(data.needsExtraInfo){
                     alert("추기 정보 입력이 필요합니다.")
-                    navigate("member/modify")
+                    navigate("/modifypage")
                 }else{
                     alert("로그인에 성공했습니다.")
                     navigate("/")
@@ -29,7 +29,7 @@ const NaverRedirectHandler = () => {
             }).catch(err => {
                 console.error("로그인 처리 에러:",err)
                 alert("로그 처리 중 오류가 발생했습니다.")
-                navigate("/member/login")
+                navigate("/login")
             })
         }
     },[code, state])
