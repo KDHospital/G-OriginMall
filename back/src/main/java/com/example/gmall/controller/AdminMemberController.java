@@ -132,7 +132,6 @@ public class AdminMemberController {
 		var dtoList = result.getContent().stream().map(o -> {
 			Map<String, Object> map = new HashMap<>();
 			map.put("orderId", o.getOrderId());
-			map.put("tossOrderId", o.getTossOrderId() != null ? o.getTossOrderId() : "ORDER_" + o.getOrderId());
 			map.put("totalPrice", o.getTotalPrice());
 			map.put("status", (int) o.getStatus());
 			map.put("createdAt", o.getCreatedAt() != null ? o.getCreatedAt().toString() : "");
@@ -250,6 +249,7 @@ public class AdminMemberController {
 				.taxInvoice(taxInvoice != null && taxInvoice)
 				.cashReceiptNo(cashReceiptNo)
 				.settlementName(settlementName).settlementBank(settlementBank).bankAccount(bankAccount)
+				.isVerified(isVerified != null && isVerified)
 				.build();
 
 		Member saved = memberRepository.save(seller);
@@ -409,6 +409,7 @@ public class AdminMemberController {
 			map.put("mname", m.getMname());
 			map.put("tel", m.getTel());
 			map.put("email", m.getEmail());
+			map.put("description", m.getDescription() != null ? m.getDescription() : "");
 			map.put("businessNo", m.getBusinessNo() != null ? m.getBusinessNo() : "");
 			map.put("businessVerified", m.isBusinessVerified());
 			map.put("isDeleted", m.isDeleted());
@@ -449,6 +450,8 @@ public class AdminMemberController {
 		// 판매자 통계
 		result.put("productCount", productRepository.countBySellerId(memberId));
 		result.put("orderCount", ordersRepository.countBySellerId(memberId));
+		result.put("totalRevenue", ordersRepository.sumTotalRevenueBySellerId(memberId));
+		result.put("realRevenue", ordersRepository.sumRealRevenueBySellerId(memberId));
 
 		return ResponseEntity.ok(result);
 	}

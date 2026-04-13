@@ -278,4 +278,23 @@ public class OrderController {
 	    orderService.adminCancelOrderItem(orderId, orderItemId);
 	    return ResponseEntity.noContent().build();
 	}
+	
+	// 결제 실패 처리
+	// PATCH /api/orders/{orderId}/fail
+	@PatchMapping("/orders/{orderId}/fail")
+	public ResponseEntity<Void> failOrder(
+	        @PathVariable("orderId") Long orderId
+	) {
+	    orderService.failOrder(orderId);
+	    return ResponseEntity.noContent().build();
+	}
+	
+	// 관리자 페이지 - 판매자별 매출
+	@GetMapping("/admin/sellers/{sellerId}/revenue")
+	public ResponseEntity<Map<String, Long>> getSellerRevenue(
+	        @PathVariable("sellerId") Long sellerId
+	) {
+	    return ResponseEntity.ok(orderService.getSellerRevenue(sellerId));
+	}
+	
 }

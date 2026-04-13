@@ -141,7 +141,7 @@ const AdminSellerListPage = () => {
             </select>
             <div className="relative flex-1 max-w-sm">
               <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={handleSearchKeyDown}
-                placeholder="이름, 아이디, 사업자번호 검색"
+                placeholder="담당자명, 아이디, 사업자번호 검색"
                 className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all bg-white" />
               {searchInput && <button onClick={handleSearchClear} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">✕</button>}
             </div>
@@ -174,8 +174,9 @@ const AdminSellerListPage = () => {
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
                     <th className="px-4 py-4 w-24 text-center font-semibold">승인여부</th>
-                    <th className="px-4 py-4 w-40 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-40 text-center font-semibold">담당자명</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디</th>
+                    <th className="px-4 py-4 w-40 text-center font-semibold">상호명</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">사업자번호</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">연락처</th>
                     <th className="px-4 py-4 w-28 text-center font-semibold">가입일</th>
@@ -183,7 +184,7 @@ const AdminSellerListPage = () => {
                 </thead>
                 <tbody>
                   {sellers.length === 0 ? (
-                    <tr><td colSpan={9} className="py-24 text-center text-gray-400">등록된 판매회원이 없습니다.</td></tr>
+                    <tr><td colSpan={10} className="py-24 text-center text-gray-400">등록된 판매회원이 없습니다.</td></tr>
                   ) : sellers.map((seller, idx) => {
                     const virtualNo = totalItems - (currentPage - 1) * itemsPerPage - idx;
                     return (
@@ -205,6 +206,7 @@ const AdminSellerListPage = () => {
                         </td>
                         <td className="px-4 py-4 text-center font-medium text-gray-800">{seller.mname}</td>
                         <td className="px-4 py-4 text-left text-gray-600">{seller.loginId}</td>
+                        <td className="px-4 py-4 text-center text-gray-500 text-xs">{seller.description || '-'}</td>
                         <td className="px-4 py-4 text-center text-gray-500 text-xs">{fmtBizNo(seller.businessNo)}</td>
                         <td className="px-4 py-4 text-center text-gray-500 text-xs">{fmtTel(seller.tel)}</td>
                         <td className="px-4 py-4 text-center text-gray-400 text-xs">{seller.createdAt?.split('T')[0]}</td>

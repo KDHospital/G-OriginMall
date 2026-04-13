@@ -3,6 +3,7 @@ import { login } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { KAKAO_AUTH_URL } from "../../api/kakaoApi";
+import { getNaverAuthUrl } from "../../api/naverAPI";
 
 const initState = {
     loginId:'',
@@ -34,13 +35,17 @@ const LoginComponent = () => {
         .then( (data) => {
             console.log("로그인 성공:", data)
             const memberObj = {
-        role: data.role,
-        mname: data.mname,
-        memberId: data.memberId,
-        result: data.result
+            id: data.memberId,  
+            loginId: data.loginId,
+            mname: data.mname,
+            role: Number(data.role), 
+            businessVerified: data.businessVerified,
+            result: data.result,
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken
     }
     
-            localStorage.setItem("member",JSON.stringify(data))
+            localStorage.setItem("member",JSON.stringify(memberObj))
 
             if(data.refreshToken || data.accessToken){
                 axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${data.refreshToken || data.accessToken}`
@@ -115,6 +120,15 @@ const LoginComponent = () => {
                         <img 
                              src="\public\assets\images\kakao_login_large_wide.png"
                               alt="카카오 로그인" 
+                              className="shadow-sm rounded" />
+                    </a>
+
+                </div>
+                <div className="flex justify-center">
+                    <a href={getNaverAuthUrl()} className="hover:opacity-90 transition-opacity">
+                        <img 
+                             src="\public\assets\images\NAVER_login_Light_KR_green_wide_H56.png"
+                              alt="네이버 로그인" 
                               className="shadow-sm rounded" />
                     </a>
 

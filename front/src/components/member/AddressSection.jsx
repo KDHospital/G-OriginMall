@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
+import { formatPhone, stripPhone } from "../../util/phoneUtil";
 
 export default function AddressSection({
     addresses: initialAddresses,
@@ -30,7 +31,12 @@ export default function AddressSection({
     };
 
     const handleChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, value } = e.target;
+        if (name === "recipientPhone") {
+            setForm((prev) => ({ ...prev, recipientPhone: formatPhone(value) }));
+            return;
+        }
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleZipcodeSearch = () => {
@@ -56,6 +62,7 @@ export default function AddressSection({
 
         axiosInstance.post("/members/addresses", {
             ...form,
+            recipientPhone: stripPhone(form.recipientPhone), // ← DB 저장 시 하이픈 제거
             isDefault: false,
             memo: "",
         })
@@ -74,7 +81,7 @@ export default function AddressSection({
         setEditTarget(addr);
         setForm({
             recipientName: addr.recipientName,
-            recipientPhone: addr.recipientPhone,
+            recipientPhone: formatPhone(addr.recipientPhone ?? ""), // ← 표시용 포맷
             zipcode: addr.zipcode,
             address: addr.address,
             addressDetail: addr.addressDetail,
@@ -90,6 +97,7 @@ export default function AddressSection({
 
         axiosInstance.put(`/members/addresses/${editTarget.addressId}`, {
             ...form,
+            recipientPhone: stripPhone(form.recipientPhone), // ← DB 저장 시 하이픈 제거
             isDefault: editTarget.default,
             memo: "",
         })
@@ -256,7 +264,7 @@ export default function AddressSection({
                                         )}
                                     </div>
                                     <p className="text-gray-500 text-xs">{addr.address} {addr.addressDetail}</p>
-                                    <p className="text-gray-400 text-xs mt-0.5">{addr.recipientPhone}</p>
+                                    <p className="text-gray-400 text-xs mt-0.5">{formatPhone(addr.recipientPhone ?? "")}</p>
                                 </div>
 
                                 {/* 관리 버튼 */}

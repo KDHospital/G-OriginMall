@@ -108,16 +108,16 @@ const AdminSellerDetailPage = () => {
     try {
       const data = {
         mname: form.mname.trim(),
-        tel: form.tel.trim(),
+        tel: form.tel.replace(/-/g, '').trim(),
         businessVerified: form.businessVerified,
         businessNo: form.businessNo?.replace(/-/g, '').trim() || '',
         isVerified: form.isVerified || false,
         taxInvoice: form.taxInvoice || false,
-        cashReceiptNo: form.cashReceiptNo?.trim() || '',
+        cashReceiptNo: form.cashReceiptNo?.replace(/-/g, '').trim() || '',
         description: form.description?.trim() || '',
         settlementName: form.settlementName?.trim() || '',
         settlementBank: form.settlementBank?.trim() || '',
-        bankAccount: form.bankAccount?.trim() || ''
+        bankAccount: form.bankAccount?.replace(/-/g, '').trim() || ''
       };
       if (form.mpwd) data.mpwd = form.mpwd;
       await adminUpdateSeller(memberId, data);
@@ -224,7 +224,7 @@ const AdminSellerDetailPage = () => {
                   </span>
                 )}
                 <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600">판매회원</span>
-                {(editing ? form.isVerified : seller.isVerified) && <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-50 text-yellow-600">특산물 인증</span>}
+                {(editing ? form.isVerified : seller.isVerified) && <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-50 text-yellow-600">금빛나루 인증</span>}
               </div>
               <h3 className="text-xl font-bold text-gray-900">{seller.mname}</h3>
               <p className="text-sm text-gray-400 mt-1">회원ID : {seller.id}</p>
@@ -233,7 +233,7 @@ const AdminSellerDetailPage = () => {
             <div className="px-6 py-5">
               <div className="grid grid-cols-2 gap-x-12 gap-y-5">
                 <DetailField label="아이디">{editing ? <input value={seller.loginId} disabled className="w-full px-4 py-2.5 border border-gray-100 rounded-lg text-sm bg-gray-50 text-gray-500" /> : <DetailText value={seller.loginId} />}</DetailField>
-                <DetailField label="이름">{editing ? <><input name="mname" value={form.mname} onChange={handleChange} type="text" className={editCls('mname')} />{editErrMsg('mname') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mname')}</p>}</> : <DetailText value={seller.mname} />}</DetailField>
+                <DetailField label="담당자명">{editing ? <><input name="mname" value={form.mname} onChange={handleChange} type="text" className={editCls('mname')} />{editErrMsg('mname') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mname')}</p>}</> : <DetailText value={seller.mname} />}</DetailField>
                 <DetailField label="이메일">{editing ? <input value={seller.email} disabled className="w-full px-4 py-2.5 border border-gray-100 rounded-lg text-sm bg-gray-50 text-gray-500" /> : <DetailText value={seller.email} />}</DetailField>
                 <DetailField label="연락처">{editing ? <><input name="tel" value={form.tel} onChange={handleChange} type="text" className={editCls('tel')} />{editErrMsg('tel') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('tel')}</p>}</> : <DetailText value={fmtTel(seller.tel)} />}</DetailField>
                 <DetailField label="가입일"><DetailText value={fmtDateTime(seller.createdAt)} /></DetailField>
@@ -248,14 +248,45 @@ const AdminSellerDetailPage = () => {
 
           {/* 판매 현황 */}
           {!editing && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">등록 상품 수</p>
-                <p className="text-2xl font-bold text-gray-900">{seller.productCount ?? 0}<span className="text-sm font-normal text-gray-400 ml-1">건</span></p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  등록 상품 수
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {seller.productCount ?? 0}
+                  <span className="text-sm font-normal text-gray-400 ml-1">건</span>
+                </p>
               </div>
               <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">총 주문 건수</p>
-                <p className="text-2xl font-bold text-gray-900">{seller.orderCount ?? 0}<span className="text-sm font-normal text-gray-400 ml-1">건</span></p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  총 주문 건수
+                  <span className="text-[10px] font-normal text-gray-300 ml-1">(결제전, 취소/환불 포함)</span>
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {seller.orderCount ?? 0}
+                  <span className="text-sm font-normal text-gray-400 ml-1">건</span>
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  총 매출
+                  <span className="text-[10px] font-normal text-gray-300 ml-1">(전체 주문)</span>
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(seller.totalRevenue ?? 0).toLocaleString()}
+                  <span className="text-sm font-normal text-gray-400 ml-1">원</span>
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  실 매출
+                  <span className="text-[10px] font-normal text-gray-300 ml-1">(결제전, 취소/환불 제외)</span>
+                </p>
+                <p className="text-2xl font-bold text-emerald-600">
+                  {(seller.realRevenue ?? 0).toLocaleString()}
+                  <span className="text-sm font-normal text-emerald-400 ml-1">원</span>
+                </p>
               </div>
             </div>
           )}
@@ -269,10 +300,10 @@ const AdminSellerDetailPage = () => {
             <div className="px-6 py-5">
               <div className="grid grid-cols-2 gap-x-12 gap-y-5">
                 <DetailField label="사업자등록번호">{editing ? <input name="businessNo" value={form.businessNo} onChange={handleChange} type="text" placeholder="000-00-00000" maxLength={12} className={editCls('_')} /> : <DetailText value={fmtBizNo(seller.businessNo)} />}</DetailField>
-                <DetailField label="세금계산서 발행">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="taxInvoice" type="checkbox" checked={form.taxInvoice} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">발행 가능</span></label> : <DetailText value={seller.taxInvoice ? '가능' : '불가'} />}</DetailField>
+                <DetailField label="세금계산서 발급 여부">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="taxInvoice" type="checkbox" checked={form.taxInvoice} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">발행 가능</span></label> : <DetailText value={seller.taxInvoice ? '가능' : '불가'} />}</DetailField>
                 <DetailField label="현금영수증 번호">{editing ? <input name="cashReceiptNo" value={form.cashReceiptNo} onChange={handleChange} type="text" placeholder="선택 입력" className={editCls('_')} /> : <DetailText value={seller.cashReceiptNo} />}</DetailField>
-                <DetailField label="특산물 인증">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label> : <DetailText value={seller.isVerified ? '인증됨' : '미인증'} />}</DetailField>
-                <div className="col-span-2"><DetailField label="소개">{editing ? <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="판매자 소개 (선택)" className={editCls('_') + ' resize-y'} /> : <DetailText value={seller.description} />}</DetailField></div>
+                <DetailField label="금빛나루 인증">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label> : <DetailText value={seller.isVerified ? '인증됨' : '미인증'} />}</DetailField>
+                <div className="col-span-2"><DetailField label="상호명">{editing ? <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="상호명 (선택)" className={editCls('_') + ' resize-y'} /> : <DetailText value={seller.description} />}</DetailField></div>
               </div>
             </div>
           </div>

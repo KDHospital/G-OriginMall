@@ -67,13 +67,26 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
 	long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 
 	// 오늘 매출 합계
-	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.createdAt BETWEEN :start AND :end AND o.status != 4")
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o " +
+		       "WHERE o.createdAt BETWEEN :start AND :end " +
+		       "AND o.status NOT IN (0, 4, 5)")
 	Long sumTotalPriceByCreatedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 	
 	// 판매자 페이지 - 판매자 오늘 주문 수
 	long countBySellerIdAndCreatedAtBetween(Long sellerId, LocalDateTime start, LocalDateTime end);
 
 	// 판매자 페이지 - 판매자 오늘 매출
-	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.seller.id = :sellerId AND o.createdAt BETWEEN :start AND :end AND o.status != 4")
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o " +
+		       "WHERE o.seller.id = :sellerId " +
+		       "AND o.createdAt BETWEEN :start AND :end " +
+		       "AND o.status NOT IN (0, 4, 5)")
 	Long sumTotalPriceBySellerIdAndCreatedAtBetween(@Param("sellerId") Long sellerId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+	
+	// 관리자 페이지 - 판매자별 총 매출액
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.seller.id = :sellerId")
+	Long sumTotalRevenueBySellerId(@Param("sellerId") Long sellerId);
+	
+	// 관리자 페이지 - 판매자별 실 매출액(결제전, 취소/환불, 결제 실패 제외)
+	@Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Orders o WHERE o.seller.id = :sellerId AND o.status NOT IN (0, 4, 5)")
+	Long sumRealRevenueBySellerId(@Param("sellerId") Long sellerId);
 }

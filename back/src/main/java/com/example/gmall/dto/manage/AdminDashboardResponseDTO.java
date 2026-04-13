@@ -14,6 +14,12 @@ public class AdminDashboardResponseDTO {
     private long soldOutProducts;
     private List<RecentOrderDTO> recentOrders;
     private List<RecentMemberDTO> recentMembers;
+    
+    // 판매자별 총 매출액
+    private long totalRevenue;
+    
+    // 판매자별 실 매출액
+    private long realRevenue;
 
     @Getter
     @Builder

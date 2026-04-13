@@ -4,6 +4,7 @@ import BasicLayout from "../../layouts/BasicLayout";
 import axiosInstance from "../../api/axios";
 import MyPageComponent from "../../components/member/MyPageComponent";
 import { BASE_URL } from "../../util/imagesUtil";
+import { formatPhone } from "../../util/phoneUtil";
 
 // ─────────────────────────────────────────
 // 상태 배지
@@ -14,6 +15,7 @@ const STATUS_STYLE = {
     2: "bg-yellow-100 text-yellow-600",
     3: "bg-green-100 text-green-600",
     4: "bg-red-100 text-red-500",
+    5: "bg-orange-100 text-orange-500",
 };
 
 // ─────────────────────────────────────────
@@ -338,7 +340,7 @@ export default function MyOrderDetail() {
                                 </tr>
                                 <tr className="border-b border-gray-50">
                                     <td className="p-4 w-32 bg-gray-50 font-bold text-gray-600">연락처</td>
-                                    <td className="p-4">{order.receiverTel}</td>
+                                    <td className="p-4">{formatPhone(order.receiverTel ?? "")}</td>
                                 </tr>
                                 <tr className="border-b border-gray-50">
                                     <td className="p-4 w-32 bg-gray-50 font-bold text-gray-600">주소</td>

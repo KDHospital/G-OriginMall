@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import AdminLayout from "../../layouts/AdminLayout";
 import axiosInstance from "../../api/axios";
 import { BASE_URL } from "../../util/imagesUtil";
+import { formatPhone } from "../../util/phoneUtil";
 
 // ─────────────────────────────────────────
 // 상태 배지
@@ -13,6 +14,7 @@ const STATUS_STYLE = {
     2: "bg-yellow-100 text-yellow-600",
     3: "bg-green-100 text-green-600",
     4: "bg-red-100 text-red-500",
+    5: "bg-orange-100 text-orange-500",
 };
 
 function StatusBadge({ status, label }) {
@@ -301,7 +303,7 @@ export default function AdminOrderDetail() {
                             </tr>
                             <tr className="border-b border-gray-50">
                                 <td className="p-4 w-32 bg-gray-50 font-bold text-gray-600 text-xs">연락처</td>
-                                <td className="p-4 text-xs">{order.receiverTel}</td>
+                                <td className="p-4 text-xs">{formatPhone(order.receiverTel ?? "")}</td>
                             </tr>
                             <tr className="border-b border-gray-50">
                                 <td className="p-4 w-32 bg-gray-50 font-bold text-gray-600 text-xs">주소</td>

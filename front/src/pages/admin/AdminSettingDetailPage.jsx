@@ -66,7 +66,7 @@ const AdminSettingDetailPage = () => {
 
     setSaving(true);
     try {
-      const data = { mname: form.mname.trim(), tel: form.tel.trim() };
+      const data = { mname: form.mname.trim(), tel: form.tel.replace(/-/g, '').trim() };
       if (form.mpwd) data.mpwd = form.mpwd;
       await adminUpdateAdmin(memberId, data);
       alert("관리자 정보가 수정되었습니다.");

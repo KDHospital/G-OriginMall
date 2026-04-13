@@ -69,6 +69,12 @@ public interface OrderService {
 	
 	// 관리자 페이지 - 부분 결제 취소
 	void adminCancelOrderItem(Long orderId, Long orderItemId);
+	
+	// 결제 실패 처리
+	void failOrder(Long orderId);
+	
+	// 관리자 페이지 - 판매자별 매출
+	Map<String, Long> getSellerRevenue(Long sellerId);
 
 	
 }

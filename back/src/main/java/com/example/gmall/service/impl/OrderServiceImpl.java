@@ -82,6 +82,12 @@ public class OrderServiceImpl implements OrderService {
         for (OrderRequestDTO.OrderItemRequestDTO itemDto : dto.getOrderItems()) {
             Product product = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+            
+            // 상품 상태 체크
+            if (product.getSoldStatus() != 0) {
+                throw new IllegalStateException(
+                    product.getPname() + "은(는) 현재 구매할 수 없는 상품입니다.");
+            }
 
             // 재고 확인
             if (product.getStock() < itemDto.getQuantity()) {
@@ -194,8 +200,8 @@ public class OrderServiceImpl implements OrderService {
     public void cancelOrder(Long memberId, Long orderId) {
     	Orders orders = getOrderOfMember(memberId, orderId);
 
-        if (orders.getStatus() >= 2) {
-            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        if (orders.getStatus() >= 2 || orders.getStatus() == 5) {
+            throw new IllegalStateException("배송 중이거나 완료된(이미 취소된) 주문은 취소할 수 없습니다.");
         }
 
         // 토스 결제 취소 — paymentKey 있을 때만 호출
@@ -228,8 +234,8 @@ public class OrderServiceImpl implements OrderService {
         Orders orders = getOrderOfMember(memberId, orderId);
 
         // 배송중, 배송완료는 취소 불가
-        if (orders.getStatus() >= 2) {
-            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        if (orders.getStatus() >= 2 || orders.getStatus() == 5) {
+            throw new IllegalStateException("배송 중이거나 완료된(이미 취소된) 주문은 취소할 수 없습니다.");
         }
 
         // 해당 OrderItem 조회
@@ -687,8 +693,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 배송중, 배송완료는 취소 불가
-        if (orders.getStatus() >= 2) {
-            throw new IllegalStateException("배송 중이거나 완료된 주문은 취소할 수 없습니다.");
+        if (orders.getStatus() >= 2 || orders.getStatus() == 5) {
+            throw new IllegalStateException("배송 중이거나 완료된(이미 취소된) 주문은 취소할 수 없습니다.");
         }
 
         // 토스 결제 취소
@@ -804,4 +810,50 @@ public class OrderServiceImpl implements OrderService {
         log.info("상품 개별 취소 완료 - orderId: {}, orderItemId: {}", orders.getOrderId(), orderItemId);
     }
     
+    // 결제 취소 시 로직
+    @Override
+    public void failOrder(Long orderId) {
+        Orders orders = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
+
+        // 이미 결제 완료된 주문은 실패 처리 불가
+        if (orders.getStatus() != 0) {
+            log.warn("결제실패 처리 불가 - 이미 처리된 주문 orderId: {}, status: {}", orderId, orders.getStatus());
+            return;
+        }
+        
+     // 같은 그룹 전체 주문 실패 처리
+        List<Orders> groupOrders = ordersRepository.findByOrderGroupId(orders.getOrderGroupId());
+
+        groupOrders.forEach(o -> {
+            // 재고 복구
+            o.getOrderItems().stream()
+                    .filter(item -> !item.isCancelled())
+                    .forEach(item -> item.getProduct().restoreStock(item.getQuantity()));
+
+            // 상태 이력 저장
+            OrderStatusHistory history = OrderStatusHistory.builder()
+                    .orders(o)
+                    .seller(o.getSeller())
+                    .fromStatus(o.getStatus())
+                    .toStatus((byte) 5)
+                    .memo("결제 실패")
+                    .build();
+
+            orderStatusHistoryRepository.save(history);
+            o.updateStatus((byte) 5);
+        });
+
+        log.info("결제 실패 처리 완료 - orderGroupId: {}", orders.getOrderGroupId());
+    }
+    
+    // 관리자 페이지 - 판매자별 매출
+    @Override
+    public Map<String, Long> getSellerRevenue(Long sellerId) {
+        Map<String, Long> revenue = new HashMap<>();
+        revenue.put("totalRevenue", ordersRepository.sumTotalRevenueBySellerId(sellerId));
+        revenue.put("realRevenue", ordersRepository.sumRealRevenueBySellerId(sellerId));
+        return revenue;
+    }
+
 }

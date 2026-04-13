@@ -233,7 +233,7 @@ return(
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
-                                    placeholder="상호명과 업체에 대한 설명을 간략하게 입력해 주시기 바랍니다"
+                                    placeholder="상호명을 입력해 주세요"
                                     className="w-full p-3 bg-gray-50 rounded-lg text-sm border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400"
                                 />
                            
