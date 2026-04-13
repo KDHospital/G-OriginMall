@@ -3,6 +3,7 @@ import { login } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { KAKAO_AUTH_URL } from "../../api/kakaoApi";
+import { getNaverAuthUrl } from "../../api/naverAPI";
 
 const initState = {
     loginId:'',
@@ -119,6 +120,15 @@ const LoginComponent = () => {
                         <img 
                              src="\public\assets\images\kakao_login_large_wide.png"
                               alt="카카오 로그인" 
+                              className="shadow-sm rounded" />
+                    </a>
+
+                </div>
+                <div className="flex justify-center">
+                    <a href={getNaverAuthUrl()} className="hover:opacity-90 transition-opacity">
+                        <img 
+                             src="\public\assets\images\NAVER_login_Light_KR_green_wide_H56.png"
+                              alt="네이버 로그인" 
                               className="shadow-sm rounded" />
                     </a>
 
