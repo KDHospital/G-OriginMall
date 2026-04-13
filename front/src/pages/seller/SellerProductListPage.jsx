@@ -11,12 +11,14 @@ const SOLD_STATUS_STYLE = {
     0: "bg-green-100 text-green-600",
     1: "bg-gray-100 text-gray-400",
     2: "bg-red-100 text-red-400",
+    3: "bg-black text-white",
 };
 
 const SOLD_STATUS_LABEL = {
     0: "판매중",
     1: "숨김",
     2: "품절",
+    3: "삭제됨", 
 };
 
 function SoldStatusBadge({ status }) {
@@ -161,12 +163,16 @@ export default function SellerProductListPage() {
                                     {/* 관리 */}
                                     <td className="p-4 text-center">
                                         <div className="flex items-center justify-center gap-2">
-                                            <button
-                                                onClick={() => navigate(`/seller/products/${product.productId}/edit`)}
-                                                className="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors whitespace-nowrap"
-                                            >
-                                                수정
-                                            </button>
+                                            {product.soldStatus !== 3 ? (
+                                                <button
+                                                    onClick={() => navigate(`/seller/products/${product.productId}/edit`)}
+                                                    className="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors whitespace-nowrap"
+                                                >
+                                                    수정
+                                                </button>
+                                            ) : (
+                                                <span className="text-xs text-gray-300">삭제됨</span>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

@@ -252,13 +252,6 @@ public class ProductServiceImpl implements ProductService {
 	            .map(ProductImage::getProductImageId)
 	            .collect(Collectors.toList());
 	    
-	    toDelete.forEach(img -> deleteFile(img.getImageUrl()));
-	    
-	    
-	    log.info("keepUrls: {}", keepUrls);
-	    log.info("product images: {}", product.getProductImages().stream()
-	        .map(ProductImage::getImageUrl)
-	        .collect(Collectors.toList()));
 	    
 	    toDelete.forEach(img -> deleteFile(img.getImageUrl()));
 	    productImageRepository.deleteAllInBatch(toDelete);

@@ -9,8 +9,9 @@ const SOLD_STATUS_STYLE = {
     0: "bg-green-100 text-green-600",
     1: "bg-gray-100 text-gray-400",
     2: "bg-red-100 text-red-400",
+    3: "bg-black text-white",
 }
-const SOLD_STATUS_LABEL = { 0: "판매중", 1: "숨김", 2: "품절" }
+const SOLD_STATUS_LABEL = { 0: "판매중", 1: "숨김", 2: "품절", 3: "삭제됨", }
 
 function SoldStatusBadge({ status }) {
     return (
@@ -49,7 +50,8 @@ const AdminProductListPage = () => {
 
     // 체크박스
     const [checkedIds, setCheckedIds] = useState([])
-    const allChecked = products.length > 0 && checkedIds.length === products.length
+    const selectableProducts = products.filter(p => p.soldStatus !== 3)
+    const allChecked = selectableProducts.length > 0 && checkedIds.length === selectableProducts.length
 
     // ── 카테고리 로드 ────────────────────────────
     useEffect(() => {
@@ -139,7 +141,7 @@ const AdminProductListPage = () => {
 
     // ── 체크박스 ─────────────────────────────────
     const handleCheckAll = () => {
-        setCheckedIds(allChecked ? [] : products.map((p) => p.productId))
+        setCheckedIds(allChecked ? [] : selectableProducts.map((p) => p.productId))
     }
     const handleCheck = (id) => {
         setCheckedIds((prev) =>
@@ -163,7 +165,7 @@ const AdminProductListPage = () => {
     // ── 선택 삭제 ────────────────────────────────
     const handleDelete = async () => {
         if (checkedIds.length === 0) return alert("항목을 선택해주세요.")
-        if (!window.confirm(`${checkedIds.length}개 상품을 삭제하시겠습니까?\n(숨김 처리로 대체됩니다)`)) return
+        if (!window.confirm(`${checkedIds.length}개 상품을 삭제하시겠습니까?`)) return
         try {
             await axiosInstance.delete("/admin/products", { data: checkedIds })
             alert("삭제되었습니다.")
@@ -254,6 +256,7 @@ const AdminProductListPage = () => {
                             <option value="0">판매중</option>
                             <option value="1">숨김</option>
                             <option value="2">품절</option>
+                            <option value="3">삭제됨</option>
                         </select>
                     </div>
                     {/* 인증 상태 */}
@@ -342,7 +345,8 @@ const AdminProductListPage = () => {
                                         <input type="checkbox"
                                             checked={checkedIds.includes(product.productId)}
                                             onChange={() => handleCheck(product.productId)}
-                                            className="w-4 h-4 accent-gray-700 cursor-pointer" />
+                                            disabled={product.soldStatus === 3}
+                                            className="w-4 h-4 accent-gray-700 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed" />
                                     </td>
                                     {/* No */}
                                     <td className="p-3 text-center text-xs text-gray-400">
@@ -406,12 +410,12 @@ const AdminProductListPage = () => {
                                     </td>
                                     {/* 관리 */}
                                     <td className="p-3 text-center">
-                                        <button
-                                            onClick={() => navigate(`/admin/products/${product.productId}/edit`)}
-                                            className="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                                        >
-                                            수정
-                                        </button>
+                                            <button
+                                                onClick={() => navigate(`/admin/products/${product.productId}/edit`)}
+                                                className="text-xs px-3 py-1.5 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                                            >
+                                                수정
+                                            </button>
                                     </td>
                                 </tr>
                             ))}
