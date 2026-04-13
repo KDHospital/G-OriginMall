@@ -141,7 +141,7 @@ const AdminSellerListPage = () => {
             </select>
             <div className="relative flex-1 max-w-sm">
               <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={handleSearchKeyDown}
-                placeholder="이름, 아이디, 사업자번호 검색"
+                placeholder="담당자명, 아이디, 사업자번호 검색"
                 className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all bg-white" />
               {searchInput && <button onClick={handleSearchClear} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm">✕</button>}
             </div>
@@ -174,7 +174,7 @@ const AdminSellerListPage = () => {
                     <th className="px-3 py-4 w-14 text-center font-semibold">No.</th>
                     <th className="px-4 py-4 w-20 text-center font-semibold">상태</th>
                     <th className="px-4 py-4 w-24 text-center font-semibold">승인여부</th>
-                    <th className="px-4 py-4 w-40 text-center font-semibold">이름</th>
+                    <th className="px-4 py-4 w-40 text-center font-semibold">담당자명</th>
                     <th className="px-4 py-4 text-left font-semibold">아이디</th>
                     <th className="px-4 py-4 w-40 text-center font-semibold">상호명</th>
                     <th className="px-4 py-4 w-32 text-center font-semibold">사업자번호</th>

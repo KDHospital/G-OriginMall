@@ -224,7 +224,7 @@ const AdminSellerDetailPage = () => {
                   </span>
                 )}
                 <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-600">판매회원</span>
-                {(editing ? form.isVerified : seller.isVerified) && <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-50 text-yellow-600">특산물 인증</span>}
+                {(editing ? form.isVerified : seller.isVerified) && <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-50 text-yellow-600">금빛나루 인증</span>}
               </div>
               <h3 className="text-xl font-bold text-gray-900">{seller.mname}</h3>
               <p className="text-sm text-gray-400 mt-1">회원ID : {seller.id}</p>
@@ -233,7 +233,7 @@ const AdminSellerDetailPage = () => {
             <div className="px-6 py-5">
               <div className="grid grid-cols-2 gap-x-12 gap-y-5">
                 <DetailField label="아이디">{editing ? <input value={seller.loginId} disabled className="w-full px-4 py-2.5 border border-gray-100 rounded-lg text-sm bg-gray-50 text-gray-500" /> : <DetailText value={seller.loginId} />}</DetailField>
-                <DetailField label="이름">{editing ? <><input name="mname" value={form.mname} onChange={handleChange} type="text" className={editCls('mname')} />{editErrMsg('mname') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mname')}</p>}</> : <DetailText value={seller.mname} />}</DetailField>
+                <DetailField label="담당자명">{editing ? <><input name="mname" value={form.mname} onChange={handleChange} type="text" className={editCls('mname')} />{editErrMsg('mname') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('mname')}</p>}</> : <DetailText value={seller.mname} />}</DetailField>
                 <DetailField label="이메일">{editing ? <input value={seller.email} disabled className="w-full px-4 py-2.5 border border-gray-100 rounded-lg text-sm bg-gray-50 text-gray-500" /> : <DetailText value={seller.email} />}</DetailField>
                 <DetailField label="연락처">{editing ? <><input name="tel" value={form.tel} onChange={handleChange} type="text" className={editCls('tel')} />{editErrMsg('tel') && <p className="text-xs text-red-500 mt-1.5">{editErrMsg('tel')}</p>}</> : <DetailText value={fmtTel(seller.tel)} />}</DetailField>
                 <DetailField label="가입일"><DetailText value={fmtDateTime(seller.createdAt)} /></DetailField>
@@ -269,9 +269,9 @@ const AdminSellerDetailPage = () => {
             <div className="px-6 py-5">
               <div className="grid grid-cols-2 gap-x-12 gap-y-5">
                 <DetailField label="사업자등록번호">{editing ? <input name="businessNo" value={form.businessNo} onChange={handleChange} type="text" placeholder="000-00-00000" maxLength={12} className={editCls('_')} /> : <DetailText value={fmtBizNo(seller.businessNo)} />}</DetailField>
-                <DetailField label="세금계산서 발행">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="taxInvoice" type="checkbox" checked={form.taxInvoice} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">발행 가능</span></label> : <DetailText value={seller.taxInvoice ? '가능' : '불가'} />}</DetailField>
+                <DetailField label="세금계산서 발급 여부">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="taxInvoice" type="checkbox" checked={form.taxInvoice} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">발행 가능</span></label> : <DetailText value={seller.taxInvoice ? '가능' : '불가'} />}</DetailField>
                 <DetailField label="현금영수증 번호">{editing ? <input name="cashReceiptNo" value={form.cashReceiptNo} onChange={handleChange} type="text" placeholder="선택 입력" className={editCls('_')} /> : <DetailText value={seller.cashReceiptNo} />}</DetailField>
-                <DetailField label="특산물 인증">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label> : <DetailText value={seller.isVerified ? '인증됨' : '미인증'} />}</DetailField>
+                <DetailField label="금빛나루 인증">{editing ? <label className="flex items-center gap-2 cursor-pointer mt-1"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label> : <DetailText value={seller.isVerified ? '인증됨' : '미인증'} />}</DetailField>
                 <div className="col-span-2"><DetailField label="상호명">{editing ? <textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="상호명 (선택)" className={editCls('_') + ' resize-y'} /> : <DetailText value={seller.description} />}</DetailField></div>
               </div>
             </div>

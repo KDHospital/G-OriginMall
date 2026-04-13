@@ -260,6 +260,7 @@ public void registerSeller(SellerSignupDTO dto) {
                 .emailVerified(true)
                 .businessNo(dto.getBusinessNo())
                 .taxInvoice(dto.getTaxInvoice())
+                .cashReceiptNo(dto.getCashReceiptNo())
                 .isVerified(dto.getIsVerified())
                 .settlementName(dto.getSettlementName())
                 .settlementBank(dto.getSettlementBank())
