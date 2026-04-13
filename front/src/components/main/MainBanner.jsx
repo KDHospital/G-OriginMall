@@ -13,6 +13,7 @@ const MainBanner = () => {
             try {
                 const res = await getActiveBanners()
                 setBanners(res.data)
+                console.log(res.data)
             } catch (err) {
                 console.error('배너 목록 로드 실패',err)
             }
@@ -38,8 +39,8 @@ const MainBanner = () => {
         <section className="relative h-[600px] overflow-hidden">
             {banners.map((banner,idx)=>(
                 <Link 
-                key={banners.bannerId}
-                href={banner.linkUrl || '#'}
+                key={banner.bannerId}
+                to={banner.linkUrl || '#'}
                 className={`absolute inset-0 transition-opacity duration-700
                         ${idx === current ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}>
 

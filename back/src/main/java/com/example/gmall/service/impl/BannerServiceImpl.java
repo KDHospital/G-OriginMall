@@ -62,7 +62,7 @@ public class BannerServiceImpl implements BannerService {
                 .imageUrl(imageUrl)
                 .linkUrl(dto.getLinkUrl())
                 .sortOrder(dto.getSortOrder())
-                .isActive(dto.isActive())
+                .isActive(dto.getIsActive())
                 .build();
 
         return new BannerResponseDTO(bannerRepository.save(banner));
@@ -84,7 +84,7 @@ public class BannerServiceImpl implements BannerService {
         		dto.getImageUrl(),
         		dto.getLinkUrl(),
         		dto.getSortOrder(),
-        		dto.isActive()
+        		dto.getIsActive()
         		);
 
         return new BannerResponseDTO(bannerRepository.save(banner));

@@ -55,6 +55,7 @@ import AdminOrderDetail from './pages/admin/AdminOrderDetail';
 import AdminProductListPage from './pages/admin/AdminProductListPage';
 import AdminProductModifyPage from './pages/admin/AdminProductModifyPage';
 import AdminBanner from './pages/admin/AdminBanner';
+import AdminBannerEdit from './pages/admin/AdminBannerEdit';
 
 import BoardPage from './pages/support/BoardPage';
 import BoardReadPage from './pages/support/BoardReadPage';
@@ -173,6 +174,7 @@ function App() {
 
         {/* 어드민-배너관리  - 이효진 담당 */}
         <Route path="/admin/banner" element={<ProtectedRoute allowRole={2}><AdminBanner /></ProtectedRoute>} />
+        <Route path="/admin/banner/:bannerId/edit" element={<ProtectedRoute allowRole={2}><AdminBannerEdit /></ProtectedRoute>} />
 
 
 

@@ -2,7 +2,7 @@ import { useState, useRef,useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import AdminLayout from "../../layouts/AdminLayout"
 import axiosInstance from "../../api/axios"
-import { BASE_URL,getImageUrl } from "../../util/imagesUtil"
+import { getImageUrl } from "../../util/imagesUtil"
 
 const formatPrice = (n) => {
     if (!n && n !== 0) return "";
