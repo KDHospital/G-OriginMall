@@ -104,7 +104,7 @@ export default function OrderSuccessPage() {
             <span className="text-white text-xl">✓</span>
           </div>
           <h2 className="text-lg font-bold text-gray-800 mb-2">결제가 완료되었습니다</h2>
-          <p className="text-sm text-gray-500 mb-1">주문번호: {orderId}</p>
+          <p className="text-sm text-gray-500 mb-1">주문번호: ORDER_{realOrderId}</p>
           <p className="text-sm text-gray-500 mb-6">
             결제금액: {Number(amount).toLocaleString("ko-KR")}원
           </p>
