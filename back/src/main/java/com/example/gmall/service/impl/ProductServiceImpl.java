@@ -260,8 +260,8 @@ public class ProductServiceImpl implements ProductService {
 	        .map(ProductImage::getImageUrl)
 	        .collect(Collectors.toList()));
 	    
-	    
-	    productImageRepository.deleteAllById(toDeleteIds);
+	    toDelete.forEach(img -> deleteFile(img.getImageUrl()));
+	    productImageRepository.deleteAllInBatch(toDelete);
 
 	    // 2. 새 이미지 업로드
 	    if (dto.getImages() != null && !dto.getImages().isEmpty()) {
@@ -283,6 +283,7 @@ public class ProductServiceImpl implements ProductService {
 	            }
 	        }
 	    }
+	    
 
 	    return new ProductResponseDTO(product);
 	}
