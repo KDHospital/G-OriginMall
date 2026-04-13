@@ -287,24 +287,24 @@ const AdminBannerPage = () => {
                                     <button
                                         onClick={() => handleToggle(banner.bannerId)}
                                         className={`relative w-11 h-6 rounded-full transition-colors ${
-                                            banner.getActive ? "bg-green-500" : "bg-gray-300"
+                                            banner.isActive ? "bg-green-500" : "bg-gray-300"
                                         }`}
                                     >
                                         <span
                                             className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${
-                                                banner.getActive ? "left-6" : "left-1"
+                                                banner.isActive ? "left-6" : "left-1"
                                             }`}
                                         />
                                     </button>
                                     <span
                                         className={`text-xs font-semibold ${
-                                            banner.getActive ? "text-green-600" : "text-gray-400"
+                                            banner.isActive ? "text-green-600" : "text-gray-400"
                                         }`}
                                     >
                                         {banner.isActive ? "노출중" : "숨김"}
                                     </span>
                                     <span className="text-xs text-gray-300">
-                                        is_active = {banner.getActive ? 1 : 0}
+                                        is_active = {banner.isActive ? 1 : 0}
                                     </span>
                                 </div>
 

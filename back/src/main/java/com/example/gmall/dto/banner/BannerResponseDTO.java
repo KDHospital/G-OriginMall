@@ -10,7 +10,7 @@ public class BannerResponseDTO {
 	private String imageUrl;
 	private String linkUrl;
 	private Integer sortOrder;
-	private boolean isActive;
+	private Boolean isActive;
 	
 	public BannerResponseDTO(Banner b) {
 		this.bannerId = b.getBannerId();
