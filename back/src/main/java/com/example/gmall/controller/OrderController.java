@@ -278,4 +278,15 @@ public class OrderController {
 	    orderService.adminCancelOrderItem(orderId, orderItemId);
 	    return ResponseEntity.noContent().build();
 	}
+	
+	// 결제 실패 처리
+	// PATCH /api/orders/{orderId}/fail
+	@PatchMapping("/orders/{orderId}/fail")
+	public ResponseEntity<Void> failOrder(
+	        @PathVariable("orderId") Long orderId
+	) {
+	    orderService.failOrder(orderId);
+	    return ResponseEntity.noContent().build();
+	}
+	
 }

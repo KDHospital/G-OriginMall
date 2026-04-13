@@ -234,7 +234,13 @@ public class ProductServiceImpl implements ProductService {
 	    if (product.getThumbnailImageUrl() != null
 	            && !keepUrls.contains(product.getThumbnailImageUrl())) {
 	        deleteFile(product.getThumbnailImageUrl());
-	        product.updateThumbnailImageUrl(null);
+	        
+	        // keepUrls에 남은 이미지가 있으면 첫 번째를 썸네일로 승격
+	        if (!keepUrls.isEmpty()) {
+	            product.updateThumbnailImageUrl(keepUrls.get(0));
+	        } else {
+	            product.updateThumbnailImageUrl(null);
+	        }
 	    }
 
 	    // product_image 테이블에서 keepUrls에 없는 것 삭제
@@ -242,10 +248,20 @@ public class ProductServiceImpl implements ProductService {
 	            .filter(img -> !keepUrls.contains(img.getImageUrl()))
 	            .collect(Collectors.toList());
 
-	    toDelete.forEach(img -> {
-	        deleteFile(img.getImageUrl());
-	        productImageRepository.delete(img);
-	    });
+	    List<Integer> toDeleteIds = toDelete.stream()
+	            .map(ProductImage::getProductImageId)
+	            .collect(Collectors.toList());
+	    
+	    toDelete.forEach(img -> deleteFile(img.getImageUrl()));
+	    
+	    
+	    log.info("keepUrls: {}", keepUrls);
+	    log.info("product images: {}", product.getProductImages().stream()
+	        .map(ProductImage::getImageUrl)
+	        .collect(Collectors.toList()));
+	    
+	    toDelete.forEach(img -> deleteFile(img.getImageUrl()));
+	    productImageRepository.deleteAllInBatch(toDelete);
 
 	    // 2. 새 이미지 업로드
 	    if (dto.getImages() != null && !dto.getImages().isEmpty()) {
@@ -267,6 +283,7 @@ public class ProductServiceImpl implements ProductService {
 	            }
 	        }
 	    }
+	    
 
 	    return new ProductResponseDTO(product);
 	}
@@ -282,15 +299,24 @@ public class ProductServiceImpl implements ProductService {
 	            .build();
 	    productImageRepository.save(productImage);
 	}
-
+	
+	// -- 판매자 상품 수정 이미지 삭제
 	private void deleteFile(String imageUrl) {
 	    if (imageUrl == null) return;
 	    try {
-	        // "/uploads/products/..." → "uploads/products/..."
-	        String filePath = imageUrl.startsWith("/")
+	        // uploadPath + productId 폴더에 저장되어 있으므로
+	        // imageUrl: /uploads/products/1/xxx.jpg
+	        // 실제 경로: {uploadPath의 상위}/uploads/products/1/xxx.jpg
+	        String relativePath = imageUrl.startsWith("/")
 	                ? imageUrl.substring(1)
 	                : imageUrl;
-	        java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(filePath));
+	        
+	        // 프로젝트 루트 기준 절대 경로로 변환
+	        String absolutePath = System.getProperty("user.dir") + "/" + relativePath;
+	        
+	        java.nio.file.Path path = java.nio.file.Paths.get(absolutePath);
+	        boolean deleted = java.nio.file.Files.deleteIfExists(path);
+	        log.info("파일 삭제 {}: {}", deleted ? "성공" : "파일없음", absolutePath);
 	    } catch (IOException e) {
 	        log.warn("파일 삭제 실패: {}", imageUrl);
 	    }
