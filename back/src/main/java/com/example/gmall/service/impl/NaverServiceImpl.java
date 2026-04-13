@@ -108,6 +108,7 @@ public class NaverServiceImpl implements NaverService{
 			.role((Byte) claims.get("role"))
 			.accessToken(ourAccessToken)
 			.refreshToken(ourRefreshToken)
+			.isSocial(true)
 			.needsExtraInfo(needsExtraInfo)
 			.build();
 	}
