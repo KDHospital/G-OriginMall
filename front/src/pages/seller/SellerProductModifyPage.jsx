@@ -59,6 +59,15 @@ export default function SellerProductModifyPage() {
         axiosInstance.get(`/products/${productId}`)
             .then((res) => {
                 const p = res.data;
+
+                // 본인 상품인지 확인
+                const memberData = JSON.parse(localStorage.getItem("member"));
+                const sellerId = memberData?.data?.memberId;
+                if (String(p.sellerId) !== String(sellerId)) {
+                    alert("본인의 상품만 수정할 수 있습니다.");
+                    navigate("/seller/products");
+                    return;
+                }
                 setForm({
                     pname: p.pname ?? "",
                     pdesc: p.pdesc ?? "",
