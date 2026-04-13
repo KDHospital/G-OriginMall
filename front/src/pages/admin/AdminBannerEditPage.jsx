@@ -5,7 +5,7 @@ import AdminLayout from "../../layouts/AdminLayout"
 import { getImageUrl } from "../../util/imagesUtil"
 
 
-const AdminBannerEdit = () => {
+const AdminBannerEditPage = () => {
     const navigate = useNavigate()
     const { bannerId } = useParams()
 
@@ -272,4 +272,4 @@ const AdminBannerEdit = () => {
         </AdminLayout>
     )
 }
-export default AdminBannerEdit
+export default AdminBannerEditPage

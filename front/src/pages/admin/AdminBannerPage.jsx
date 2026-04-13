@@ -11,7 +11,7 @@ import AdminLayout from "../../layouts/AdminLayout"
 import { getImageUrl } from "../../util/imagesUtil"
 
 
-const AdminBanner = () => {
+const AdminBannerPage = () => {
     const navigate = useNavigate()
     // ── 목록 상태 ─────────────────────────────
     const [banners, setBanners] = useState([])
@@ -42,6 +42,7 @@ const AdminBanner = () => {
         try {
             const res = await getBannerList()
             setBanners(res.data)
+            console.log(res.data)
         } catch (err) {
             showToast("배너 조회 실패","err")
         } finally {
@@ -96,6 +97,7 @@ const AdminBanner = () => {
                     b.bannerId === id ? { ...b, isActive: !b.isActive } : b
                 )
             )
+            
             showToast("노출상태 변경에 성공하였습니다.")
         } catch (err) {
             console.error(err)
@@ -285,24 +287,24 @@ const AdminBanner = () => {
                                     <button
                                         onClick={() => handleToggle(banner.bannerId)}
                                         className={`relative w-11 h-6 rounded-full transition-colors ${
-                                            banner.isActive ? "bg-green-500" : "bg-gray-300"
+                                            banner.getActive ? "bg-green-500" : "bg-gray-300"
                                         }`}
                                     >
                                         <span
                                             className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${
-                                                banner.isActive ? "left-6" : "left-1"
+                                                banner.getActive ? "left-6" : "left-1"
                                             }`}
                                         />
                                     </button>
                                     <span
                                         className={`text-xs font-semibold ${
-                                            banner.isActive ? "text-green-600" : "text-gray-400"
+                                            banner.getActive ? "text-green-600" : "text-gray-400"
                                         }`}
                                     >
                                         {banner.isActive ? "노출중" : "숨김"}
                                     </span>
                                     <span className="text-xs text-gray-300">
-                                        is_active = {banner.isActive ? 1 : 0}
+                                        is_active = {banner.getActive ? 1 : 0}
                                     </span>
                                 </div>
 
@@ -509,4 +511,4 @@ const AdminBanner = () => {
         </AdminLayout>
     )
 }
-export default AdminBanner
+export default AdminBannerPage
