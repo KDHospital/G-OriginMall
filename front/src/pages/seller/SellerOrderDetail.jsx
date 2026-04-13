@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import SellerLayout from "../../layouts/SellerLayout";
 import axiosInstance from "../../api/axios";
 import { BASE_URL } from "../../util/imagesUtil";
+import { formatPhone } from "../../util/phoneUtil";
 
 // ─────────────────────────────────────────
 // 상태 배지
@@ -284,7 +285,7 @@ export default function SellerOrderDetail() {
                             </tr>
                             <tr className="border-b border-gray-50">
                                 <td className="p-4 w-32 bg-gray-50 font-bold text-gray-600 text-xs">연락처</td>
-                                <td className="p-4 text-xs">{order.receiverTel}</td>
+                                <td className="p-4 text-xs">{formatPhone(order.receiverTel ?? "")}</td>
                             </tr>
                             <tr className="border-b border-gray-50">
                                 <td className="p-4 w-32 bg-gray-50 font-bold text-gray-600 text-xs">주소</td>
