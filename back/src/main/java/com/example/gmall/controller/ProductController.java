@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -202,12 +203,13 @@ public class ProductController {
 
 	// 어드민 선택 삭제 (HIDDEN 처리)
 	// DELETE /api/admin/products
+	@Transactional
 	@DeleteMapping("/admin/products")
 	public ResponseEntity<Void> deleteProducts(@RequestBody List<Long> productIds) {
-	    productIds.forEach(id -> {
+		productIds.forEach(id -> {
 	        Product p = productRepository.findById(id)
 	                .orElseThrow(() -> new IllegalArgumentException("없는 상품: " + id));
-	        p.updateSoldStatus((byte) 1); // 실제 삭제 대신 HIDDEN
+	        p.updateSoldStatus((byte) 3); // HIDDEN → DELETED
 	    });
 	    return ResponseEntity.ok().build();
 	}

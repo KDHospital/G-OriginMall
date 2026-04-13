@@ -82,6 +82,12 @@ public class OrderServiceImpl implements OrderService {
         for (OrderRequestDTO.OrderItemRequestDTO itemDto : dto.getOrderItems()) {
             Product product = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+            
+            // 상품 상태 체크
+            if (product.getSoldStatus() != 0) {
+                throw new IllegalStateException(
+                    product.getPname() + "은(는) 현재 구매할 수 없는 상품입니다.");
+            }
 
             // 재고 확인
             if (product.getStock() < itemDto.getQuantity()) {

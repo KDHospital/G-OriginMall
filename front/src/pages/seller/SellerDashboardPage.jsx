@@ -19,6 +19,7 @@ const SOLD_STATUS_STYLE = {
     0: "bg-green-100 text-green-600",
     1: "bg-gray-100 text-gray-400",
     2: "bg-red-100 text-red-400",
+    3: "bg-black text-white",
 };
 
 function StatusBadge({ status, label, styleMap }) {
@@ -202,8 +203,12 @@ function SellerDashboardPage() {
                                 dashboard?.recentProducts?.map((product) => (
                                     <tr
                                         key={product.productId}
-                                        onClick={() => navigate(`/seller/products/${product.productId}/edit`)}
-                                        className="border-t border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
+                                        onClick={() => product.soldStatus !== 3 && navigate(`/seller/products/${product.productId}/edit`)}
+                                        className={`border-t border-gray-50 transition-colors ${
+                                            product.soldStatus !== 3
+                                                ? "hover:bg-gray-50 cursor-pointer"
+                                                : "cursor-not-allowed opacity-60"
+                                        }`}
                                     >
                                         <td className="py-2 text-gray-800 font-medium truncate max-w-[100px]">
                                             {product.pname}
