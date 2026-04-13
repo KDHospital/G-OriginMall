@@ -83,7 +83,7 @@ const AdminMemberAddPage = () => {
         loginId: form.loginId.trim(),
         mname: form.mname.trim(),
         mpwd: form.mpwd,
-        tel: form.tel.trim(),
+        tel: form.tel.replace(/-/g, '').trim(),
         email: form.email.trim(),
         gender: form.gender
       });

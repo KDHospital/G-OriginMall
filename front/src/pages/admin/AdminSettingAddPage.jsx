@@ -73,7 +73,7 @@ const AdminSettingAddPage = () => {
         loginId: form.loginId.trim(),
         mname: form.mname.trim(),
         mpwd: form.mpwd,
-        tel: form.tel.trim(),
+        tel: form.tel.replace(/-/g, '').trim(),
         email: form.email.trim()
       });
       alert("관리자가 등록되었습니다.");

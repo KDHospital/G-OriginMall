@@ -53,7 +53,7 @@ const AdminSellerAddPage = () => {
 
   const errors = {
     loginId: !form.loginId.trim() ? '아이디를 입력해주세요.' : '',
-    mname: !form.mname.trim() ? '이름을 입력해주세요.' : '',
+    mname: !form.mname.trim() ? '담당자명을 입력해주세요.' : '',
     email: !form.email.trim() ? '이메일을 입력해주세요.' : (!emailRegex.test(form.email) ? '올바른 이메일 형식이 아닙니다.' : ''),
     mpwd: !form.mpwd ? '비밀번호를 입력해주세요.' : (!pwdRegex.test(form.mpwd) ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : ''),
     mpwdConfirm: !form.mpwdConfirm ? '비밀번호 확인을 입력해주세요.' : (form.mpwd !== form.mpwdConfirm ? '비밀번호가 일치하지 않습니다.' : ''),
@@ -77,8 +77,8 @@ const AdminSellerAddPage = () => {
         loginId: form.loginId.trim(), mname: form.mname.trim(), mpwd: form.mpwd,
         tel: form.tel.replace(/-/g, ''), email: form.email.trim(), gender: form.gender,
         businessNo: form.businessNo.replace(/-/g, '').trim(), taxInvoice: form.taxInvoice,
-        cashReceiptNo: form.cashReceiptNo.trim(), settlementName: form.settlementName.trim(),
-        settlementBank: form.settlementBank.trim(), bankAccount: form.bankAccount.trim(),
+        cashReceiptNo: form.cashReceiptNo.replace(/-/g, '').trim(), settlementName: form.settlementName.trim(),
+        settlementBank: form.settlementBank.trim(), bankAccount: form.bankAccount.replace(/-/g, '').trim(),
         isVerified: form.isVerified, description: form.description.trim()
       });
       alert("판매회원이 등록되었습니다.");
@@ -114,7 +114,7 @@ const AdminSellerAddPage = () => {
                 <input name="loginId" value={form.loginId} onChange={handleChange} type="text" placeholder="example@email.com" autoComplete="off" className={`${inputClass} max-w-md${errorClass('loginId')}`} />
                 {hasError('loginId') && <p className="text-xs text-red-500 mt-1.5">{errors.loginId}</p>}
               </Field>
-              <Field label="이름" required>
+              <Field label="담당자명" required>
                 <input name="mname" value={form.mname} onChange={handleChange} type="text" placeholder="담당자명" className={`${inputClass}${errorClass('mname')}`} />
                 {hasError('mname') && <p className="text-xs text-red-500 mt-1.5">{errors.mname}</p>}
               </Field>
@@ -152,14 +152,14 @@ const AdminSellerAddPage = () => {
             </div>
             <div className="p-6 grid grid-cols-2 gap-6">
               <Field label="사업자등록번호"><input name="businessNo" value={form.businessNo} onChange={handleChange} type="text" placeholder="000-00-00000" maxLength={12} className={inputClass} /></Field>
-              <Field label="세금계산서 발행">
+              <Field label="세금계산서 발급 여부">
                 <label className="flex items-center gap-2 cursor-pointer"><input name="taxInvoice" type="checkbox" checked={form.taxInvoice} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">발행 가능</span></label>
               </Field>
               <Field label="현금영수증 번호"><input name="cashReceiptNo" value={form.cashReceiptNo} onChange={handleChange} type="text" placeholder="선택 입력" className={inputClass} /></Field>
-              <Field label="특산물 인증">
+              <Field label="금빛나루 인증">
                 <label className="flex items-center gap-2 cursor-pointer"><input name="isVerified" type="checkbox" checked={form.isVerified} onChange={handleChange} className="w-4 h-4 accent-blue-600" /><span className="text-sm text-gray-700">인증됨</span></label>
               </Field>
-              <Field label="소개" span2><textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="판매자 소개 (선택)" className={inputClass + " resize-y"} /></Field>
+              <Field label="상호명" span2><textarea name="description" value={form.description} onChange={handleChange} rows={3} placeholder="상호명 (선택)" className={inputClass + " resize-y"} /></Field>
             </div>
           </div>
 
