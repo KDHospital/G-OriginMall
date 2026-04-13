@@ -83,6 +83,7 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
                             case 0 -> "판매중";
                             case 1 -> "숨김";
                             case 2 -> "품절";
+                            case 3 -> "삭제됨";
                             default -> "알 수 없음";
                         })
                         .build())
