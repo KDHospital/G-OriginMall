@@ -450,6 +450,8 @@ public class AdminMemberController {
 		// 판매자 통계
 		result.put("productCount", productRepository.countBySellerId(memberId));
 		result.put("orderCount", ordersRepository.countBySellerId(memberId));
+		result.put("totalRevenue", ordersRepository.sumTotalRevenueBySellerId(memberId));
+		result.put("realRevenue", ordersRepository.sumRealRevenueBySellerId(memberId));
 
 		return ResponseEntity.ok(result);
 	}

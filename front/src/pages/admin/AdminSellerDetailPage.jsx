@@ -248,14 +248,45 @@ const AdminSellerDetailPage = () => {
 
           {/* 판매 현황 */}
           {!editing && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">등록 상품 수</p>
-                <p className="text-2xl font-bold text-gray-900">{seller.productCount ?? 0}<span className="text-sm font-normal text-gray-400 ml-1">건</span></p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  등록 상품 수
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {seller.productCount ?? 0}
+                  <span className="text-sm font-normal text-gray-400 ml-1">건</span>
+                </p>
               </div>
               <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">총 주문 건수</p>
-                <p className="text-2xl font-bold text-gray-900">{seller.orderCount ?? 0}<span className="text-sm font-normal text-gray-400 ml-1">건</span></p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  총 주문 건수
+                  <span className="text-[10px] font-normal text-gray-300 ml-1">(결제전, 취소/환불 포함)</span>
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {seller.orderCount ?? 0}
+                  <span className="text-sm font-normal text-gray-400 ml-1">건</span>
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  총 매출
+                  <span className="text-[10px] font-normal text-gray-300 ml-1">(전체 주문)</span>
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(seller.totalRevenue ?? 0).toLocaleString()}
+                  <span className="text-sm font-normal text-gray-400 ml-1">원</span>
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  실 매출
+                  <span className="text-[10px] font-normal text-gray-300 ml-1">(결제전, 취소/환불 제외)</span>
+                </p>
+                <p className="text-2xl font-bold text-emerald-600">
+                  {(seller.realRevenue ?? 0).toLocaleString()}
+                  <span className="text-sm font-normal text-emerald-400 ml-1">원</span>
+                </p>
               </div>
             </div>
           )}
