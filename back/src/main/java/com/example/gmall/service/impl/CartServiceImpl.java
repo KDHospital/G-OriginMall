@@ -31,7 +31,8 @@ public class CartServiceImpl implements CartService {
     @Transactional(readOnly = true)
     public CartSummaryDTO getCartItems(Long memberId) {
         List<CartItemResponseDTO> dtoList = cartItemRepository.findByMemberId(memberId)
-                .stream()
+        		.stream()
+                .filter(item -> item.getProduct().getSoldStatus() == 0) // ← HIDDEN 제외
                 .map(CartItemResponseDTO::new)
                 .collect(Collectors.toList());
         return new CartSummaryDTO(dtoList);
@@ -43,6 +44,10 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        
+        if (product.getSoldStatus() != 0) {
+            throw new IllegalStateException("현재 구매할 수 없는 상품입니다.");
+        }
 
         CartItem cartItem = cartItemRepository
                 .findByMemberIdAndProductProductId(memberId, dto.getProductId())
