@@ -19,6 +19,7 @@ const SOLD_STATUS_STYLE = {
     0: "bg-green-100 text-green-600",
     1: "bg-gray-100 text-gray-400",
     2: "bg-red-100 text-red-400",
+    3: "bg-black text-white",
 };
 
 function StatusBadge({ status, label, styleMap }) {

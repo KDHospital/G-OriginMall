@@ -389,12 +389,13 @@ const AdminProductModifyPage = () => {
                 <div className="grid grid-cols-2 gap-5">
                     <section className="bg-white rounded-md p-5 shadow-sm">
                         <h3 className="text-sm font-bold text-gray-700 mb-1">판매 상태</h3>
-                        <p className="text-xs text-gray-400 mb-4">0=ACTIVE / 1=HIDDEN / 2=SOLD_OUT</p>
+                        <p className="text-xs text-gray-400 mb-4">0=ACTIVE / 1=HIDDEN / 2=SOLD_OUT / 3=DELETED</p>
                         <div className="space-y-3">
                             {[
                                 { value: 0, label: "판매중",  desc: "상품 목록에 노출" },
                                 { value: 1, label: "숨김",    desc: "상품 목록에서 노출 안 됨" },
                                 { value: 2, label: "품절",    desc: "품절로 표시 노출" },
+                                { value: 3, label: "삭제됨",  desc: "상품 목록에 노출 안됨, 판매자 수정 불가"},
                             ].map((item) => (
                                 <label key={item.value} className="flex items-start gap-2 cursor-pointer">
                                     <input type="radio" name="soldStatus" value={item.value}

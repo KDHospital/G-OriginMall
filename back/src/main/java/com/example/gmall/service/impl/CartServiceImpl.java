@@ -30,9 +30,9 @@ public class CartServiceImpl implements CartService {
     // 장바구니 조회
     @Transactional(readOnly = true)
     public CartSummaryDTO getCartItems(Long memberId) {
-        List<CartItemResponseDTO> dtoList = cartItemRepository.findByMemberId(memberId)
-        		.stream()
-                .filter(item -> item.getProduct().getSoldStatus() == 0) // ← HIDDEN 제외
+    	List<CartItemResponseDTO> dtoList = cartItemRepository.findByMemberId(memberId)
+                .stream()
+                .filter(item -> item.getProduct().getSoldStatus() == 0) // ACTIVE만
                 .map(CartItemResponseDTO::new)
                 .collect(Collectors.toList());
         return new CartSummaryDTO(dtoList);

@@ -53,7 +53,7 @@ public class Product {
     @Column(name = "thumbnail_image_url", length = 255)
     private String thumbnailImageUrl;
 
-    // 0=ACTIVE, 1=HIDDEN, 2=SOLD_OUT
+    // 0=ACTIVE, 1=HIDDEN, 2=SOLD_OUT, 3=DELETED
     @Builder.Default
     @Column(name = "sold_status", nullable = false, columnDefinition = "TINYINT DEFAULT 0")
     private Byte soldStatus = 0;
@@ -92,7 +92,7 @@ public class Product {
         this.deliveryFee = deliveryFee;
     }
 
-    // ── 판매 상태 변경 (0=ACTIVE, 1=HIDDEN, 2=SOLD_OUT) ─────────────
+    // ── 판매 상태 변경 (0=ACTIVE, 1=HIDDEN, 2=SOLD_OUT, 3=DELETED) ─────────────
     public void updateSoldStatus(Byte soldStatus) {
         this.soldStatus = soldStatus;
     }
