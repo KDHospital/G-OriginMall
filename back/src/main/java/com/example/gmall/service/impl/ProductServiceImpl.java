@@ -258,6 +258,21 @@ public class ProductServiceImpl implements ProductService {
 		        ? dto.getExistingImageOrders() : new ArrayList<>();
 		List<Integer> newOrders = dto.getNewImageOrders() != null
 		        ? dto.getNewImageOrders() : new ArrayList<>();
+		
+		// ── 이미지 처리 ──────────────────────────────────────────────────
+		// 0. 상세 이미지 먼저 처리 (영속성 컨텍스트 꼬임 방지)
+		productImageRepository.deleteByProductAndSortOrder(product, 10);
+		productImageRepository.flush(); // ← DB에 즉시 반영
+
+		String detailUrl = null;
+		if (dto.getDetailImage() != null && !dto.getDetailImage().isEmpty()) {
+		    detailUrl = uploadImages(List.of(dto.getDetailImage()), productId).get(0);
+		} else if (dto.getDetailImageUrl() != null) {
+		    detailUrl = dto.getDetailImageUrl();
+		}
+		if (detailUrl != null) {
+		    saveProductImage(product, detailUrl, 10);
+		}
 
 		// 1. 삭제 대상 (keepUrls에 없는 기존 이미지) — sortOrder 10 제외
 		List<ProductImage> toDelete = product.getProductImages().stream()
@@ -302,28 +317,7 @@ public class ProductServiceImpl implements ProductService {
 		    product.updateThumbnailImageUrl(null);
 		}
 
-		// 5. 상세 이미지 처리
-		ProductImage existingDetailImage = product.getProductImages().stream()
-		        .filter(img -> img.getSortOrder() == 10)
-		        .findFirst().orElse(null);
-
-		if (existingDetailImage != null) {
-		    deleteFile(existingDetailImage.getImageUrl());
-		    productImageRepository.delete(existingDetailImage);
-		}
-
-		String detailUrl = null;
-		if (dto.getDetailImage() != null && !dto.getDetailImage().isEmpty()) {
-		    // 새 상세 이미지 파일 업로드
-		    detailUrl = uploadImages(List.of(dto.getDetailImage()), productId).get(0);
-		} else if (dto.getDetailImageUrl() != null) {
-		    // 기존 URL 유지
-		    detailUrl = dto.getDetailImageUrl();
-		}
-
-		if (detailUrl != null) {
-		    saveProductImage(product, detailUrl, 10);
-		}
+		
 
 		return new ProductResponseDTO(product);
 	}

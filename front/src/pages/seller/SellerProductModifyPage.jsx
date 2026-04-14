@@ -184,8 +184,10 @@ export default function SellerProductModifyPage() {
 
     // 상세 이미지 삭제
     const handleDetailImageRemove = () => {
+        console.log("삭제 전 detailImageUrl:", detailImageUrl);
         setDetailImageUrl(null);
         setDetailImageFile(null);
+        console.log("삭제 후 detailImageUrl:", detailImageUrl);
     };
 
     // ── 저장 ─────────────────────────────────────
