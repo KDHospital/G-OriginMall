@@ -115,6 +115,21 @@ public class AdminMemberController {
 		result.put("updatedAt", m.getUpdatedAt() != null ? m.getUpdatedAt().toString() : "");
 		result.put("withdrawAt", m.getWithdrawAt() != null ? m.getWithdrawAt().toString() : "");
 
+		// 소셜 로그인 정보
+		var snsList = m.getSnsList();
+		if (snsList != null && !snsList.isEmpty()) {
+			var snsData = snsList.stream().map(sns -> {
+				Map<String, Object> snsMap = new HashMap<>();
+				snsMap.put("provider", sns.getProvider());
+				snsMap.put("providerUserId", sns.getProviderUserId());
+				snsMap.put("linkedAt", sns.getLinkedAt() != null ? sns.getLinkedAt().toString() : "");
+				return snsMap;
+			}).toList();
+			result.put("snsList", snsData);
+		} else {
+			result.put("snsList", List.of());
+		}
+
 		return ResponseEntity.ok(result);
 	}
 

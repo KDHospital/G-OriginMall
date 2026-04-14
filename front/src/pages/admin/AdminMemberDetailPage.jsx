@@ -132,7 +132,7 @@ const AdminMemberDetailPage = () => {
                 </span>
                 {member.emailVerified && (
                   <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600">
-                    이메일 인증됨
+                    인증 완료
                   </span>
                 )}
               </div>
@@ -177,6 +177,68 @@ const AdminMemberDetailPage = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* 소셜 로그인 관리 */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h4 className="font-bold text-gray-800">소셜 로그인 연동</h4>
+            </div>
+            <div className="px-6 py-5">
+              {member.snsList && member.snsList.length > 0 ? (
+                <div className="space-y-3">
+                  {member.snsList.map((sns, idx) => {
+                    const isKakao = sns.provider?.toLowerCase() === 'kakao';
+                    const isNaver = sns.provider?.toLowerCase() === 'naver';
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg"
+                      >
+                        {/* 아이콘 */}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                          isKakao ? 'bg-yellow-400 text-yellow-900' : isNaver ? 'bg-green-500' : 'bg-gray-400'
+                        }`}>
+                          {isKakao ? 'K' : isNaver ? 'N' : '?'}
+                        </div>
+                        {/* 정보 */}
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-gray-800">
+                            {isKakao ? '카카오 로그인' : isNaver ? '네이버 로그인' : sns.provider}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            연동일: {sns.linkedAt ? fmtDateTime(sns.linkedAt) : '-'}
+                          </p>
+                        </div>
+                        {/* 상태 */}
+                        <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600">
+                          연동됨
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex items-center gap-6">
+                  {/* 카카오 */}
+                  <div className="flex items-center gap-3 p-4 border border-gray-100 rounded-lg flex-1">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-yellow-400 text-yellow-900 text-sm font-bold">K</div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">카카오 로그인</p>
+                      <p className="text-xs text-gray-400">연동되지 않음</p>
+                    </div>
+                  </div>
+                  {/* 네이버 */}
+                  <div className="flex items-center gap-3 p-4 border border-gray-100 rounded-lg flex-1">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-green-500 text-white text-sm font-bold">N</div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">네이버 로그인</p>
+                      <p className="text-xs text-gray-400">연동되지 않음</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
