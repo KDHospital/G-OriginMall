@@ -47,7 +47,7 @@ const CategoryTabs = () => {
                             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
                                 <span className="material-symbols-outlined text-3xl">{getIconName(item)}</span>
                             </div>
-                            <span className="text-sm font-bold">{item.categoryName}</span>
+                            <span className="text-lg font-bold">{item.categoryName}</span>
                         </Link>
                     ))}
                 </div>
