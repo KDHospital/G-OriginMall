@@ -88,11 +88,6 @@ const ProductInfo = ({product}) => {
             
         }
     }
-    const handleCantCart = () =>{
-        setTimeout(()=>{
-            alert("품절된 상품입니다.")
-        },2000)   
-    }
 
     return(
         <div className="space-y-8">
