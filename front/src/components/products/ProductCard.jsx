@@ -5,9 +5,28 @@ const ProductCard = ({item}) => {
 
     return(
         <div className="group flex flex-col">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-surface-container-low mb-4">
-                <img className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt={item.pname} src={getImageUrl(item.thumbnailImageUrl) || "https://placehold.co/278x347?text=Product Image not found!!"} />
-            </div>
+            {item.stock === 0 ? (
+                <div className="relative aspect-[4/5] overflow-hidden rounded-xl mb-4">
+                    <img
+                        className="w-full h-full object-cover"
+                        src={getImageUrl(item.thumbnailImageUrl) || "https://placehold.co/278x347?text=Product Image not found!!"}
+                        alt={item.pname}
+                    />
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="text-white text-lg font-bold">
+                            품절입니다
+                        </span>
+                    </div>
+                </div>
+            ) : (
+                <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-surface-container-low mb-4">
+                    <img
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        src={getImageUrl(item.thumbnailImageUrl) || "https://placehold.co/278x347?text=Product Image not found!!"}
+                        alt={item.pname}
+                    />
+                </div>
+            )}
             <div className="space-y-1 px-1">
                 <h3 className="font-manrope font-bold text-lg text-on-surface">{item.pname}</h3>
                 <p className="font-manrope text-xs text-on-surface-variant line-clamp-1 italic">{item.categoryName}</p>
