@@ -37,55 +37,77 @@ const FindIdComponent = () =>{
         }
 
         return(
-            <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-                <h2 className="text-3xl font-black mb-8 text-center text-indigo-700"> 아이디 찾기</h2>
-            {!resultId ? (
-                <div className="space-y-5">
-                    <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">이름</label>
-                    <input 
+          <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
+
+    <h2 className="text-3xl font-black mb-8 text-center text-green-700">아이디 찾기</h2>
+    
+    {!resultId ? (
+        <div className="space-y-5">
+            {/* 이름 입력 */}
+            <div>
+                <label className="block text-sm font-bold text-gray-600 mb-1.5 ml-1">이름</label>
+                <input 
                     name="mname"
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="성함을 입력하세요"
                     value={info.mname}
-                    onChange={handleChange}/>
-                    </div>
-                    <div>
-                       <label className="block text-sm font-bold text-gray-700 mb-1">전화번호</label> 
-                    <input 
+                    onChange={handleChange}
+                    className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-green-500 focus:bg-white rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                    placeholder="성함을 입력하세요"
+                />
+            </div>
+
+            {/* 전화번호 입력 */}
+            <div>
+                <label className="block text-sm font-bold text-gray-600 mb-1.5 ml-1">전화번호</label> 
+                <input 
                     name="tel"
-                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="전화번호를 입력해주세요"
                     value={info.tel}
                     onChange={handleChange}
-                    />
-                    </div>
-                    <button
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-xl font-black text-lg shadow-lg transition-all transform active:scale-95"
-                    onClick={handelClickFind}>
-                        아이디 찾기
-                    </button>
+                    className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-green-500 focus:bg-white rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                    placeholder="전화번호를 입력해주세요"
+                />
+            </div>
+
+            <button
+                className="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-2xl font-black text-lg shadow-lg shadow-green-100 transition-all transform active:scale-95 mt-4"
+                onClick={handelClickFind}
+            >
+                아이디 찾기
+            </button>
+        </div>
+    ) : (  
+        /* 아이디 결과 화면 */
+        <div className="text-center space-y-4 animate-fadeIn">
+            <div className="p-8 bg-yellow-50 rounded-3xl border border-yellow-100 relative">
+
+                <p className="text-gray-600 font-medium mb-3">찾으시는 아이디는 다음과 같습니다.</p>
+                
+                <div className="my-4 p-5 bg-white rounded-2xl shadow-inner border border-yellow-200">
+                    <p className="text-2xl font-black text-green-700 break-all tracking-tight">
+                        {resultId}
+                    </p>
                 </div>
-           ): (  
-           <div className="text-center p-6 bg-indigo-50 rounded-2xl border border-indigo-100 animate-pulse-once">
-            <p className="text-gray-500 font-medium">찾으시는 아이디는 다음과 같습니다.</p>
-            <div className="my-4 p-4 bg-white rounded-xl shadow-inner border border-indigo-100">
-                <p className="text-2xl font-black text-indigo-700 break-all">{resultId}</p>
+                
+                <p className="text-[11px] text-yellow-700 font-bold">보안을 위해 아이디의 일부가 숨겨져 보일 수 있습니다.</p>
             </div>
-            <button 
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl font-bold transition-all"
-            onClick={() => navigate("/login")}
-            >로그인하러 가기
-             </button>
-             <button 
-             className="w-full bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 p-3 rounded-xl font-bold transition-all"
-             onClick={() => navigate("/findpwd")}
-                 >
-              비밀번호 찾기
-           </button>
-           </div>
-           ) }
+
+            <div className="space-y-2 pt-4">
+                <button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-2xl font-black shadow-lg transition-all transform active:scale-95"
+                    onClick={() => navigate("/login")}
+                >
+                    로그인하러 가기
+                </button>
+                
+                <button 
+                    className="w-full bg-white border-2 border-green-100 text-green-600 hover:bg-green-50 p-4 rounded-2xl font-bold transition-all"
+                    onClick={() => navigate("/findpwd")}
+                >
+                    비밀번호 찾기
+                </button>
             </div>
+        </div>
+    )}
+</div>
 
         )
 }

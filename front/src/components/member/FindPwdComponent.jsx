@@ -82,53 +82,102 @@ const FindPwdComponent= () => {
     }
 
     return(
-<div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-        <h2 className="text-3xl font-black mb-8 text-center text-green-700">비밀번호 찾기</h2>
+<div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
+   
+    <h2 className="text-3xl font-black mb-2 text-center text-green-700">비밀번호 찾기</h2>
+    <p className="text-center text-gray-400 text-sm mb-8 font-medium">안전한 계정 복구를 도와드릴게요</p>
 
-        {step === 1 && (
-            <div className="space-y-4">
+    {/* 단계 표시 (Step Indicator) - 노란색 포인트 */}
+    <div className="flex justify-center gap-2 mb-10">
+        {[1, 2, 3].map((num) => (
+            <div 
+                key={num}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    step === num ? "bg-yellow-400 w-8" : "bg-gray-200"
+                }`}
+            />
+        ))}
+    </div>
+
+    {step === 1 && (
+        <div className="space-y-5 animate-fadeIn">
+            <div className="relative">
                 <input 
-                name="loginId"
-                value={info.loginId}
-                onChange={handleChange}
-                className="w-full p-4 border rounded-xl"
-                placeholder="이메일 입력"/>
-                <button disabled={isSubmitting} className={`w-full p-4 rounded-xl font-bold text-white transition-colors ${
-              isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-            }`} onClick={handleSendCode}>
-                {isSubmitting ? "발송중..." : "인증번호 받기"}</button>
-
+                    name="loginId"
+                    value={info.loginId}
+                    onChange={handleChange}
+                    className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-green-500 focus:bg-white rounded-2xl outline-none transition-all placeholder:text-gray-400"
+                    placeholder="이메일 주소 입력"
+                />
             </div>
-        )}
+            <button 
+                disabled={isSubmitting} 
+                className={`w-full p-4 rounded-2xl font-black text-white shadow-lg transition-all transform active:scale-95 ${
+                    isSubmitting 
+                    ? "bg-gray-300 cursor-not-allowed" 
+                    : "bg-green-600 hover:bg-green-700 hover:shadow-green-100"
+                }`} 
+                onClick={handleSendCode}
+            >
+                {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                        </svg>
+                        발송 중...
+                    </span>
+                ) : "인증번호 받기"}
+            </button>
+        </div>
+    )}
 
-        {step === 2 && (
-            <div className="space-y-4">
-                <input
+    {step === 2 && (
+        <div className="space-y-5 animate-fadeIn">
+            <div className="bg-yellow-50 p-4 rounded-2xl border border-yellow-100 mb-2">
+                <p className="text-xs text-yellow-700 text-center font-bold">
+                    입력하신 이메일로 인증번호 6자리를 보냈습니다.
+                </p>
+            </div>
+            <input
                 name="code"
                 value={info.code}
                 onChange={handleChange}
-                className="w-full p-4 border rounded-xl"
-                placeholder="인증번호 6자리" />
-                <button className="w-full bg-green-600 text-white p-4 rounded-xl font-bold" onClick={handleVerifyCode}>인증하기</button>
+                className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-green-500 focus:bg-white rounded-2xl outline-none transition-all text-center text-2xl font-bold tracking-widest"
+                placeholder="000000" 
+                maxLength={6}
+            />
+            <button 
+                className="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-2xl font-black shadow-lg transform active:scale-95 transition-all" 
+                onClick={handleVerifyCode}
+            >
+                인증 확인
+            </button>
+            <p className="text-center text-xs text-gray-400">
+                번호를 못 받으셨나요? <button className="text-green-600 underline font-bold" onClick={handleSendCode}>다시 보내기</button>
+            </p>
+        </div>
+    )}
 
+    {step === 3 && (
+        <div className="space-y-5 animate-fadeIn">
+            <div className="text-center mb-4">
+            <p className="text-xs text-yellow-700 text-center font-bold"> 새로운 비밀번호를 입력해주세요.</p>
             </div>
-        )}
-
-        {step === 3 && (
-            <div className="space-y-4">
-                <input 
+            <input 
                 type="password"
                 name="nmpwd"
                 value={info.nmpwd}
                 onChange={handleChange}
-                className="w-full p-4 border ronuded-xl"
-                placeholder="새 비밀번호 입력"/>
-                <button className="w-full bg-green-600 text-white p-4 rounded-xl font-bold" onClick={handleResetPwd}>변경완료</button>
-
-
-            </div>
-        )}
-
+                className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-green-500 focus:bg-white rounded-2xl outline-none transition-all"
+                placeholder="새로운 비밀번호"
+            />
+            <button 
+                className="w-full bg-green-600 hover:bg-green-700 text-white p-4 rounded-2xl font-black shadow-lg transform active:scale-95 transition-all" 
+                onClick={handleResetPwd}
+            >
+                비밀번호 변경 완료
+            </button>
+        </div>
+    )}
 </div>
     )
 

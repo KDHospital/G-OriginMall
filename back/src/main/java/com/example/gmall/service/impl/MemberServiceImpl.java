@@ -239,7 +239,11 @@ public class MemberServiceImpl implements MemberService {
  			// 아이디가 너무 짧은 경우(3자 이하) 앞 1글자만 공개
  				return idPart.substring(0,1) + "**@" + domainPart;
  			}
+ 			
  		}
+ 		if (loginId.length() > 3) {
+ 	        return loginId.substring(0, 3) + "*".repeat(loginId.length() - 3);
+ 	    }
  		return loginId.substring(0,3) + "***";
  	}
  	//비밀번호 재설정
