@@ -25,7 +25,7 @@ const useCustomMove = () => {
     const maxPrice = getNum(queryParams.get('maxPrice'),200000)
 
     //정렬 필터 추가
-    const sort = queryParams.get('sort')||'latest' //기본값, 최신순
+    const sort = queryParams.get('sort')||'default' //기본값, 최신순
 
     const moveToList = (pageParam) => {
         let queryStr ="";
@@ -34,14 +34,14 @@ const useCustomMove = () => {
             const pageNum = getNum(pageParam.page,1)
             const sizeNum = getNum(pageParam.size,12)
 
-            queryStr = createSearchParams({page:pageNum,size:sizeNum,...(categoryId&&{categoryId})}).toString()
+            queryStr = createSearchParams({page:pageNum,size:sizeNum,...(sort && { sort }),...(categoryId&&{categoryId})}).toString()
         } else{
             queryStr = queryDefault
         }
         setRefresh(!refresh)
 
         navigate({
-            pathname:`../products`,
+            pathname:`/products`,
             search: queryStr
         })
     }

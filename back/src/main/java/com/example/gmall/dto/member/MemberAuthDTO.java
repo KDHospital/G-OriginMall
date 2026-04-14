@@ -22,7 +22,7 @@ public class MemberAuthDTO extends User{
     private String refreshToken;
     private boolean needsExtraInfo;
     private String socialType;
-
+    private boolean isSocial;
     
     
 }

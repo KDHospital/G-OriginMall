@@ -39,13 +39,6 @@ const ProductSideNavBar = () => {
         setParentCategory(parent || null)
     }, [categoryId, categories])
 
-    // 슬라이더 조작 끝났을 때만 API 요청 (드래그 중엔 요청 안 보냄)
-    const handlePriceChange = (e) => {
-        setPriceValue(Number(e.target.value))
-    }
-    const handlePriceCommit = (e) => {
-        moveToPrice(0, Number(e.target.value))
-    }
     //카테고리 이름에 맞는 아이콘 배정
     const getIconName = (child) => {
         switch (child.categoryName) {
@@ -116,30 +109,6 @@ const ProductSideNavBar = () => {
                         </button>
                     )
                 })}
-            </div>
-
-            {/* 가격 필터 */}
-            <div className="mt-12 pt-8 border-t border-outline-variant/20">
-                <h3 className="font-manrope text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-6">
-                    가격 필터
-                </h3>
-                <div className="space-y-4">
-                    <input
-                        className="w-full h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary"
-                        max="200000"
-                        min="0"
-                        step="1000"
-                        type="range"
-                        value={priceValue}
-                        onChange={handlePriceChange}
-                        onMouseUp={handlePriceCommit}   // 드래그 끝날 때 요청
-                        onTouchEnd={handlePriceCommit}  // 모바일 터치 끝날 때 요청
-                    />
-                    <div className="flex justify-between font-manrope text-sm text-on-surface">
-                        <span>0원</span>
-                        <span>{priceValue.toLocaleString()}{priceValue >= 200000 ? '+' : ''}원</span>
-                    </div>
-                </div>
             </div>
         </div>
     )

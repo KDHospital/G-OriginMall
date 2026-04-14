@@ -113,6 +113,14 @@ export default function SellerProductModifyPage() {
     // ── 핸들러 ────────────────────────────────────
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        // ── 재고 1 미만 입력 방지 ─────────────────────
+        if (name === "stock") {
+            const num = Number(value);
+
+            if (num < 1) {
+                return;
+            }
+        }        
         setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
     };
 

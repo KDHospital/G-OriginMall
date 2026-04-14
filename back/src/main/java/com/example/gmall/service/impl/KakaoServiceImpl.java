@@ -109,6 +109,7 @@ public class KakaoServiceImpl implements KakaoService{
 				.role((Byte)claims.get("role"))
 				.accessToken(ourAccessToken)
 				.refreshToken(ourRefreshToken)
+				.isSocial(true)
 				.needsExtraInfo(needsExtraInfo)
 				.build();
 	
