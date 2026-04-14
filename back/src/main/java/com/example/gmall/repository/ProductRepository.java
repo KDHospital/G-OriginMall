@@ -14,7 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	//전체 상품 목록, 가격필터
 	@Query("SELECT p FROM Product p JOIN FETCH p.category c " + "JOIN FETCH p.seller " +  
-		       "WHERE p.soldStatus = 0 " +
+		       "WHERE p.soldStatus IN (0, 2) " +
 		       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 		       "AND p.price >= :minPrice " +
 		       "AND p.price <= :maxPrice")
@@ -34,7 +34,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 	//금빛나루 전용관
 	@Query("SELECT p FROM Product p JOIN FETCH p.category c " + "JOIN FETCH p.seller " +  
-		       "WHERE p.soldStatus = 0 AND p.isCertified = true " +
+		       "WHERE p.soldStatus IN (0, 2) AND p.isCertified = true " +
 		       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 		       "AND p.price >= :minPrice " +
 		       "AND p.price <= :maxPrice")
@@ -47,7 +47,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 	//기획전 전용관
 	@Query("SELECT p FROM Product p JOIN FETCH p.category c " + "JOIN FETCH p.seller " +  
-		       "WHERE p.soldStatus = 0 AND p.isExhibition = true " +
+		       "WHERE p.soldStatus IN (0, 2) AND p.isExhibition = true " +
 		       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 		       "AND p.price >= :minPrice " +
 		       "AND p.price <= :maxPrice")
@@ -101,7 +101,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	       "JOIN FETCH p.category c " +
 	       "JOIN FETCH p.seller " +
 	       "LEFT JOIN OrderItem oi ON oi.product = p " +  // 🔥 엔티티 기준으로 수정
-	       "WHERE p.soldStatus = 0 " +
+	       "WHERE p.soldStatus IN (0, 2) " +
 	       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 	       "AND p.price >= :minPrice AND p.price <= :maxPrice " +
 	       "GROUP BY p " +   // 🔥 productId 말고 p로
@@ -117,7 +117,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	       "JOIN FETCH p.category c " +
 	       "JOIN FETCH p.seller " +
 	       "LEFT JOIN OrderItem oi ON oi.product = p " +
-	       "WHERE p.soldStatus = 0 " +
+	       "WHERE p.soldStatus IN (0, 2) " +
 	       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 	       "AND p.price >= :minPrice AND p.price <= :maxPrice " +
 	       "GROUP BY p " +
@@ -135,7 +135,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	       "JOIN FETCH p.category c " +
 	       "JOIN FETCH p.seller " +
 	       "LEFT JOIN OrderItem oi ON oi.product = p " +
-	       "WHERE p.soldStatus = 0 " +
+	       "WHERE p.soldStatus IN (0, 2) " +
 	       "AND p.isCertified = true " +   
 	       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 	       "AND p.price >= :minPrice AND p.price <= :maxPrice " +
@@ -152,7 +152,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	       "JOIN FETCH p.category c " +
 	       "JOIN FETCH p.seller " +
 	       "LEFT JOIN OrderItem oi ON oi.product = p " +
-	       "WHERE p.soldStatus = 0 " +
+	       "WHERE p.soldStatus IN (0, 2) " +
 	       "AND p.isCertified = true " +   // 🔥 이것도 반드시 추가
 	       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 	       "AND p.price >= :minPrice AND p.price <= :maxPrice " +
@@ -171,7 +171,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	       "JOIN FETCH p.category c " +
 	       "JOIN FETCH p.seller " +
 	       "LEFT JOIN OrderItem oi ON oi.product = p " +
-	       "WHERE p.soldStatus = 0 " +
+	       "WHERE p.soldStatus IN (0, 2) " +
 	       "AND p.isExhibition = true " +   
 	       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 	       "AND p.price >= :minPrice AND p.price <= :maxPrice " +
@@ -190,7 +190,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	       "JOIN FETCH p.category c " +
 	       "JOIN FETCH p.seller " +
 	       "LEFT JOIN OrderItem oi ON oi.product = p " +
-	       "WHERE p.soldStatus = 0 " +
+	       "WHERE p.soldStatus IN (0, 2) " +
 	       "AND p.isExhibition = true " +   
 	       "AND (:categoryId IS NULL OR c.categoryId = :categoryId OR c.parent.categoryId = :categoryId) " +
 	       "AND p.price >= :minPrice AND p.price <= :maxPrice " +
