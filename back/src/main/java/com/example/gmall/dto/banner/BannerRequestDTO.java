@@ -9,5 +9,5 @@ public class BannerRequestDTO {
     private String imageUrl;   // S3 업로드 후 전달받은 URL
     private String linkUrl;
     private Integer sortOrder;
-    private boolean isActive;
+    private Boolean isActive;
 }

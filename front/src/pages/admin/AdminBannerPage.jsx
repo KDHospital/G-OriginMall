@@ -11,7 +11,7 @@ import AdminLayout from "../../layouts/AdminLayout"
 import { getImageUrl } from "../../util/imagesUtil"
 
 
-const AdminBanner = () => {
+const AdminBannerPage = () => {
     const navigate = useNavigate()
     // ── 목록 상태 ─────────────────────────────
     const [banners, setBanners] = useState([])
@@ -42,6 +42,7 @@ const AdminBanner = () => {
         try {
             const res = await getBannerList()
             setBanners(res.data)
+            console.log(res.data)
         } catch (err) {
             showToast("배너 조회 실패","err")
         } finally {
@@ -96,6 +97,8 @@ const AdminBanner = () => {
                     b.bannerId === id ? { ...b, isActive: !b.isActive } : b
                 )
             )
+            
+            showToast("노출상태 변경에 성공하였습니다.")
         } catch (err) {
             console.error(err)
             showToast("노출 상태 변경에 실패했습니다.", "error")
@@ -115,11 +118,6 @@ const AdminBanner = () => {
             setConfirmId(null)
         }
     }
-    // ── 삭제 확인 요청 ─────────────────────────
-    const handleDeleteClick = (id) => {
-        setConfirmId(id)
-    }
-
 
     // ── 이미지 선택 ───────────────────────────
     const handleImageChange = (e) => {
@@ -314,7 +312,7 @@ const AdminBanner = () => {
                                 <div className="flex flex-col gap-1.5 shrink-0">
                                     <button
                                         onClick={() =>
-                                            navigate(`/admin/banners/${banner.bannerId}/edit`)
+                                            navigate(`/admin/banner/${banner.bannerId}/edit`)
                                         }
                                         className="px-4 py-1.5 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-600 transition-colors"
                                     >
@@ -355,7 +353,7 @@ const AdminBanner = () => {
                             >
                                 {preview ? (
                                     <img
-                                        src={`${getImageUrl(preview)}`}
+                                        src={preview}
                                         alt="미리보기"
                                         className="w-full object-contain max-h-40"
                                     />
@@ -513,4 +511,4 @@ const AdminBanner = () => {
         </AdminLayout>
     )
 }
-export default AdminBanner
+export default AdminBannerPage

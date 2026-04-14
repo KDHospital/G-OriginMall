@@ -12,7 +12,8 @@ const initState ={
     gender:0,
     currentMpwd:'',
     mpwd:'',
-    reMpwd:''
+    reMpwd:'',
+    isSocial: false
 }
 
  const formatPhoneNumber = (value) => {
@@ -39,7 +40,9 @@ const ModifyComponent = () =>{
                 loginId: memberData.loginId || "",
                 mname: memberData.mname || '',
                 tel: formatPhoneNumber(memberData.tel || ''),
-                gender : memberData.gender ?? 0
+                gender : memberData.gender ?? 0,
+                isSocial: memberData.social === true,
+                needsExtraInfo: memberData.needsExtraInfo === true
             })
             setLoading(false)
         })
@@ -63,7 +66,7 @@ const ModifyComponent = () =>{
 
     const handleClickModify = () => {
 
-        if(!form.currentMpwd) {
+        if(!form.isSocial && !form.currentMpwd) {
             return alert("정보 수정을 위해 현재 비밀번호를 입력해주세요")
         }
 
@@ -79,9 +82,10 @@ const ModifyComponent = () =>{
             id:memberId,
             loginId: String(form.loginId),
             mname:form.mname,
-            currentMpwd:form.currentMpwd,
+            currentMpwd: form.isSocial ? "" : form.currentMpwd,
             tel:form.tel.replace(/-/g,''),
-            gender: Number(form.gender)
+            gender: Number(form.gender),
+            isSocial: form.isSocial
         }
         
        
@@ -110,7 +114,8 @@ const ModifyComponent = () =>{
 
         <div className="space-y-6"> {/* 간격을 위해 space-y-6으로 변경 */}
             
-            {/* 1. 현재 비밀번호 확인 (독립) */}
+            {/* 1. 현재 비밀번호 확인 (일반 유저만 표시) */}
+            {!form.isSocial ? (
             <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-200">
                 <label className="font-bold text-sm text-indigo-800 block mb-1">현재 비밀번호 확인</label>
                 <input 
@@ -122,6 +127,15 @@ const ModifyComponent = () =>{
                     onChange={handleChange} 
                 />
             </div>
+            ): (
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 ">
+                    <p className="text-sm font-bold text-indigo-600">
+                        소셜 계정으로 로그인 중입니다.
+                    </p>
+                <p className="text-xs text-gray-400 mt-1">비밀번호 확인 없이 정보 수정이 가능합니다.</p>
+                </div>
+
+            )}
 
             <hr className="border-gray-100" />
 
@@ -133,11 +147,31 @@ const ModifyComponent = () =>{
                 </div>
                 <div>
                     <label className="font-bold text-xs text-gray-500 block mb-1">이름</label>
-                    <input className="w-full p-3 border border-gray-100 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed" value={form.mname} readOnly />
-                </div>
+    <input 
+        name="mname"
+        value={form.mname}
+        onChange={handleChange}
+        
+        readOnly={!(form.isSocial && form.needsExtraInfo)}
+        className={`w-full p-3 border rounded-lg outline-none ${
+            form.isSocial && form.needsExtraInfo
+            ? "border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-indigo-400" 
+            : "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed" 
+        }`}
+    />
+    
+   
+    {!form.isSocial ? (
+        <p className="text-[10px] text-gray-400 mt-1">* 일반 회원은 이름을 수정할 수 없습니다.</p>
+    ) : form.needsExtraInfo ? (
+        <p className="text-[10px] text-indigo-500 mt-1">* 소셜 회원은 최초 1회만 본명으로 수정이 가능합니다.</p>
+    ) : (
+        <p className="text-[10px] text-gray-400 mt-1">* 이미 이름 변경이 완료된 소셜 계정입니다.</p>
+    )}
+</div>
             </div>
 
-           
+           {!form.isSocial ?(
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="font-bold text-sm text-gray-700 block mb-1">새 비밀번호</label>
@@ -162,7 +196,7 @@ const ModifyComponent = () =>{
                     />
                 </div>
             </div>
-
+                ) : (<></>)}
             
             <div>
                 <label className="font-bold text-sm text-gray-700 block mb-1">연락처</label>

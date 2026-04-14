@@ -24,7 +24,7 @@ const KakaoRedirectHandler = () => {
                 //추가 정보 입력 필요 여부 확인
                 if (data.needsExtraInfo) {
                     alert("가입을 환영합니다! 정확한 서비스 이용을 위해 추가 정보를 입력해주세요.")
-                    navigate("/modify")
+                    navigate("/modifypage")
                 } else {
                     alert(`${data.mname}님 환영합니다!`)
                     navigate("/")  

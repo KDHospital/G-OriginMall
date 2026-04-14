@@ -62,30 +62,66 @@ public class BannerServiceImpl implements BannerService {
                 .imageUrl(imageUrl)
                 .linkUrl(dto.getLinkUrl())
                 .sortOrder(dto.getSortOrder())
-                .isActive(dto.isActive())
+                .isActive(dto.getIsActive())
                 .build();
 
         return new BannerResponseDTO(bannerRepository.save(banner));
     }
     
-//어드민 - 배너 수정
+ // ── 어드민 - 배너 수정 ─────────────────────────────
     @Transactional
     public BannerResponseDTO updateBanner(Integer bannerId, MultipartFile imageFile, BannerRequestDTO dto) {
+
         Banner banner = findBannerById(bannerId);
 
-        // 새 이미지 파일이 있으면 로컬 저장 후 URL 갱신
+        int newOrder = dto.getSortOrder();
+        int oldOrder = banner.getSortOrder();
+
+        // ── 같은 순서면 자리 이동 없이 내용만 수정 ─────────────
+        if (newOrder == oldOrder) {
+
+            // 이미지 처리
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String newImageUrl = fileUploadService.uploadBannerImage(imageFile);
+                banner.updateImageUrl(newImageUrl);
+            } else if (dto.getImageUrl() != null) {
+                banner.updateImageUrl(dto.getImageUrl());
+            }
+
+            banner.updateBanner(
+                    banner.getImageUrl(),
+                    dto.getLinkUrl(),
+                    oldOrder,
+                    dto.getIsActive()
+            );
+
+            return new BannerResponseDTO(bannerRepository.save(banner));
+        }
+
+        // ── 충돌 배너 찾기 (같은 sortOrder) ─────────────────
+        Banner exist = bannerRepository.findBySortOrder(newOrder).orElse(null);
+
+        if (exist != null) {
+            // 자리 교체
+            exist.updateSortOrder(oldOrder);
+            bannerRepository.save(exist);
+        }
+
+        // ── 이미지 처리 ─────────────────────────────
         if (imageFile != null && !imageFile.isEmpty()) {
             String newImageUrl = fileUploadService.uploadBannerImage(imageFile);
             banner.updateImageUrl(newImageUrl);
         } else if (dto.getImageUrl() != null) {
             banner.updateImageUrl(dto.getImageUrl());
         }
+
+        // ── 최종 수정 ─────────────────────────────
         banner.updateBanner(
-        		dto.getImageUrl(),
-        		dto.getLinkUrl(),
-        		dto.getSortOrder(),
-        		dto.isActive()
-        		);
+                banner.getImageUrl(),
+                dto.getLinkUrl(),
+                newOrder,
+                dto.getIsActive()
+        );
 
         return new BannerResponseDTO(bannerRepository.save(banner));
     }

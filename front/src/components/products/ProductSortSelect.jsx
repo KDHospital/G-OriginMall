@@ -12,7 +12,9 @@ const ProductSortSelect = () => {
                 value={sort} 
                 onChange={handleChange}
                 className="bg-surface-container-low border-none rounded-lg font-manrope text-sm focus:ring-2 focus:ring-primary py-2 px-4 cursor-pointer">
-                    <option value="latest">추천순</option>
+                    <option value="defalt">정렬</option>
+                    <option value="salesLow">판매량 낮은 순</option>
+                    <option value="salesHigh">판매량 높은 순</option>
                     <option value="priceLow">낮은 가격순</option>
                     <option value="priceHigh">높은 가격순</option>
                 </select>
