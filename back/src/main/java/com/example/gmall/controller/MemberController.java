@@ -1,5 +1,7 @@
 package com.example.gmall.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -128,20 +130,23 @@ public class MemberController {
 		}
 	}
 		//아이디 찾기
-		@PostMapping("/find-id")
-		public ResponseEntity<?> findId(@RequestBody Map<String, String> request){
-		try {
-			String mname = request.get("mname");
-			String tel = request.get("tel");
-			
-			String foundId = memberService.findLoginId(mname, tel);
-			
-			return ResponseEntity.ok(Map.of("loginId",foundId));
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(Map.of("message",e.getMessage()));
-		}
-		
+	@PostMapping("/find-id")
+	public ResponseEntity<?> findId(@RequestBody Map<String, String> request) {
+	    try {
+	        String mname = request.get("mname");
+	        String tel = request.get("tel");
+	        
+	        String foundId = memberService.findLoginId(mname, tel);
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("loginId", foundId); // null이어도 에러 안 남
+	        
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 여기서 터지는 진짜 이유를 콘솔에서 꼭 확인해봐!
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(Collections.singletonMap("message", "서버 오류가 발생했습니다."));
+	    }
 	}
 		//비밀번호 변경
 		@PostMapping("/reset-password")
