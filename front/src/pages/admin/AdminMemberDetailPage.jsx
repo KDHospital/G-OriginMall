@@ -132,7 +132,7 @@ const AdminMemberDetailPage = () => {
                 </span>
                 {member.emailVerified && (
                   <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600">
-                    이메일 인증됨
+                    인증 완료
                   </span>
                 )}
               </div>
