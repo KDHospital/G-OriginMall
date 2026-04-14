@@ -43,7 +43,7 @@ import java.util.TreeMap;
 @Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
-		private final ProductRepository productRepository;
+	private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
     private final ProductImageRepository productImageRepository;
@@ -68,20 +68,10 @@ public class ProductServiceImpl implements ProductService {
 	        case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
 	        default          -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
 	    };
-
-	// 웹-상품 목록 조회
-	public Page<ProductListResponseDTO> getProducts(Integer categoryId, int minPrice, int maxPrice, String sort,
-			int page, int size) {
-		// sort 값에 따라 정렬 기준 결정
-		Sort sorting = switch (sort) {
-		case "priceLow" -> Sort.by(Sort.Direction.ASC, "price");
-		case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
-		default -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
-		};
-
-		Pageable pageable = PageRequest.of(page, size, sorting);
-		return productRepository.findActiveProducts(categoryId, minPrice, maxPrice, pageable)
-				.map(ProductListResponseDTO::new);
+	    
+	    Pageable pageable = PageRequest.of(page, size, sorting);
+	    return productRepository.findActiveProducts(categoryId, minPrice, maxPrice, pageable)
+	    		.map(ProductListResponseDTO::new);
 	}
 
 	// 웹-상품 상세 조회
@@ -157,47 +147,6 @@ public class ProductServiceImpl implements ProductService {
 	@Value("${file.upload.products}")
     private String uploadPath;
 
-	// 웹-금빛나루 인증 목록 조회
-	// GET /api/products/certified?page=0&size=12&categoryId=1
-	// ──────────────────────────────────────────
-	public Page<ProductListResponseDTO> getCertifiedProducts(Integer categoryId, int minPrice, int maxPrice,
-			String sort, int page, int size) {
-
-		Sort sorting = switch (sort) {
-		case "priceLow" -> Sort.by(Sort.Direction.ASC, "price");
-		case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
-		default -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
-		};
-
-		Pageable pageable = PageRequest.of(page, size, sorting);
-		return productRepository.findCertifiedProducts(categoryId, minPrice, maxPrice, pageable)
-				.map(ProductListResponseDTO::new);
-	}
-
-	// 웹-기획전 목록 조회
-	// GET /api/products/exhibition?page=0&size=12&categoryId=1
-	// ──────────────────────────────────────────
-	public Page<ProductListResponseDTO> getExhibitionProducts(Integer categoryId, int minPrice, int maxPrice,
-			String sort, int page, int size) {
-		Sort sorting = switch (sort) {
-		case "priceLow" -> Sort.by(Sort.Direction.ASC, "price");
-		case "priceHigh" -> Sort.by(Sort.Direction.DESC, "price");
-		default -> Sort.by(Sort.Direction.DESC, "createdAt"); // latest
-		};
-
-		Pageable pageable = PageRequest.of(page, size, sorting);
-		return productRepository.findExhibitionProducts(categoryId, minPrice, maxPrice, pageable)
-				.map(ProductListResponseDTO::new);
-	}
-
-	// 공통 유틸
-	private Product findProductOrThrow(Long productId) {
-		return productRepository.findById(productId)
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품: " + productId));
-	}
-
-	@Value("${file.upload.products}")
-	private String uploadPath;
 
 	// 상품 등록
 	@Override
