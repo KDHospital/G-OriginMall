@@ -35,6 +35,8 @@ import SellerProductListPage from './pages/seller/SellerProductListPage';
 import SellerOrders from './pages/seller/SellerOrders';
 import SellerOrderDetail from './pages/seller/SellerOrderDetail';
 import SellerProductModifyPage from './pages/seller/SellerProductModifyPage';
+import SellerProfilePage from './pages/seller/SellerProfilePage';
+
 
 import AdminMemberListPage from './pages/admin/AdminMemberListPage';
 import AdminMemberDetailPage from './pages/admin/AdminMemberDetailPage';
@@ -168,15 +170,16 @@ function App() {
           <Route path="/seller/orders" element={<ProtectedRoute allowRole={1}><SellerOrders /></ProtectedRoute>} />
           <Route path="/seller/orders/:orderId" element={<ProtectedRoute allowRole={1}><SellerOrderDetail /></ProtectedRoute>} />
           <Route path="/seller/products/:productId/edit" element={<ProtectedRoute allowRole={1}><SellerProductModifyPage /></ProtectedRoute>} />
+          <Route path="/seller/profile" element={<ProtectedRoute allowRole={1}><SellerProfilePage /></ProtectedRoute>} />
 
-        {/* 어드민-상품관리,목록  - 이효진 담당 */}
-        <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
-        <Route path="/admin/products" element={<ProtectedRoute allowRole={2}><AdminProductListPage /></ProtectedRoute>} />
-        <Route path="/admin/products/:productId/edit" element={<ProtectedRoute allowRole={2}><AdminProductModifyPage /></ProtectedRoute>} />
+          {/* 어드민-상품관리,목록  - 이효진 담당 */}
+          <Route path="/admin/products/new" element={<ProtectedRoute allowRole={2}><AdminProductNewPage /></ProtectedRoute>} />
+          <Route path="/admin/products" element={<ProtectedRoute allowRole={2}><AdminProductListPage /></ProtectedRoute>} />
+          <Route path="/admin/products/:productId/edit" element={<ProtectedRoute allowRole={2}><AdminProductModifyPage /></ProtectedRoute>} />
 
-        {/* 어드민-배너관리  - 이효진 담당 */}
-        <Route path="/admin/banner" element={<ProtectedRoute allowRole={2}><AdminBannerPage /></ProtectedRoute>} />
-        <Route path="/admin/banner/:bannerId/edit" element={<ProtectedRoute allowRole={2}><AdminBannerEditPage /></ProtectedRoute>} />
+          {/* 어드민-배너관리  - 이효진 담당 */}
+          <Route path="/admin/banner" element={<ProtectedRoute allowRole={2}><AdminBannerPage /></ProtectedRoute>} />
+          <Route path="/admin/banner/:bannerId/edit" element={<ProtectedRoute allowRole={2}><AdminBannerEditPage /></ProtectedRoute>} />
 
 
 

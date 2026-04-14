@@ -93,8 +93,23 @@ function AdminLayout({ children }) {
 
     // 현재 경로가 메뉴와 일치하는지 확인
     const isActive = (path) => {
-        if (path === '/admin') return location.pathname === '/admin';
-        return location.pathname === path || location.pathname.startsWith(path + '/');
+        const current = location.pathname;
+
+        // 완전 동일
+        if (current === path) return true;
+
+        // 하위 경로 허용할지 명확히 지정
+        const allowSubRoutes = [
+            '/admin/members',
+            '/admin/board'
+        ];
+
+        if (allowSubRoutes.includes(path)) {
+            return current.startsWith(path + '/');
+        }
+
+        return false;
+        
     };
 
     return (
