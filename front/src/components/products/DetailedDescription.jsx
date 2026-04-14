@@ -5,16 +5,14 @@ const DetailedDescription = ({ product }) => {
 
     // imageUrls 배열에서 마지막 이미지 꺼내기
     // imageUrls가 없거나 비어있으면 null (썸네일만 있는 경우)
-    const lastImage = product.imageUrls?.length > 0
-        ? product.imageUrls[product.imageUrls.length - 1]
-        : null
+    const detailImage = product.detailImageUrl ?? null
 
     return (
         <div className="py-16 space-y-24">
             {/* 마지막 이미지 있을 때만 렌더링 */}
-            {lastImage && (
+            {detailImage && (
                 <img
-                    src={getImageUrl(lastImage)}
+                    src={getImageUrl(detailImage)}
                     alt={`${product.pname} 상세 설명`}
                     className="w-full rounded-xl"
                 />

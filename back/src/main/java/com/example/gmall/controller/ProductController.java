@@ -140,12 +140,19 @@ public class ProductController {
 	         @PathVariable("productId") Long productId,
 	         @ModelAttribute ProductRequestDTO dto) {
 	
-	     Long sellerId = (Long) authentication.getPrincipal();
-	
-	     // 본인 상품인지 검증 (코드 추가 예정, GlobalExceptionHandler에 코드 추가 필요)
-//	     verifyProductOwner(productId, sellerId);
-	
-	     return ResponseEntity.ok(productService.modify(productId, dto));
+		 	Long sellerId = (Long) authentication.getPrincipal();
+
+		    // sellerId null 체크
+		    if (sellerId == null) {
+		        throw new SecurityException("로그인이 필요합니다.");
+		    }
+
+		    // 본인 상품인지 검증
+		    if (!productRepository.existsByProductIdAndSeller_Id(productId, sellerId)) {
+		        throw new SecurityException("본인의 상품만 수정할 수 있습니다.");
+		    }
+
+		    return ResponseEntity.ok(productService.modify(productId, dto));
 	 }
 	
 	 // 어드민 상품 수정 (판매자 구분 없이 모든 상품 수정 가능, 프론트에 코드 추가 예정)
