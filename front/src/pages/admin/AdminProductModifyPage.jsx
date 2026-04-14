@@ -18,6 +18,9 @@ const AdminProductModifyPage = () => {
     const { productId } = useParams(); // /admin/products/:productId/edit
     //React에서 렌더링을 유발하지 않고 지속되는 값을 저장하거나, DOM 요소에 직접 접근할 때 사용하는 훅
     const imageInputRef = useRef(null);
+
+    const detailImageInputRef = useRef(null);
+
     //카테고리 저장
     const [categories, setCategories] = useState([]);
     //셀렉트의 부모(1뎁스) 저장
@@ -42,10 +45,10 @@ const AdminProductModifyPage = () => {
     //price 계산
     const price = parsePrice(form.listPrice) - parsePrice(form.discountPrice);
 
-    // 기존 이미지 URL (서버에 저장된 것)
-    const [existingImages, setExistingImages] = useState([]); // [{ imageUrl, productImageId }]
-    // 새로 추가한 이미지 파일
-    const [newImages, setNewImages] = useState([]); // [{ file, previewUrl }]
+    const [allImages, setAllImages] = useState([]);
+    const [detailImageUrl, setDetailImageUrl] = useState(null);
+    const [detailImageFile, setDetailImageFile] = useState(null);
+
     const [dragIndex, setDragIndex] = useState(null);
 
     // ── 카테고리 + 상품 데이터 로드 ──────────────
@@ -87,7 +90,14 @@ const AdminProductModifyPage = () => {
                         existing.push({ imageUrl: url, isThumbnail: false });
                     }
                 });
-                setExistingImages(existing);
+                
+                setAllImages(existing.map((img) => ({ type: "existing", imageUrl: img.imageUrl })));
+
+                // 상세 이미지 세팅 추가
+                if (p.detailImageUrl) {
+                    setDetailImageUrl(p.detailImageUrl);
+                }
+
             })
             .catch((err) => console.error("상품 로드 실패:", err));
     }, [productId]);
@@ -131,28 +141,53 @@ const AdminProductModifyPage = () => {
     // 새 이미지 추가
     const handleImageAdd = (e) => {
         const files = Array.from(e.target.files);
-        const added = files.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }));
-        setNewImages((prev) => [...prev, ...added]);
+        const remaining = 5 - allImages.length;
+        if (remaining <= 0) {
+            alert("이미지는 최대 5개까지 등록 가능합니다.");
+            return;
+        }
+        const added = files.slice(0, remaining).map((file) => ({
+            type: "new",
+            file,
+            previewUrl: URL.createObjectURL(file),
+        }));
+        setAllImages((prev) => [...prev, ...added]);
         e.target.value = "";
     };
 
     // 새 이미지 삭제
-    const handleNewImageRemove = (index) => {
-        setNewImages((prev) => prev.filter((_, i) => i !== index));
+    const handleImageRemove = (index) => {
+        setAllImages((prev) => prev.filter((_, i) => i !== index));
     };
 
-    // 드래그 (기존 + 새 이미지 통합 순서 변경은 복잡하므로 새 이미지 내에서만)
+    // 드래그 (allImages 통합 기준)
     const handleDragStart = (index) => setDragIndex(index);
     const handleDragOver = (e, index) => {
         e.preventDefault();
         if (dragIndex === null || dragIndex === index) return;
-        const updated = [...newImages];
+        const updated = [...allImages];
         const dragged = updated.splice(dragIndex, 1)[0];
         updated.splice(index, 0, dragged);
-        setNewImages(updated);
+        setAllImages(updated);
         setDragIndex(index);
     };
     const handleDragEnd = () => setDragIndex(null);
+
+    // 상세 이미지
+    const handleDetailImageAdd = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setDetailImageUrl(URL.createObjectURL(file));
+            setDetailImageFile(file);
+        }
+        e.target.value = "";
+    };
+
+    const handleDetailImageRemove = () => {
+        setDetailImageUrl(null);
+        setDetailImageFile(null);
+    };
+
 
     // ── 저장 ─────────────────────────────────────
     const handleSubmit = async () => {
@@ -160,8 +195,7 @@ const AdminProductModifyPage = () => {
         if (!form.pname)         return alert("상품명을 입력해주세요.");
         if (!form.listPrice)     return alert("정가를 입력해주세요.");
         if (!form.stock)         return alert("재고 수량을 입력해주세요.");
-        if (existingImages.length === 0 && newImages.length === 0)
-            return alert("대표 이미지가 최소 1장 필요합니다.");
+        if (allImages.length === 0) return alert("대표 이미지가 최소 1장 필요합니다.");
 
         const formData = new FormData();
         formData.append("categoryId",    selectedCategoryId);
@@ -176,11 +210,23 @@ const AdminProductModifyPage = () => {
         formData.append("certified", form.isCertified); 
         formData.append("exhibition", form.isExhibition);
 
-        // 기존 이미지 중 남긴 것들의 URL 전달 (백엔드에서 기존 이미지 유지 판단용)
-        existingImages.forEach((img) => formData.append("existingImageUrls", img.imageUrl));
+        // 기존 existingImages, newImages forEach 삭제하고 아래로 교체
+        allImages.forEach((img, sortOrder) => {
+            if (img.type === "existing") {
+                formData.append("existingImageUrls", img.imageUrl);
+                formData.append("existingImageOrders", sortOrder);
+            } else {
+                formData.append("images", img.file);
+                formData.append("newImageOrders", sortOrder);
+            }
+        });
 
-        // 새 이미지 파일 추가
-        newImages.forEach((img) => formData.append("images", img.file));
+        // 상세 이미지
+        if (detailImageFile) {
+            formData.append("detailImage", detailImageFile);
+        } else if (detailImageUrl) {
+            formData.append("detailImageUrl", detailImageUrl);
+        }
 
         try {
             await axiosInstance.put(`/admin/products/${productId}`, formData, {
@@ -194,8 +240,6 @@ const AdminProductModifyPage = () => {
         }
     };
 
-    // 전체 이미지 수 (기존 + 신규)
-    const totalImageCount = existingImages.length + newImages.length;
 
 
 
@@ -323,66 +367,86 @@ const AdminProductModifyPage = () => {
                 {/* ── 상품 이미지 ── */}
                 <section className="bg-white rounded-md p-5 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-700 mb-1">상품 이미지</h3>
-                    <p className="text-xs text-gray-400 mb-4">기존 이미지 × 버튼으로 삭제, 새 이미지 추가 가능</p>
+                    <p className="text-xs text-gray-400 mb-4">최대 5장 · 드래그로 순서 변경 · 첫 번째 이미지가 대표</p>
 
                     <div
-                        onClick={() => imageInputRef.current?.click()}
-                        className="border-2 border-dashed border-gray-200 rounded-md p-8 flex flex-col items-center justify-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors mb-4"
+                        onClick={() => allImages.length < 5 && imageInputRef.current?.click()}
+                        className={`border-2 border-dashed rounded-md p-8 flex flex-col items-center justify-center transition-colors mb-4
+                            ${allImages.length < 5
+                                ? "border-gray-200 cursor-pointer hover:border-green-400 hover:bg-green-50"
+                                : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-50"}`}
                     >
                         <span className="text-2xl mb-2">+</span>
-                        <p className="text-sm text-gray-400">클릭하여 이미지 추가</p>
+                        <p className="text-sm text-gray-400">
+                            {allImages.length < 5 ? "클릭하여 이미지 추가" : "최대 5장 도달"}
+                        </p>
                     </div>
                     <input ref={imageInputRef} type="file" accept="image/*" multiple onChange={handleImageAdd} className="hidden" />
 
-                    {totalImageCount > 0 && (
+                    {allImages.length > 0 && (
                         <div className="flex gap-3 flex-wrap mt-2">
-                            {/* 기존 이미지 */}
-                            {existingImages.map((img, index) => (
-                                <div key={`existing-${index}`} className={`relative w-20 h-20 rounded border-2 overflow-hidden
-                                    ${index === 0 && newImages.length === 0 ? "border-green-500" : "border-gray-200"}`}>
-                                    <img src={`${getImageUrl(img.imageUrl)}`} alt="" className="w-full h-full object-cover" />
-                                    {index === 0 && newImages.length === 0 && (
-                                        <div className="absolute bottom-0 left-0 right-0 bg-green-500 text-white text-center text-xs py-0.5">대표</div>
-                                    )}
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); handleExistingImageRemove(index); }}
-                                        className="absolute top-0.5 right-0.5 w-5 h-5 bg-gray-800 bg-opacity-60 text-white rounded-full text-xs flex items-center justify-center"
-                                    >×</button>
-                                </div>
-                            ))}
-
-                            {/* 새 이미지 */}
-                            {newImages.map((img, index) => (
-                                <div key={`new-${index}`}
+                            {allImages.map((img, index) => (
+                                <div key={`img-${index}`}
                                     draggable
                                     onDragStart={() => handleDragStart(index)}
                                     onDragOver={(e) => handleDragOver(e, index)}
                                     onDragEnd={handleDragEnd}
                                     className={`relative w-20 h-20 rounded border-2 overflow-hidden cursor-grab
-                                        ${existingImages.length === 0 && index === 0 ? "border-green-500" : "border-blue-300"}
+                                        ${index === 0 ? "border-green-500" : img.type === "new" ? "border-blue-300" : "border-gray-200"}
                                         ${dragIndex === index ? "opacity-50" : ""}`}
                                 >
-                                    <img src={img.previewUrl} alt="" className="w-full h-full object-cover" />
-                                    {existingImages.length === 0 && index === 0 && (
+                                    <img
+                                        src={img.type === "existing" ? getImageUrl(img.imageUrl) : img.previewUrl}
+                                        alt="" className="w-full h-full object-cover"
+                                    />
+                                    {index === 0 && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-green-500 text-white text-center text-xs py-0.5">대표</div>
                                     )}
-                                    {existingImages.length > 0 && (
+                                    {img.type === "new" && index !== 0 && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-blue-400 text-white text-center text-xs py-0.5">신규</div>
                                     )}
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); handleNewImageRemove(index); }}
+                                        onClick={(e) => { e.stopPropagation(); handleImageRemove(index); }}
                                         className="absolute top-0.5 right-0.5 w-5 h-5 bg-gray-800 bg-opacity-60 text-white rounded-full text-xs flex items-center justify-center"
                                     >×</button>
                                 </div>
                             ))}
-
-                            <div
-                                onClick={() => imageInputRef.current?.click()}
-                                className="w-20 h-20 rounded border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-green-400 hover:bg-green-50 text-gray-300 text-2xl"
-                            >+</div>
+                            {allImages.length < 5 && (
+                                <div
+                                    onClick={() => imageInputRef.current?.click()}
+                                    className="w-20 h-20 rounded border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-green-400 hover:bg-green-50 text-gray-300 text-2xl"
+                                >+</div>
+                            )}
                         </div>
                     )}
                     <p className="text-xs text-gray-300 mt-2">* 파란 테두리 = 새로 추가된 이미지</p>
+
+                    {/* ── 상세 이미지 ── */}
+                    <div className="mt-5 pt-4 border-t border-gray-100">
+                        <h4 className="text-sm font-bold text-gray-700 mb-1">상세 이미지</h4>
+                        <p className="text-xs text-gray-400 mb-3">× 삭제 후 재등록 방식 · 드래그 순서 변경 불가</p>
+                        <div className="flex gap-3">
+                            {detailImageUrl ? (
+                                <div className="relative w-20 h-20 rounded border-2 border-orange-300 overflow-hidden">
+                                    <img
+                                        src={detailImageFile ? detailImageUrl : getImageUrl(detailImageUrl)}
+                                        alt="" className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute bottom-0 left-0 right-0 bg-orange-400 text-white text-center text-xs py-0.5">상세</div>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); handleDetailImageRemove(); }}
+                                        className="absolute top-0.5 right-0.5 w-5 h-5 bg-gray-800 bg-opacity-60 text-white rounded-full text-xs flex items-center justify-center"
+                                    >×</button>
+                                </div>
+                            ) : (
+                                <div
+                                    onClick={() => detailImageInputRef.current?.click()}
+                                    className="w-20 h-20 rounded border-2 border-dashed border-orange-300 flex items-center justify-center cursor-pointer hover:border-orange-400 hover:bg-orange-50 text-gray-300 text-2xl"
+                                >+</div>
+                            )}
+                        </div>
+                        <input ref={detailImageInputRef} type="file" accept="image/*" onChange={handleDetailImageAdd} className="hidden" />
+                    </div>
                 </section>
 
                 {/* ── 판매 상태 / 금빛나루 인증 ── */}
