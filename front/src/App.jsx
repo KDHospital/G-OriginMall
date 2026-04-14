@@ -68,7 +68,7 @@ import FaqPage from './pages/support/FaqPage';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import { CartProvider } from './context/CartContext';
-
+import ScrollToTop from './hooks/ScrollToTop';
 
 // 팀원들이 페이지 컴포넌트 만들면 여기에 import 추가
 // 예시:
@@ -84,6 +84,8 @@ function App() {
   return (
     <BrowserRouter>
       <CartProvider>
+        {/* 항상 최상단으로 이동 */}
+        <ScrollToTop />              
         <Routes>
           {/* 메인 */}
           <Route path="/" element={<MainPage />} />
