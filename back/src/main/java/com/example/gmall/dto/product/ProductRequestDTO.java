@@ -25,6 +25,12 @@ public class ProductRequestDTO {
     private List<MultipartFile> images;
     //품절
     private Byte soldStatus;
-    // 수정 시 유지할 기존 이미지 URL 목록
-    private List<String> existingImageUrls;        
+    // 수정 시 이미지 순서 인덱스
+    private List<String> existingImageUrls;
+    private List<Integer> existingImageOrders;        
+    private List<Integer> newImageOrders;
+    
+    private String detailImageUrl;
+    // 수정 시 새 상세 이미지 파일
+    private MultipartFile detailImage;
 }
