@@ -37,7 +37,7 @@ const FindIdComponent = () =>{
         }
 
         return(
-          <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
+          <div className="max-w-md mx-auto mt-10 mb-10 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
 
     <h2 className="text-3xl font-black mb-8 text-center text-green-700">아이디 찾기</h2>
     

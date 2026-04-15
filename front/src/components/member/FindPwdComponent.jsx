@@ -82,7 +82,7 @@ const FindPwdComponent= () => {
     }
 
     return(
-<div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
+<div className="max-w-md mx-auto mt-20 mb-10 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
    
     <h2 className="text-3xl font-black mb-2 text-center text-green-700">비밀번호 찾기</h2>
     <p className="text-center text-gray-400 text-sm mb-8 font-medium">안전한 계정 복구를 도와드릴게요</p>
