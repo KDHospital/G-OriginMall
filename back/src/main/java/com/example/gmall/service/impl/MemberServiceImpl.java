@@ -144,6 +144,7 @@ public class MemberServiceImpl implements MemberService {
  				.role(member.getRole())
  				.social(isSocial)
  				.needsExtraInfo(needsInfo)
+ 				.created_at(member.getCreatedAt())
  				.build();
  	}
  	
@@ -165,6 +166,7 @@ public class MemberServiceImpl implements MemberService {
  				.gender(member.getGender())
  				.social(isSocial)
  				.needsExtraInfo(needsInfo)
+ 				.created_at(member.getCreatedAt())
  				.build();
  	}
  	//회원정보 수정
