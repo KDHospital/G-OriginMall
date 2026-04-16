@@ -73,7 +73,7 @@ const BoardListPage = () => {
                         {post.title}
                       </td>
                       <td className="py-4 text-center text-gray-500">
-                        {post.mName || '관리자'} {/* ✅ 필드명 수정 */}
+                        {post.mName || '관리자'} 
                       </td>
                       <td className="py-4 text-center text-gray-400">
                         {post.createdAt?.split('T')[0]}

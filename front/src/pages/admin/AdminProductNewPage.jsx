@@ -21,6 +21,8 @@ const parsePrice = (str) => {
 const AdminProductNewPage = () => {
   const navigate = useNavigate();
   const imageInputRef = useRef(null);
+  const detailImageInputRef = useRef(null);
+  
 
   const [categories, setCategories] = useState([]);
   const [selectedParentId, setSelectedParentId] = useState(null);
@@ -46,6 +48,7 @@ const AdminProductNewPage = () => {
     deliveryFee: "",
     soldStatus: 0,
     isCertified: false,
+    isExhibition: false
   });
 
   // 판매가 자동 계산 (정가 - 할인금액)
@@ -54,6 +57,10 @@ const AdminProductNewPage = () => {
   // ── 이미지 상태 ───────────────────────
   // 첫 번째 이미지 → 썸네일 자동 지정
   const [images, setImages] = useState([]); // { file, previewUrl }
+  const [detailImageFile, setDetailImageFile] = useState(null);
+  const [detailImageUrl, setDetailImageUrl] = useState(null);
+
+
   const [dragIndex, setDragIndex] = useState(null);
 
   // ── 핸들러 ────────────────────────────
@@ -86,12 +93,17 @@ const AdminProductNewPage = () => {
   // 이미지 추가
   const handleImageAdd = (e) => {
     const files = Array.from(e.target.files);
-    const newImages = files.map((file) => ({
-      file,
-      previewUrl: URL.createObjectURL(file),
+    const remaining = 5 - images.length;
+    if (remaining <= 0) {
+        alert("이미지는 최대 5개까지 등록 가능합니다.");
+        return;
+    }
+    const newImages = files.slice(0, remaining).map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
     }));
     setImages((prev) => [...prev, ...newImages]);
-    e.target.value = ""; // input 초기화
+    e.target.value = "";
   };
 
   // 이미지 삭제
@@ -114,6 +126,20 @@ const AdminProductNewPage = () => {
 
   const handleDragEnd = () => setDragIndex(null);
 
+  const handleDetailImageAdd = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        setDetailImageUrl(URL.createObjectURL(file));
+        setDetailImageFile(file);
+    }
+    e.target.value = "";
+};
+
+const handleDetailImageRemove = () => {
+    setDetailImageUrl(null);
+    setDetailImageFile(null);
+};
+
   // 저장
   const handleSubmit = async () => {
     // 필수값 검증
@@ -134,16 +160,21 @@ const AdminProductNewPage = () => {
     formData.append("stock", form.stock);
     formData.append("deliveryFee", parsePrice(form.deliveryFee));
     formData.append("soldStatus", form.soldStatus);
-    formData.append("isCertified", form.isCertified);
-    formData.append("isExhibition", false); // 판매자는 기획전 불가
+    formData.append("certified", form.isCertified);
+    formData.append("exhibition", form.isExhibition); // 판매자는 기획전 불가
     images.forEach((img) => formData.append("images", img.file));
 
+    // 상세 이미지 추가
+    if (detailImageFile) {
+        formData.append("detailImage", detailImageFile);
+    }
+
     try {
-        await axiosInstance.post("/seller/products", formData, {
+        await axiosInstance.post("/admin/products", formData, {
             headers: { "Content-Type": "multipart/form-data" }
         });
         alert("상품이 등록되었습니다.");
-        navigate("/seller/products");
+        navigate("/admin/products");
     } catch (err) {
         console.error(err);
         alert("상품 등록에 실패했습니다.");
@@ -155,7 +186,7 @@ const AdminProductNewPage = () => {
     return(
         <AdminLayout>
             {/* 페이지 타이틀 */}
-            <h2 className="text-lg font-bold text-gray-700 border-l-4 border-green-500 pl-3 mb-5">
+            <h2 className="text-lg font-bold text-gray-700 border-l-4 border-blue-500 pl-3 mb-5">
                 상품 등록
             </h2>
 
@@ -342,11 +373,16 @@ const AdminProductNewPage = () => {
 
                 {/* 이미지 업로드 영역 */}
                 <div
-                    onClick={() => imageInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-200 rounded-md p-8 flex flex-col items-center justify-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors mb-4"
+                    onClick={() => images.length < 5 && imageInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-md p-8 flex flex-col items-center justify-center transition-colors mb-4
+                        ${images.length < 5
+                            ? "border-gray-200 cursor-pointer hover:border-green-400 hover:bg-green-50"
+                            : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-50"}`}
                 >
                     <span className="text-2xl mb-2">+</span>
-                    <p className="text-sm text-gray-400">클릭하여 이미지 업로드</p>
+                    <p className="text-sm text-gray-400">
+                        {images.length < 5 ? "클릭하여 이미지 업로드" : "최대 5장 도달"}
+                    </p>
                     <p className="text-xs text-gray-300 mt-1">JPG, PNG, 최대 10MB</p>
                 </div>
                 <input
@@ -394,17 +430,42 @@ const AdminProductNewPage = () => {
                         </div>
                     ))}
                     {/* 추가 버튼 */}
-                    <div
-                        onClick={() => imageInputRef.current?.click()}
-                        className="w-20 h-20 rounded border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors text-gray-300 text-2xl"
-                    >
-                        +
-                    </div>
+                    {images.length < 5 && (
+                        <div
+                            onClick={() => imageInputRef.current?.click()}
+                            className="w-20 h-20 rounded border-2 border-dashed border-gray-200 flex items-center justify-center cursor-pointer hover:border-green-400 hover:bg-green-50 transition-colors text-gray-300 text-2xl"
+                        >+</div>
+                    )}
                     </div>
                 )}
                 <p className="text-xs text-gray-300 mt-2">
                     * 이미지 순서를 드래그로 변경할 수 있습니다. (sort_order) 첫 번째 이미지가 대표 이미지입니다.
                 </p>
+
+                {/* ── 상세 이미지 ── */}
+                <div className="mt-5 pt-4 border-t border-gray-100">
+                    <h4 className="text-sm font-bold text-gray-700 mb-1">상세 이미지</h4>
+                    <p className="text-xs text-gray-400 mb-3">× 삭제 후 재등록 방식 · 드래그 순서 변경 불가</p>
+                    <div className="flex gap-3">
+                        {detailImageUrl ? (
+                            <div className="relative w-20 h-20 rounded border-2 border-orange-300 overflow-hidden">
+                                <img src={detailImageUrl} alt="" className="w-full h-full object-cover" />
+                                <div className="absolute bottom-0 left-0 right-0 bg-orange-400 text-white text-center text-xs py-0.5">상세</div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleDetailImageRemove(); }}
+                                    className="absolute top-0.5 right-0.5 w-5 h-5 bg-gray-800 bg-opacity-60 text-white rounded-full text-xs flex items-center justify-center"
+                                >×</button>
+                            </div>
+                        ) : (
+                            <div
+                                onClick={() => detailImageInputRef.current?.click()}
+                                className="w-20 h-20 rounded border-2 border-dashed border-orange-300 flex items-center justify-center cursor-pointer hover:border-orange-400 hover:bg-orange-50 text-gray-300 text-2xl"
+                            >+</div>
+                        )}
+                    </div>
+                    <input ref={detailImageInputRef} type="file" accept="image/*" onChange={handleDetailImageAdd} className="hidden" />
+                </div>
+
                 </section>
 
                 {/* ── 판매 상태 / 금빛나루 인증 ── */}
@@ -443,51 +504,51 @@ const AdminProductNewPage = () => {
                 {/* 금빛나루 인증 */}
                 <section className="bg-white rounded-md p-5 shadow-sm">
                     <div className="mb-4">
-                    <h3 className="text-sm font-bold text-gray-700 mb-1">금빛나루 인증</h3>
-                    <p className="text-xs text-gray-400 mb-4">is_certified - BOOLEAN</p>
-                    <label className="flex items-start gap-2 cursor-pointer">
-                        <input
-                        type="checkbox"
-                        name="isCertified"
-                        checked={form.isCertified}
-                        onChange={handleChange}
-                        className="mt-0.5 w-4 h-4 accent-green-600"
-                        />
-                        <div>
-                        <span className="text-sm text-gray-700">김포시 인증 상품</span>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                            체크 시 대표 페이지 상단 노출
-                        </p>
-                        <p className="text-xs text-gray-300 mt-0.5">
-                            금빛나루 전용관에 노출
-                        </p>
-                        </div>
-                    </label>
+                        <h3 className="text-sm font-bold text-gray-700 mb-1">금빛나루 인증</h3>
+                        <p className="text-xs text-gray-400 mb-4">is_certified - BOOLEAN</p>
+                        <label className="flex items-start gap-2 cursor-pointer">
+                            <input
+                            type="checkbox"
+                            name="isCertified"
+                            checked={form.isCertified}
+                            onChange={handleChange}
+                            className="mt-0.5 w-4 h-4 accent-green-600"
+                            />
+                            <div>
+                            <span className="text-sm text-gray-700">김포시 인증 상품</span>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                                체크 시 대표 페이지 상단 노출
+                            </p>
+                            <p className="text-xs text-gray-300 mt-0.5">
+                                금빛나루 전용관에 노출
+                            </p>
+                            </div>
+                        </label>
                     </div>
 
-                {/* 기획전 등록 */}
-                <div>
-                    <h3 className="text-sm font-bold text-gray-700 mb-1">기획전 등록</h3>
-                    <p className="text-xs text-gray-400 mb-4">is_exhibition - BOOLEAN</p>
-                    <label className="flex items-start gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        name="isExhibition"
-                        checked={form.isExhibition}
-                        onChange={handleChange}
-                        className="mt-0.5 w-4 h-4 accent-green-600"
-                    />
+                    {/* 기획전 등록 */}
                     <div>
-                        <span className="text-sm text-gray-700">기획전 등록 상품</span>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                        체크 시 대표 페이지 상단 노출
-                        </p>
-                        <p className="text-xs text-gray-300 mt-0.5">
-                        기획전 전용관에 노출
-                        </p>
-                    </div>
-                    </label>
-                </div>            
+                        <h3 className="text-sm font-bold text-gray-700 mb-1">기획전 등록</h3>
+                        <p className="text-xs text-gray-400 mb-4">is_exhibition - BOOLEAN</p>
+                        <label className="flex items-start gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            name="isExhibition"
+                            checked={form.isExhibition}
+                            onChange={handleChange}
+                            className="mt-0.5 w-4 h-4 accent-green-600"
+                        />
+                        <div>
+                            <span className="text-sm text-gray-700">기획전 등록 상품</span>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                            체크 시 대표 페이지 상단 노출
+                            </p>
+                            <p className="text-xs text-gray-300 mt-0.5">
+                            기획전 전용관에 노출
+                            </p>
+                        </div>
+                        </label>
+                    </div>            
                 </section>
 
                 </div>

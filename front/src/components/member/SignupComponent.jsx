@@ -61,7 +61,7 @@ useEffect(() => {
     if(!form.loginId) return alert("이메일을 입력해주세요")
        
         setIsSending(true)
-        sendEmailCode(form.loginId).then( ()=>{
+        sendEmailCode({email: form.loginId, type:"JOIN"}).then( ()=>{
         setIsCodeSent(true)
         setTimeLeft(180);
         alert("인증코드가 전송되었습니다")
@@ -132,124 +132,123 @@ useEffect(() => {
   }
 
 
-    return(
-        <div className="max-w-lg mx-auto border-2 border-green-200 mt-10 p-8 bg-white shadow-lg rounded-lg ">
-            <div className="text-3xl mb-8 font-extrabold text-green-600 text-center">회원가입</div>
-            <div className="space-y-6">
-                <div>
-                    <label className="font-bold mb-1 block text-gray-700">아이디 (이메일)</label>
-                    <div className="flex gap-2">
-                        <input
+    return (
+    <div className="max-w-lg mx-auto border-2 border-green-200 mt-10 p-8 bg-white shadow-lg rounded-lg">
+      
+        <div className="text-3xl mb-8 font-extrabold text-green-600 text-center">회원가입</div>
+        
+        <div className="space-y-6">
+            {/*아이디 (이메일) 섹션 */}
+            <div>
+                <label className="font-bold mb-1 block text-gray-700">아이디 (이메일)</label>
+                <div className="flex gap-2">
+                    <input
                         className="flex-1 p-3 border border-gray-300 rounded focus:outline-green-500"
                         name="loginId"
                         value={form.loginId}
                         onChange={handleChange}
                         disabled={isVerified || isSending}
-                        placeholder="example@email.com"/>
-                        <button className={`px-4 rounded text-sm font-bold transition ${
-                            (isVerified || isSending)
-                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                            : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                        }`}
-                        onClick={handleSendCode}
-                        disabled={isVerified || isSending}>
-                            {isSending ? (
-                                <span className="flex items-center gap-1">
-                                    발송중...
+                        placeholder="example@email.com"
+                    />
+                    <button className={`px-4 rounded text-sm font-bold transition shadow-sm ${
+                        (isVerified || isSending)
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "bg-yellow-400 hover:bg-yellow-500 text-yellow-900" 
+                    }`}
+                    onClick={handleSendCode}
+                    disabled={isVerified || isSending}>
+                        {isSending ? "발송중..." : isCodeSent ? "재전송" : "인증받기"}
+                    </button>
+                </div>
+
+                {/*인증코드 입력창 */}
+                {isCodeSent && !isVerified && (
+                    <div className="mt-2 p-4 bg-yellow-50 border border-yellow-200 rounded"> 
+                        <div className="flex gap-2 relative">
+                            <div className="flex-1 relative">
+                                <input
+                                    className="w-full p-3 border border-yellow-300 rounded focus:outline-yellow-500 bg-white"
+                                    placeholder="인증코드 6자리 입력"
+                                    value={vCode}
+                                    onChange={(e) => setVCode(e.target.value)}
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500">
+                                    {formatTime(timeLeft)}
                                 </span>
-                            ) : isCodeSent ? (
-                                "재전송"
-                            ): (
-                                "인증받기"
-                            )}
-                        </button>
+                            </div>
+                            <button
+                                className="bg-green-500 text-white px-6 rounded font-bold hover:bg-green-600 shadow-sm"
+                                onClick={handleVerifyCode}
+                            >
+                                확인
+                            </button>
+                        </div>
+                        <p className="text-xs text-amber-600 mt-2 ml-1 font-medium">* 3분 이내에 코드를 입력해주세요.</p>
                     </div>
-            {isCodeSent && !isVerified && (
-                <div className="mt-2"> 
-                    <div className="flex gap-2 relative">
-                        <div className="flex-1 relative">
-                    <input
-                    className="flex-1 p-3 border border-gray-300 rounded"
-                   placeholder="인증코드 6자리 입력"
-                   value={vCode}
-                   onChange={ (e)=> setVCode(e.target.value)}  />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-red-500">
-                        {formatTime(timeLeft)}
-                    </span>
-                   </div>
-                   
-                   <button
-                   className="bg-green-500 text-white px-6 rounded font-bold hover:bg-green-600"
-                   onClick={handleVerifyCode}>
-                    
-                        확인
-                   </button>
-                </div>
-                    <p className="text-xs text-gray-400 mt-1 ml-1">* 3분 이내에 코드를 입력해주세요.</p>
-                </div>
-            )}
-            {isVerified && <p className="text-green-600 text-sm mt-1">인증완료</p>}
+                )}
+                {isVerified && <p className="text-green-600 text-sm mt-1 font-bold ml-1 flex items-center gap-1">✓ 인증완료</p>}
             </div>
 
-            
-
-            <div className="flex flex-col">
+            {/*비밀번호 섹션 */}
+            <div className="flex flex-col space-y-4">
                 <div className="flex flex-col">
                     <label className="font-bold mb-1 text-gray-700 text-sm">비밀번호</label>
                     <input 
-                        className={`p-3 border rounded focus:outline-none ${pwdError ? 'border-red-500' : 'border-gray-300 focus:border-green-500'}`}
+                        className={`p-3 border rounded focus:outline-none ${pwdError ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-green-500'}`}
                         name="mpwd" type="password" value={form.mpwd} onChange={handleChange} placeholder="비밀번호 입력"
                     />
                 </div>
-
                
                 <div className="flex flex-col">
                     <label className="font-bold mb-1 text-gray-700 text-sm">비밀번호 확인</label>
                     <input 
-                        className={`p-3 border rounded focus:outline-none ${pwdError ? 'border-red-500 text-red-500' : 'border-gray-300 focus:border-green-500'}`}
+                        className={`p-3 border rounded focus:outline-none ${pwdError ? 'border-red-500 bg-red-50 text-red-500' : 'border-gray-300 focus:border-green-500'}`}
                         name="mpwdConfirm" type="password" value={form.mpwdConfirm} onChange={handleChange} placeholder="비밀번호 다시 입력"
                     />
-                    {pwdError && <span className="text-red-500 text-xs mt-1 ml-1">비밀번호가 일치하지 않습니다.</span>}
-                    {!pwdError && form.mpwdConfirm && <span className="text-green-600 text-xs mt-1 ml-1">비밀번호가 일치합니다.</span>}
+                    {pwdError && <span className="text-red-500 text-xs mt-1 ml-1 font-bold">✕ 비밀번호가 일치하지 않습니다.</span>}
+                    {!pwdError && form.mpwdConfirm && <span className="text-green-600 text-xs mt-1 ml-1 font-bold">✓ 비밀번호가 일치합니다.</span>}
+                </div>
             </div>
 
+            {/*이름 및 연락처 섹션 */}
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
                     <label className="font-bold mb-1 text-gray-700 text-sm">이름</label>
-                    <input className="p-3 border border-gray-300 rounded" name="mname"value={form.mname} onChange={handleChange} />
+                    <input className="p-3 border border-gray-300 rounded focus:border-green-500 outline-none" name="mname" value={form.mname} onChange={handleChange} placeholder="성함 입력"/>
                 </div>
                 <div className="flex flex-col">
                     <label className="font-bold mb-1 text-gray-700 text-sm">연락처</label>
-                    <input className="p-3 border border-gray-300 rounded" name="tel" value={form.tel} placeholder="010-0000-0000" maxLength="13" onChange={handleTelChange} />
+                    <input className="p-3 border border-gray-300 rounded focus:border-green-500 outline-none" name="tel" value={form.tel} placeholder="010-0000-0000" maxLength="13" onChange={handleTelChange} />
                 </div>
             </div>
+
+            {/* 성별 섹션 */}
             <div>
-                    <label className="font-bold mb-1 block text-gray-700 text-sm">성별</label>
-                    <div className="flex gap-4 p-3 bg-gray-50 rounded border border-gray-200 justify-around">
-                       <label className="text-sm"><input type="radio" name="gender" value="0" defaultChecked onChange={handleChange} /> 미지정</label>
-                        <label className="text-sm"><input type="radio" name="gender" value="1" onChange={handleChange} /> 남성</label>
-                        <label className="text-sm"><input type="radio" name="gender" value="2" onChange={handleChange} /> 여성</label>
-                        
-                    </div>
+                <label className="font-bold mb-1 block text-gray-700 text-sm">성별</label>
+                <div className="flex gap-4 p-3 bg-gray-50 rounded border border-gray-200 justify-around">
+                    <label className="text-sm cursor-pointer flex items-center gap-2">
+                        <input type="radio" name="gender" value="0" checked={Number(form.gender) === 0} onChange={handleChange} className="accent-green-600" /> 미지정
+                    </label>
+                    <label className="text-sm cursor-pointer flex items-center gap-2">
+                        <input type="radio" name="gender" value="1" checked={Number(form.gender) === 1} onChange={handleChange} className="accent-green-600" /> 남성
+                    </label>
+                    <label className="text-sm cursor-pointer flex items-center gap-2">
+                        <input type="radio" name="gender" value="2" checked={Number(form.gender) === 2} onChange={handleChange} className="accent-green-600" /> 여성
+                    </label>
                 </div>
+            </div>
 
-                <button 
-                    className={`w-full p-4 rounded text-white font-extrabold text-xl shadow-md transition-all 
-                        ${(isVerified && !pwdError && form.mpwd) ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-300 cursor-not-allowed'}`}
-                    disabled={!isVerified || pwdError || !form.mpwd}
-                    onClick={handleClickSignup}
-                >
-                    가입하기
-                </button>
-
+            {/* 가입하기 버튼 */}
+            <button 
+                className={`w-full p-4 rounded text-white font-extrabold text-xl shadow-md transition-all active:scale-[0.98]
+                    ${(isVerified && !pwdError && form.mpwd) ? 'bg-green-600 hover:bg-green-700 shadow-green-100' : 'bg-gray-300 cursor-not-allowed'}`}
+                disabled={!isVerified || pwdError || !form.mpwd}
+                onClick={handleClickSignup}
+            >
+                가입하기
+            </button>
         </div>
-        </div>
-            
-
-
-            
-        </div>
-
-    )
+    </div>
+)
 }
 export default SignupComponent

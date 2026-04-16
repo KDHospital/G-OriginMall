@@ -1,5 +1,7 @@
 package com.example.gmall.dto.member;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +20,8 @@ public class MemberDTO {
 	private String tel;
 	private Byte gender;
 	private Byte role;
+	private boolean social;
+	private boolean needsExtraInfo;
+	private LocalDateTime created_at;
 
 }

@@ -128,18 +128,19 @@ const ProductInfo = ({product}) => {
                     )}
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                    <button onClick={handleBuyNow} className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
-                        구매하기
-                    </button>
-                    <button
+                    {product.stock === 0 ?<button disabled className="flex-1 bg-gradient-to-br bg-gray-300 text-gray-400 py-4 rounded-xl font-bold text-lg">
+                        품절</button> :<button onClick={handleBuyNow} className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+                        구매하기</button>}
+                    {product.stock === 0 ? <></>: <button
                     onClick={handleAddToCart}
                     disabled={product.soldStatus !== 0}
                     className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
                         장바구니
-                    </button>
+                    </button>}
+
                     {/* 품절 안내 */}
                     {product.soldStatus === 2 && (
-                        <p className="text-center text-error font-bold">현재 품절된 상품입니다.</p>
+                        <p className="text-center text-error font-bold leading-[60px]">현재 품절된 상품입니다.</p>
                     )}
                 </div>
             </div>

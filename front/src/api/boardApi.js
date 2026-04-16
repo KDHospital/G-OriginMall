@@ -42,25 +42,25 @@ export const removePost = async (id) => {
     return response.data;
 };
 
-// [관리자] 공지사항 등록
+// [어드민] 공지사항 등록
 export const addNotice = async (data) => {
     const response = await axiosInstance.post('/board/inquiry', data);
     return response.data;
 };
 
-// [관리자] 게시글 수정
+// [어드민] 게시글 수정
 export const adminUpdatePost = async (id, data) => {
     const response = await axiosInstance.put(`/admin/board/post/${id}`, data);
     return response.data;
 };
 
-// [관리자] 답변 등록/수정
+// [어드민] 답변 등록/수정
 export const addAnswer = async (postId, answerContent) => {
     const response = await axiosInstance.put(`/admin/board/inquiry/${postId}/answer`, { answerContent });
     return response.data;
 };
 
-// [관리자] 게시글 삭제
+// [어드민] 게시글 삭제
 export const adminRemovePost = async (id) => {
     const response = await axiosInstance.delete(`/admin/board/${id}`);
     return response.data;

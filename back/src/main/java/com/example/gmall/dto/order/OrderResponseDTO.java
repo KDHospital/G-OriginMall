@@ -51,6 +51,7 @@ public class OrderResponseDTO {
             case 2 -> "배송중";
             case 3 -> "배송완료";
             case 4 -> "취소/환불";
+            case 5 -> "결제실패";
             default -> "알 수 없음";
         };
         this.receiverName = orders.getReceiverName();

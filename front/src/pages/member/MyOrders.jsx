@@ -14,6 +14,7 @@ const STATUS_STYLE = {
     2: "bg-yellow-100 text-yellow-600",
     3: "bg-green-100 text-green-600",
     4: "bg-red-100 text-red-500",
+    5: "bg-orange-100 text-orange-500",
 };
 
 function StatusBadge({ status, label }) {
@@ -30,10 +31,17 @@ export default function MyOrders() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [memberInfo, setMemberInfo] = useState(null)
 
     const PAGE_SIZE = 10;
 
     useEffect(() => {
+       
+        const savedMember = localStorage.getItem("member");
+        if (savedMember) {
+            setMemberInfo(JSON.parse(savedMember));
+        }
+
         setLoading(true);
         axiosInstance.get(`/orders?page=${currentPage}&size=${PAGE_SIZE}`)
             .then((res) => {
@@ -43,6 +51,7 @@ export default function MyOrders() {
             })
             .catch((err) => console.error("주문 내역 로드 실패:", err))
             .finally(() => setLoading(false));
+  
     }, [currentPage]);
 
     return (
@@ -50,11 +59,11 @@ export default function MyOrders() {
             <div className="max-w-7xl mx-auto flex gap-8 p-10 bg-gray-50 min-h-screen">
 
                 {/* 사이드바 */}
-                <MyPageComponent member={null} />
+                {memberInfo && <MyPageComponent member={memberInfo} />}
 
                 {/* 메인 컨텐츠 */}
                 <main className="flex-grow space-y-6">
-                    <h2 className="text-2xl font-bold border-l-4 border-black pl-3">주문 내역</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-green-600 pl-3">주문 내역</h2>
                     <p className="text-sm text-gray-400">전체 {totalElements}건</p>
 
                     <section className="bg-white border border-gray-200 shadow-sm rounded-md">

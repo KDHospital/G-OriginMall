@@ -74,9 +74,9 @@ export const withdrawMember = (data) => {
     return axiosInstance.post("/member/withdraw",data)
 }
 
-// ===== 관리자 전용 =====
+// ===== 어드민 전용 =====
 
-// [관리자] 일반회원 목록 조회
+// [어드민] 일반회원 목록 조회
 export const adminGetMembers = async (page = 0, size = 10, keyword = '', status = '') => {
     const params = { page, size };
     if (keyword) params.keyword = keyword;
@@ -85,26 +85,96 @@ export const adminGetMembers = async (page = 0, size = 10, keyword = '', status 
     return response.data;
 };
 
-// [관리자] 회원 상세 조회
+// [어드민] 회원 상세 조회
 export const adminGetMember = async (memberId) => {
     const response = await axiosInstance.get(`/admin/members/${memberId}`);
     return response.data;
 };
 
-// [관리자] 회원 등록
+// [어드민] 회원 등록
 export const adminCreateMember = async (data) => {
     const response = await axiosInstance.post('/admin/members', data);
     return response.data;
 };
 
-// [관리자] 회원 주문 목록 조회
+// [어드민] 회원 주문 목록 조회
 export const adminGetMemberOrders = async (memberId, page = 0, size = 5) => {
     const response = await axiosInstance.get(`/admin/members/${memberId}/orders`, { params: { page, size } });
     return response.data;
 };
 
-// [관리자] 회원 수정
+// [어드민] 회원 수정
 export const adminUpdateMember = async (memberId, data) => {
     const response = await axiosInstance.put(`/admin/members/${memberId}`, data);
+    return response.data;
+};
+
+// [어드민] 회원 삭제 (비활성화)
+export const adminDeleteMember = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/members/${memberId}/delete`);
+    return response.data;
+};
+
+// ===== [어드민] 판매회원 관리 =====
+export const adminGetSellers = async (page = 0, size = 10, keyword = '', verified = null, status = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (verified !== null) params.verified = verified;
+    if (status) params.status = status;
+    const response = await axiosInstance.get('/admin/sellers', { params });
+    return response.data;
+};
+
+export const adminGetSellerDetail = async (memberId) => {
+    const response = await axiosInstance.get(`/admin/sellers/${memberId}`);
+    return response.data;
+};
+
+export const adminCreateSeller = async (data) => {
+    const response = await axiosInstance.post('/admin/sellers', data);
+    return response.data;
+};
+
+export const adminUpdateSeller = async (memberId, data) => {
+    const response = await axiosInstance.put(`/admin/sellers/${memberId}`, data);
+    return response.data;
+};
+
+export const adminApproveSeller = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/approve-seller/${memberId}`);
+    return response.data;
+};
+
+export const adminRejectSeller = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/reject-seller/${memberId}`);
+    return response.data;
+};
+
+// ===== [어드민] 관리자 =====
+export const adminGetAdmins = async (page = 0, size = 10, keyword = '', status = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (status) params.status = status;
+    const response = await axiosInstance.get('/admin/admins', { params });
+    return response.data;
+};
+
+export const adminGetAdminDetail = async (memberId) => {
+    const response = await axiosInstance.get(`/admin/admins/${memberId}`);
+    return response.data;
+};
+
+export const adminCreateAdmin = async (data) => {
+    const response = await axiosInstance.post('/admin/admins', data);
+    return response.data;
+};
+
+export const adminUpdateAdmin = async (memberId, data) => {
+    const response = await axiosInstance.put(`/admin/admins/${memberId}`, data);
+    return response.data;
+};
+
+export const adminDeleteAdmin = async (memberId) => {
+    const response = await axiosInstance.post(`/admin/admins/${memberId}/delete`);
     return response.data;
 };

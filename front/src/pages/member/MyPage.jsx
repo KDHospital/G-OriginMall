@@ -15,6 +15,7 @@ const STATUS_STYLE = {
     2: "bg-yellow-100 text-yellow-600",
     3: "bg-green-100 text-green-600",
     4: "bg-red-100 text-red-500",
+    5: "bg-orange-100 text-orange-500",
 };
 
 function StatusBadge({ status, label }) {
@@ -94,7 +95,7 @@ function MyPage() {
 
                 {/* 메인 컨텐츠 */}
                 <main className="flex-grow space-y-6">
-                    <h2 className="text-2xl font-bold border-l-4 border-black pl-3">마이페이지</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-green-600 pl-3">마이페이지</h2>
 
                     {/* 요약 카드 */}
                     <section className="grid grid-cols-3 gap-4">
@@ -208,7 +209,7 @@ function MyPage() {
                                 <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">이름</td><td className="p-4">{member.mname}</td></tr>
                                 <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">연락처</td><td className="p-4">{formatPhoneNumber(member.tel)}</td></tr>
                                 <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">성별</td><td className="p-4">{genderMap[member.gender] || "정보 없음"}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">가입일</td><td className="p-4">2026-01-15</td></tr>
+                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">가입일</td><td className="p-4">{member.created_at ? member.created_at.split('T')[0] : 정보없음}</td></tr>
                             </tbody>
                         </table>
                     </section>

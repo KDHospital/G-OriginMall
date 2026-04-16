@@ -159,221 +159,210 @@ const handleClickSignup = async () => {
 
 return(
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-6 font-sans">
-            <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl p-10">
-                <h2 className="text-3xl font-black text-gray-800 mb-8 border-b-4 border-indigo-500 pb-2">입점 신청</h2>
+        <div className="w-full max-w-2xl bg-white border-2 border-green-200 rounded-lg shadow-2xl p-10">
+            {/* 제목: 그린 포인트 바 */}
+            <h2 className="text-3xl font-black text-gray-800 mb-8 border-b-4 border-green-500 pb-2">입점 신청</h2>
 
-                <div className="space-y-8">
-                    {/* 계정 정보 섹션 */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-indigo-700 border-b border-indigo-100 pb-2">계정 정보</h3>
-                        <div className="flex flex-col gap-2">
-                            <label className="text-sm font-bold text-gray-700 ml-1">아이디(이메일)</label>
-                            <div className="flex gap-2">
-                                <input
-                                    name="loginId" type="email" value={form.loginId} onChange={handleChange}
-                                    disabled={isEmailVerified}
-                                    className="flex-1 p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400 disabled:bg-gray-200"
-                                    placeholder="example@email.com" />
-                                <button
-                                    onClick={handleSendCode} disabled={isSending || isEmailVerified}
-                                    className="px-4 bg-indigo-100 text-indigo-700 font-bold rounded-xl hover:bg-indigo-200 transition-all text-sm whitespace-nowrap"
-                                >
-                                    {isCodeSent ? "재발송" : "인증번호 발송"}
-                                </button>
-                            </div>
-                        </div>
-
-                        {isCodeSent && !isEmailVerified && (
-                            <div className="flex flex-col gap-2">
-                                <div className="text-sm font-bold ml-1 text-indigo-600">인증번호 입력</div>
-                                <div className="flex gap-2">
-                                    <div className="relative flex-1">
-                                        <input
-                                            value={vCode} onChange={(e) => setVCode(e.target.value)}
-                                            className="w-full p-4 bg-gray-50 rounded-xl border border-gray-300 outline-none"
-                                            placeholder="6자리 숫자"
-                                        />
-                                        <span className="absolute right-4 top-4 text-red-500 font-bold">{formatTime(timeLeft)}</span>
-                                    </div>
-                                    <button onClick={handleVerifyCode} className="px-6 bg-green-400 text-white font-bold rounded-xl hover:bg-green-500 transition-all">확인</button>
-                                </div>
-                            </div>
-                        )}
-                        {isEmailVerified && <p className="text-xs text-green-600 font-bold ml-1">이메일 인증이 완료되었습니다.</p>}
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-1">
-                                <input name="mpwd" type="password" placeholder="비밀번호" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                                <span className="text-[10px] text-gray-400 ml-2">* 영문, 숫자, 특수문자 포함 8~20자</span>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                            <input name="mpwdConfirm" type="password" placeholder="비밀번호 확인" onChange={handleChange} className={`p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400 h-[56px]
-                           ${form.mpwdConfirm.length > 0 
-                            ? (form.mpwd === form.mpwdConfirm ? 'border-green-500 focus:ring-green-400' : 'border-red-500 focus:ring-red-400')
-                            : 'border-gray-200 focus:ring-indigo-400'
-                           } `} />
-                        
-                        {form.mpwdConfirm.length > 0 && (
-                            <span className={`text-[10px] font-bold ml-2 ${
-                                form.mpwd === form.mpwdConfirm ? `text-green-600` : 'text-red-500'
-                            }`}>
-                                {form.mpwd === form.mpwdConfirm ? '비밀번호가 일치합니다' : '비밀번호가 일치하지 않습니다.'}
-                            </span>
-                        )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 사업자 정보 섹션 */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-indigo-700 border-b border-indigo-100 pb-2">사업자 정보</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-bold">
-                            <div className="flex flex-col gap-2">
-                                <label className="ml-1 text-gray-600">담당자명</label>
-                                <input name="mname" value={form.mname} placeholder="이름" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="ml-1 text-gray-600">연락처</label>
-                                <input name="tel" value={form.tel} placeholder="010-0000-0000" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                            </div>
-                            
-                            <div className="flex flex-col gap-2">
-                                <label className="text-sm font-bold text-gray-600 ml-1">성별</label>
-                            <div className="flex gap-2">
-                            <label className={`flex-1 flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all 
-                             ${form.gender === 0 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                <input 
-                                type="radio" name="gender" value="0"
-                                checked={form.gender === 0}
-                                onChange={() => setForm({...form,gender: 0})}
-                                className="hidden"/>
-                                <span className="font-bold text-sm">미지정</span>
-                             </label>
-                                 
-                                 
-                             <label className={`flex-1 flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all 
-                             ${form.gender === 1 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                <input 
-                                type="radio" name="gender" value="1"
-                                checked={form.gender === 1}
-                                onChange={() => setForm({...form,gender: 1})}
-                                className="hidden"/>
-                                <span className="font-bold text-sm">남성</span>
-                             </label>
-                            
-                            <label className={`flex-1 flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all 
-                             ${form.gender === 2 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                <input 
-                                type="radio" name="gender" value="2"
-                                checked={form.gender === 2}
-                                onChange={() => setForm({...form,gender: 2})}
-                                className="hidden"/>
-                                <span className="font-bold text-sm">여성</span>
-                             </label>
-                            
-                            </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <label className="ml-1 text-sm font-bold text-gray-600">사업자 등록번호</label>
-                            <input name="businessNo" value={form.businessNo} placeholder="000-00-00000" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                        </div>
-
-                        {/* 세금계산서 발급 여부 */}
-                        <div className="flex flex-col gap-3">
-                            <label className="text-sm font-bold text-gray-600 ml-1">세금계산서 발급 여부</label>
-                            <div className="flex gap-4">
-                                <label className={`flex-1 flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all ${form.taxInvoice ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                    <input type="radio" name="taxInvoice" value="true" checked={form.taxInvoice === true} onChange={handleChange} className="hidden" />
-                                    <span className="font-bold">발급</span>
-                                </label>
-                                <label className={`flex-1 flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all ${!form.taxInvoice ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                    <input type="radio" name="taxInvoice" value="false" checked={form.taxInvoice === false} onChange={handleChange} className="hidden" />
-                                    <span className="font-bold">미발급</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        {/* 현금영수증 섹션 */}
-                        <div className="bg-gray-50 p-6 rounded-2xl space-y-4 border border-gray-100">
-                            <h3 className="font-bold text-gray-700 text-sm ml-1">현금영수증 발급 설정</h3>
-                            <div className="flex gap-4">
-                                <label className={`flex-1 p-3 rounded-xl border text-center cursor-pointer transition-all ${showCashInput ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                    <input type="radio" name="cashReceiptSelect" value="yes" checked={showCashInput === true} onChange={handleChange} className="hidden" />
-                                    <span className="font-bold text-sm">발급 신청</span>
-                                </label>
-                                <label className={`flex-1 p-3 rounded-xl border text-center cursor-pointer transition-all ${!showCashInput ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-500 border-gray-200'}`}>
-                                    <input type="radio" name="cashReceiptSelect" value="no" checked={showCashInput === false} onChange={handleChange} className="hidden" />
-                                    <span className="font-bold text-sm">미발급</span>
-                                </label>
-                            </div>
-                            {showCashInput && (
-                                <div className="animate-fade-in space-y-2">
-                                    <label className="text-xs font-bold text-indigo-500 ml-1">현금영수증 번호 (휴대폰 또는 사업자번호)</label>
-                                    <input
-                                        name="cashReceiptNo"
-                                        value={form.cashReceiptNo}
-                                        onChange={handleChange}
-                                        placeholder="- 없이 숫자만 입력하세요"
-                                        className="w-full p-4 bg-white rounded-xl border border-indigo-200 outline-none focus:ring-2 focus:ring-indigo-400"
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* 금빛나루 인증 */}
-                        <div className="bg-white p-4 rounded-xl border border-indigo-100">
-                            <label className="flex items-center gap-2 cursor-pointer mb-3">
-                                <input type="checkbox" name="isVerified" checked={form.isVerified} onChange={handleChange} className="w-5 h-5 accent-indigo-600" />
-                                <span className="text-sm font-bold text-gray-700">금빛나루 인증 업체입니까?</span>
-                            </label>
-                            {form.isVerified && (
-                                <input
-                                    name="description"
-                                    value={form.description}
-                                    onChange={handleChange}
-                                    placeholder="인증번호 또는 관련 정보를 입력하세요"
-                                    className="w-full p-3 bg-gray-50 rounded-lg text-sm border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400"
-                                />
-                            )}
-                        </div>
-                    </div>
-
-                    {/* 정산 계좌 정보 섹션 */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-indigo-700 border-b border-indigo-100 pb-2">정산 계좌 정보</h3>
-                        <div className="grid grid-cols-2 gap-4 font-bold">
-                            <input name="settlementBank" placeholder="은행명" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                            <input name="settlementName" placeholder="예금주" onChange={handleChange} className="p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                        </div>
-                        <input name="bankAccount" placeholder="계좌번호 (-제외)" onChange={handleChange} className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-400" />
-                    </div>
-
-                    {/* 입점 안내 및 제출 버튼 */}
-                    <div className="space-y-4 pt-4 border-t border-gray-100">
-                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs leading-5">
-                            <p className="font-bold mb-1">📢 입점 신청 안내</p>
-                            <p>• 입점 신청은 사업자 등록증이 있는 판매자만 신청할 수 있습니다.</p>
-                            <p>• 신청 후 관리자 검토를 거쳐 승인/반려 결과를 이메일로 안내드립니다.</p>
-                            <p>• 승인 완료 시 판매자 권한이 부여되면 상품 등록이 가능합니다.</p>
-                            <p>• 심사 기간은 영업일 기준 2~3일 소요됩니다.</p>
-                        </div>
-
-                        <button
-                            disabled={!isEmailVerified}
-                            onClick={handleClickSignup}
-                            className={`w-full p-5 rounded-2xl font-black text-xl shadow-lg transition-all ${isEmailVerified
-                                ? "bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.01]"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            <div className="space-y-8">
+                {/* 계정 정보 섹션 */}
+                <div className="space-y-4">
+                    <h3 className="font-bold text-green-700 border-b border-green-100 pb-2 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-green-500 rounded-full"></span>계정 정보
+                    </h3>
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-bold text-gray-700 ml-1">아이디(이메일)</label>
+                        <div className="flex gap-2">
+                            <input
+                                name="loginId" type="email" value={form.loginId} onChange={handleChange}
+                                disabled={isEmailVerified}
+                                className="flex-1 p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400 disabled:bg-gray-100"
+                                placeholder="example@email.com" />
+                            <button
+                                onClick={handleSendCode} disabled={isSending || isEmailVerified}
+                                className={`px-4 font-bold rounded transition-all text-sm whitespace-nowrap shadow-sm ${
+                                    isEmailVerified ? "bg-gray-100 text-gray-400" : "bg-yellow-400 text-yellow-900 hover:bg-yellow-500"
                                 }`}
-                        >
-                            입점 신청서 제출하기
-                        </button>
+                            >
+                                {isCodeSent ? "재발송" : "인증번호 발송"}
+                            </button>
+                        </div>
                     </div>
+
+                    {/* 인증코드 입력창 */}
+                    {isCodeSent && !isEmailVerified && (
+                        <div className="flex flex-col gap-2 p-4 bg-yellow-50 border border-yellow-200 rounded animate-fadeIn">
+                            <div className="text-sm font-bold ml-1 text-yellow-700">인증번호 입력</div>
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <input
+                                        value={vCode} onChange={(e) => setVCode(e.target.value)}
+                                        className="w-full p-4 bg-white rounded border border-yellow-300 outline-none focus:ring-2 focus:ring-yellow-400"
+                                        placeholder="6자리 숫자"
+                                    />
+                                    <span className="absolute right-4 top-4 text-red-500 font-bold">{formatTime(timeLeft)}</span>
+                                </div>
+                                <button onClick={handleVerifyCode} className="px-6 bg-green-600 text-white font-bold rounded hover:bg-green-700 transition-all shadow-md">확인</button>
+                            </div>
+                        </div>
+                    )}
+                    {isEmailVerified && <p className="text-xs text-green-600 font-bold ml-1 flex items-center gap-1">✓ 이메일 인증이 완료되었습니다.</p>}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                        <div className="flex flex-col gap-1">
+                            <input name="mpwd" type="password" placeholder="비밀번호" onChange={handleChange} className="p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400" />
+                            <span className="text-[10px] text-gray-400 ml-2">* 영문, 숫자, 특수문자 포함 8~20자</span>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <input name="mpwdConfirm" type="password" placeholder="비밀번호 확인" onChange={handleChange} 
+                                className={`p-4 bg-gray-50 rounded border outline-none focus:ring-2 h-[56px] transition-all
+                                ${form.mpwdConfirm.length > 0 
+                                    ? (form.mpwd === form.mpwdConfirm ? 'border-green-500 focus:ring-green-400' : 'border-red-500 focus:ring-red-400')
+                                    : 'border-gray-200 focus:ring-green-400'
+                                }`} 
+                            />
+                            {form.mpwdConfirm.length > 0 && (
+                                <span className={`text-[10px] font-bold ml-2 ${form.mpwd === form.mpwdConfirm ? 'text-green-600' : 'text-red-500'}`}>
+                                    {form.mpwd === form.mpwdConfirm ? '✓ 비밀번호가 일치합니다' : '✕ 비밀번호가 일치하지 않습니다.'}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 사업자 정보 섹션 */}
+                <div className="space-y-4">
+                    <h3 className="font-bold text-green-700 border-b border-green-100 pb-2 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-green-500 rounded-full"></span>사업자 정보
+                    </h3>
+                    <div className="space-y-2">
+                        <label className="ml-1 text-sm font-bold text-gray-600">상호명</label>
+                        <input
+                            name="description"
+                            value={form.description}
+                            onChange={handleChange}
+                            placeholder="상호명을 입력해 주세요"
+                            className="w-full p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400"
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
+                        <div className="flex flex-col gap-2">
+                            <label className="ml-1 text-sm font-bold text-gray-600">담당자명</label>
+                            <input name="mname" value={form.mname} placeholder="이름" onChange={handleChange} className="p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="ml-1 text-sm font-bold text-gray-600">연락처</label>
+                            <input name="tel" value={form.tel} placeholder="010-0000-0000" onChange={handleChange} className="p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400" />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-bold text-gray-600 ml-1">성별</label>
+                        <div className="flex gap-2">
+                            {[0, 1, 2].map((val) => (
+                                <label key={val} className={`flex-1 flex items-center justify-center p-3 rounded border cursor-pointer transition-all font-bold text-sm
+                                    ${form.gender === val ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                                    <input type="radio" name="gender" value={val} checked={form.gender === val} onChange={() => setForm({...form, gender: val})} className="hidden"/>
+                                    {val === 0 ? '미지정' : val === 1 ? '남성' : '여성'}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label className="ml-1 text-sm font-bold text-gray-600">사업자 등록번호</label>
+                        <input name="businessNo" value={form.businessNo} placeholder="000-00-00000" onChange={handleChange} className="p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400 font-mono" />
+                    </div>
+
+                    {/* 세금계산서 발급 여부 */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-bold text-gray-600 ml-1">세금계산서 발급 여부</label>
+                        <div className="flex gap-4">
+                            {[true, false].map((val) => (
+                                <label key={String(val)} className={`flex-1 flex items-center justify-center p-3 rounded border cursor-pointer transition-all font-bold
+                                    ${form.taxInvoice === val ? 'bg-green-600 text-white border-green-600' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`}>
+                                    <input type="radio" name="taxInvoice" value={String(val)} checked={form.taxInvoice === val} onChange={handleChange} className="hidden" />
+                                    {val ? '발급' : '미발급'}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 현금영수증 섹션: 옐로우 배경 포인트 */}
+                    <div className="bg-yellow-50 p-6 rounded-lg space-y-4 border border-yellow-100 mt-4">
+                        <h3 className="font-bold text-yellow-800 text-sm ml-1 flex items-center gap-1">💰 현금영수증 발급 설정</h3>
+                        <div className="flex gap-4">
+                            <label className={`flex-1 p-3 rounded border text-center cursor-pointer transition-all font-bold text-sm
+                                ${showCashInput ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-500 border-gray-200'}`}>
+                                <input type="radio" name="cashReceiptSelect" value="yes" checked={showCashInput === true} onChange={handleChange} className="hidden" />
+                                발급 신청
+                            </label>
+                            <label className={`flex-1 p-3 rounded border text-center cursor-pointer transition-all font-bold text-sm
+                                ${!showCashInput ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-500 border-gray-200'}`}>
+                                <input type="radio" name="cashReceiptSelect" value="no" checked={showCashInput === false} onChange={handleChange} className="hidden" />
+                                미발급
+                            </label>
+                        </div>
+                        {showCashInput && (
+                            <div className="animate-fadeIn space-y-2">
+                                <label className="text-xs font-bold text-green-700 ml-1">현금영수증 번호 (휴대폰 또는 사업자번호)</label>
+                                <input
+                                    name="cashReceiptNo"
+                                    value={form.cashReceiptNo}
+                                    onChange={handleChange}
+                                    placeholder="- 없이 숫자만 입력하세요"
+                                    className="w-full p-4 bg-white rounded border border-green-200 outline-none focus:ring-2 focus:ring-green-400"
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 금빛나루 인증 */}
+                    <div className="bg-green-50 p-4 rounded border border-green-100">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="isVerified" checked={form.isVerified} onChange={handleChange} className="w-5 h-5 accent-green-600" />
+                            <span className="text-sm font-bold text-green-800 underline decoration-yellow-400 decoration-2 underline-offset-4">금빛나루 인증 업체입니까?</span>
+                        </label>
+                    </div>
+                </div>
+
+                {/* 정산 계좌 정보 섹션 */}
+                <div className="space-y-4">
+                    <h3 className="font-bold text-green-700 border-b border-green-100 pb-2 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-green-500 rounded-full"></span>정산 계좌 정보
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4 font-bold">
+                        <input name="settlementBank" placeholder="은행명" onChange={handleChange} className="p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400" />
+                        <input name="settlementName" placeholder="예금주" onChange={handleChange} className="p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400" />
+                    </div>
+                    <input name="bankAccount" placeholder="계좌번호 (-제외)" onChange={handleChange} className="w-full p-4 bg-gray-50 rounded border border-gray-200 outline-none focus:ring-2 focus:ring-green-400 font-mono" />
+                </div>
+
+                {/* 하단 안내 및 버튼 */}
+                <div className="space-y-4 pt-4 border-t border-gray-100">
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded text-amber-800 text-[11px] leading-5 font-medium">
+                        <p className="font-bold mb-1 text-xs">📢 입점 신청 안내</p>
+                        <p>• 입점 신청은 사업자 등록증이 있는 판매자만 신청할 수 있습니다.</p>
+                        <p>• 신청 후 관리자 검토를 거쳐 승인/반려 결과를 이메일로 안내드립니다.</p>
+                        <p>• 승인 완료 시 판매자 권한이 부여되면 상품 등록이 가능합니다.</p>
+                        <p>• 심사 기간은 영업일 기준 2~3일 소요됩니다.</p>
+                    </div>
+
+                    <button
+                        disabled={!isEmailVerified}
+                        onClick={handleClickSignup}
+                        className={`w-full p-5 rounded font-black text-xl shadow-lg transition-all active:scale-[0.99] ${
+                            isEmailVerified
+                            ? "bg-green-600 text-white hover:bg-green-700 shadow-green-100"
+                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
+                    >
+                        입점 신청서 제출하기
+                    </button>
                 </div>
             </div>
         </div>
-    )
+    </div>
+)
 
 
 

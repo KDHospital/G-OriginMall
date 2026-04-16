@@ -1,5 +1,7 @@
 package com.example.gmall.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -14,12 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.gmall.dto.member.MemberAuthDTO;
 import com.example.gmall.dto.member.MemberDTO;
 import com.example.gmall.dto.member.MemberLoginDTO;
 import com.example.gmall.dto.member.SellerSignupDTO;
 import com.example.gmall.dto.member.UserSignupDTO;
 import com.example.gmall.service.EmailService;
+import com.example.gmall.service.KakaoService;
 import com.example.gmall.service.MemberService;
+import com.example.gmall.service.NaverService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +40,8 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final EmailService emailService;
+	public final KakaoService kakaoService;
+	public final NaverService naverService;
 	
 	//아이디 중복확인
 	@GetMapping("/check-id")
@@ -47,7 +54,9 @@ public class MemberController {
 	@PostMapping("/email/send")
 	public ResponseEntity<String> sendEmailCode(@RequestBody Map<String, String> request){
 		String email = request.get("email");
-		emailService.sendCode(email);
+		String tyep = request.get("type");
+		
+		emailService.sendCode(email,tyep);
 		return ResponseEntity.ok("인증 코드가 발송되었습니다.");
 	}
 	
@@ -105,7 +114,7 @@ public class MemberController {
 		MemberDTO dto = memberService.getMemberId(memberId);
 		return ResponseEntity.ok(dto);
 	}
-	
+	//회원정보 수정
 	@PutMapping("/modify")
 	public ResponseEntity<?> modifyMember(@RequestBody MemberDTO memberDTO){
 		log.info("회원 수정 요청 {}", memberDTO);
@@ -120,22 +129,26 @@ public class MemberController {
 					.body(Map.of("message",e.getMessage()));
 		}
 	}
-		
-		@PostMapping("/find-id")
-		public ResponseEntity<?> findId(@RequestBody Map<String, String> request){
-		try {
-			String mname = request.get("mname");
-			String tel = request.get("tel");
-			
-			String foundId = memberService.findLoginId(mname, tel);
-			
-			return ResponseEntity.ok(Map.of("loginId",foundId));
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(Map.of("message",e.getMessage()));
-		}
-		
+		//아이디 찾기
+	@PostMapping("/find-id")
+	public ResponseEntity<?> findId(@RequestBody Map<String, String> request) {
+	    try {
+	        String mname = request.get("mname");
+	        String tel = request.get("tel");
+	        
+	        String foundId = memberService.findLoginId(mname, tel);
+	        
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("loginId", foundId); // null이어도 에러 안 남
+	        
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        e.printStackTrace(); // 여기서 터지는 진짜 이유를 콘솔에서 꼭 확인해봐!
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(Collections.singletonMap("message", "서버 오류가 발생했습니다."));
+	    }
 	}
+		//비밀번호 변경
 		@PostMapping("/reset-password")
 		public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request){
 			try {
@@ -150,11 +163,11 @@ public class MemberController {
 						.body(Map.of("message",e.getMessage()));
 			}
 		}
-		
+		//회원탈퇴
 		@PostMapping("/withdraw")
 		public ResponseEntity<?> withdraw(@RequestBody Map<String, String> request) {
 			
-				String memberId = request.get("id");
+				String memberId = request.get("memberId");
 				String mpwd = request.get("mpwd");
 				
 				log.info("회원 탈퇴 요청 - ID:{}", memberId);
@@ -174,6 +187,8 @@ public class MemberController {
 						.body(Map.of("message","서버에 오류가 발생했습니다."));
 			}
 		}
+		
+		//판매자 가입신청
 		@PostMapping("/register-seller")
 		public ResponseEntity<?> registerSeller(@Valid @RequestBody SellerSignupDTO dto) {
 		    log.info("판매자 가입 신청 시작: " + dto.getLoginId());
@@ -184,8 +199,68 @@ public class MemberController {
 		        "message", "판매자 가입 신청이 완료되었습니다. 관리자 승인을 기다려주세요."
 		    ));
 		}
+		//카카오 로그인
+		@GetMapping("/kakao")
+		public ResponseEntity<MemberAuthDTO> kakaoLogin(@RequestParam("code") String code, HttpServletResponse response) {
+			log.info("---Kakao Login Process Start----");
+			log.info("Authorization Code: {}",code);
+			
+			MemberAuthDTO authDTO = kakaoService.processKakaoLogin(code);
+			
+			
+			
+			
+			String refreshToken =authDTO.getRefreshToken();
+			log.info("발급된 리프레시 토큰: {}", refreshToken);
+			if(refreshToken !=null) {
+				Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+				refreshCookie.setHttpOnly(true);
+				refreshCookie.setPath("/");
+				refreshCookie.setMaxAge(60 * 60 * 24 * 7 );
+				
+				refreshCookie.setSecure(false);
+				response.addCookie(refreshCookie);
+		        log.info("Refresh Token 쿠키 저장 완료");
+				
+			}
+			
+			log.info("Login User: {}",authDTO.getLoginId());
+			log.info("Extra Info Required: {}",authDTO.isNeedsExtraInfo());
+			
+			return ResponseEntity.ok(authDTO);
+		}
 		
-		
-		
+		//네이버 로그인
+		@GetMapping("/naver")
+		public ResponseEntity<MemberAuthDTO> naverLogin(@RequestParam("code") String code,@RequestParam("state") String state, HttpServletResponse response){
+			
+			log.info("---Naver Login Process Start---");
+			log.info("Authorization Code : {}", code);
+			log.info("State: {}",state);
+			
+			// 네이버 서비스 호출
+			MemberAuthDTO authDTO = naverService.processNaverLogin(code, state);
+			
+			// 리프레시 토큰 쿠키 설정
+			String refreshToken = authDTO.getRefreshToken();
+			log.info("발급된 네이버 리프레시 토느: {}",refreshToken);
+			
+			if(refreshToken != null) {
+				Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+				refreshCookie.setHttpOnly(true);
+				refreshCookie.setPath("/");
+				refreshCookie.setMaxAge(60 * 60 * 24 * 7);
+				
+				// 개발 환경이면 false , 배포 환경(HTTPS)이면 true
+				refreshCookie.setSecure(false);
+				
+				response.addCookie(refreshCookie);
+				log.info("Naver Refresh Token 쿠키 저장 완료");	
+			}
+			log.info("Login User: {}",authDTO.getLoginId());
+			log.info("Extra Info Required: {}",authDTO.isNeedsExtraInfo());
+			
+			return ResponseEntity.ok(authDTO);
+		}
 		
 }

@@ -10,6 +10,7 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
   const [answerLoading, setAnswerLoading] = useState(false);
   const [isEditingAnswer, setIsEditingAnswer] = useState(false);
 
+  // 게시글 로드
   const loadPost = () => {
     if (!postId) return;
     setLoading(true);
@@ -23,10 +24,9 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => {
-    loadPost();
-  }, [postId]);
+  useEffect(() => { loadPost(); }, [postId]);
 
+  // 삭제 핸들러
   const handleDelete = async () => {
     if (!window.confirm("이 게시글을 삭제하시겠습니까?")) return;
     try {
@@ -38,12 +38,14 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
     }
   };
 
+  // 답변 등록/수정 핸들러
   const handleAnswerSubmit = async () => {
     if (!answerText.trim()) return alert("답변 내용을 입력해주세요.");
     setAnswerLoading(true);
     try {
       await addAnswer(postId, answerText.trim());
-      alert(hasAnswer ? "답변이 수정되었습니다." : "답변이 등록되었습니다.");
+      const hadAnswer = post.answers && post.answers.length > 0;
+      alert(hadAnswer ? "답변이 수정되었습니다." : "답변이 등록되었습니다.");
       loadPost();
     } catch (error) {
       console.error("답변 처리 실패:", error.response?.status, error.response?.data);
@@ -53,6 +55,7 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
     }
   };
 
+  // 답변 수정 시작
   const startEditAnswer = () => {
     if (post.answers && post.answers.length > 0) {
       setAnswerText(post.answers[post.answers.length - 1].content);
@@ -60,50 +63,67 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
     setIsEditingAnswer(true);
   };
 
+  // 답변 수정 취소
   const cancelEditAnswer = () => {
     setIsEditingAnswer(false);
     setAnswerText('');
   };
 
+  // 로딩/에러 상태
   if (loading) return <div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div>;
   if (!post) return <div className="py-24 text-center text-gray-400">게시글을 찾을 수 없습니다.</div>;
 
   const isInquiry = post.boardId === 2;
   const hasAnswer = post.answers && post.answers.length > 0;
 
+  // 공통 스타일
+  const btnDanger = "px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors";
+  const btnPrimary = "px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors";
+  const btnSecondary = "px-5 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
+
+  // 뱃지 스타일
+  const badge = (condition, trueStyle, falseStyle, trueLabel, falseLabel) => (
+    <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${condition ? trueStyle : falseStyle}`}>
+      {condition ? trueLabel : falseLabel}
+    </span>
+  );
+
   return (
     <div className="space-y-5">
+
       {/* 페이지 헤더 */}
       <div className="flex justify-between items-end">
         <div>
-          <button onClick={onMoveToList} className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-1 flex items-center gap-1">
+          <button
+            onClick={onMoveToList}
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-1 flex items-center gap-1"
+          >
             <span>←</span> 목록으로
           </button>
-          <h2 className="text-2xl font-bold text-gray-900">{isInquiry ? '고객문의' : '공지사항'} 상세</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {isInquiry ? '고객문의' : '공지사항'} 상세
+          </h2>
         </div>
         <div className="flex gap-2">
-          <button onClick={handleDelete} className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors">삭제</button>
+          <button onClick={handleDelete} className={btnDanger}>삭제</button>
           {!isInquiry && (
-            <button onClick={() => onMoveToModify(postId)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">수정</button>
+            <button onClick={() => onMoveToModify(postId)} className={btnPrimary}>수정</button>
           )}
         </div>
       </div>
 
       {/* 게시글 카드 */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+
         {/* 메타 정보 */}
         <div className="px-6 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5 mb-3">
-            <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${post.isPublic ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-500'}`}>
-              {post.isPublic ? '공개' : '비공개'}
-            </span>
-            {isInquiry && (
-              <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${hasAnswer ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                {hasAnswer ? '답변완료' : '대기중'}
-              </span>
-            )}
+            {badge(post.isPublic, 'bg-blue-50 text-blue-600', 'bg-gray-100 text-gray-500', '공개', '비공개')}
+            {isInquiry && badge(hasAnswer, 'bg-emerald-50 text-emerald-600', 'bg-amber-50 text-amber-600', '답변완료', '대기중')}
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-3">{post.title}</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-3">
+            {post.title}
+          </h3>
           <div className="flex items-center gap-4 text-xs text-gray-400">
             <span>{post.mName || '관리자'}</span>
             <span>{post.createdAt?.split('T')[0]}</span>
@@ -120,9 +140,13 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
       {/* 답변 영역 (문의글인 경우) */}
       {isInquiry && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+
+          {/* 답변 헤더 */}
           <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
             <h4 className="font-bold text-gray-800 flex items-center gap-2">
-              <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold">A</span>
+              <span className="w-6 h-6 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold">
+                A
+              </span>
               관리자 답변
             </h4>
             {hasAnswer && !isEditingAnswer && (
@@ -135,12 +159,17 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
             )}
           </div>
 
-          {/* 기존 답변 표시 (수정 모드가 아닐 때) */}
+          {/* 기존 답변 목록 (수정 모드가 아닐 때) */}
           {hasAnswer && !isEditingAnswer && (
             <div className="px-6 py-5 space-y-0 divide-y divide-gray-100">
               {post.answers.map((answer, idx) => (
-                <div key={answer.answerId || idx} className={`${idx > 0 ? 'pt-4' : ''} ${idx < post.answers.length - 1 ? 'pb-4' : ''}`}>
-                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{answer.content}</p>
+                <div
+                  key={answer.answerId || idx}
+                  className={`${idx > 0 ? 'pt-4' : ''} ${idx < post.answers.length - 1 ? 'pb-4' : ''}`}
+                >
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {answer.content}
+                  </p>
                   <p className="text-xs text-gray-400 mt-3">
                     {answer.createdAt?.replace('T', ' ').slice(0, 16)} 등록
                   </p>
@@ -153,7 +182,9 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
           {(!hasAnswer || isEditingAnswer) && (
             <div className="px-6 py-5">
               {!hasAnswer && (
-                <p className="text-sm text-gray-400 mb-3">아직 등록된 답변이 없습니다. 아래에 답변을 작성해 주세요.</p>
+                <p className="text-sm text-gray-400 mb-3">
+                  아직 등록된 답변이 없습니다. 아래에 답변을 작성해 주세요.
+                </p>
               )}
               <textarea
                 className="w-full p-4 border border-gray-200 rounded-lg bg-gray-50 outline-none text-sm leading-relaxed placeholder-gray-300 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all resize-y"
@@ -164,10 +195,7 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
               />
               <div className="flex justify-end gap-2 mt-3">
                 {isEditingAnswer && (
-                  <button
-                    onClick={cancelEditAnswer}
-                    className="px-5 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
+                  <button onClick={cancelEditAnswer} className={btnSecondary}>
                     취소
                   </button>
                 )}

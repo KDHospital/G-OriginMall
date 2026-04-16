@@ -9,3 +9,7 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+
+# env ignore
+.env
+.env.production

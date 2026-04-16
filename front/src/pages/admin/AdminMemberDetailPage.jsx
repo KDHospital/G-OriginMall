@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
-import { adminGetMember, adminGetMemberOrders } from '../../api/memberApi';
+import { adminGetMember, adminGetMemberOrders, adminDeleteMember } from '../../api/memberApi';
+import { fmtGender, fmtDateTime } from '../../util/adminFormatUtil';
 
 const AdminMemberDetailPage = () => {
   const { memberId } = useParams();
@@ -37,16 +38,6 @@ const AdminMemberDetailPage = () => {
       .finally(() => setOrderLoading(false));
   }, [memberId, orderPage]);
 
-  const formatGender = (gender) => {
-    if (gender === 1) return '남성';
-    if (gender === 2) return '여성';
-    return '미지정';
-  };
-
-  const formatDateTime = (dt) => {
-    if (!dt) return '-';
-    return dt.replace('T', ' ').slice(0, 16);
-  };
 
   const formatPrice = (price) => {
     if (!price) return '0';
@@ -101,9 +92,30 @@ const AdminMemberDetailPage = () => {
               </button>
               <h2 className="text-2xl font-bold text-gray-900">회원 상세</h2>
             </div>
-            <button onClick={() => navigate(`/admin/members/${memberId}/modify`)} className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
-              수정
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  if (member.isDeleted) return alert("이미 탈퇴한 회원입니다.");
+                  if (!window.confirm("해당 회원을 탈퇴 처리 할까요?")) return;
+                  try {
+                    await adminDeleteMember(memberId);
+                    alert("탈퇴 처리되었습니다.");
+                    navigate('/admin/members');
+                  } catch {
+                    alert("탈퇴 처리에 실패했습니다.");
+                  }
+                }}
+                className="px-5 py-2.5 text-sm font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+              >
+                탈퇴
+              </button>
+              <button
+                onClick={() => navigate(`/admin/members/${memberId}/modify`)}
+                className="px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors"
+              >
+                수정
+              </button>
+            </div>
           </div>
 
           {/* 회원 정보 카드 */}
@@ -120,20 +132,16 @@ const AdminMemberDetailPage = () => {
                 </span>
                 {member.emailVerified && (
                   <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-600">
-                    이메일 인증됨
+                    인증 완료
                   </span>
                 )}
               </div>
               <h3 className="text-xl font-bold text-gray-900">{member.mname}</h3>
-              <p className="text-sm text-gray-400 mt-1">{member.loginId}</p>
+              <p className="text-sm text-gray-400 mt-1">회원ID : {member.id}</p>
             </div>
 
             <div className="px-6 py-5">
               <div className="grid grid-cols-2 gap-x-12 gap-y-5">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">회원번호</label>
-                  <p className="text-sm text-gray-800">{member.id}</p>
-                </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">아이디</label>
                   <p className="text-sm text-gray-800">{member.loginId}</p>
@@ -152,23 +160,85 @@ const AdminMemberDetailPage = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">성별</label>
-                  <p className="text-sm text-gray-800">{formatGender(member.gender)}</p>
+                  <p className="text-sm text-gray-800">{fmtGender(member.gender)}</p>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">가입일</label>
-                  <p className="text-sm text-gray-800">{formatDateTime(member.createdAt)}</p>
+                  <p className="text-sm text-gray-800">{fmtDateTime(member.createdAt)}</p>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">최근 수정일</label>
-                  <p className="text-sm text-gray-800">{formatDateTime(member.updatedAt)}</p>
+                  <p className="text-sm text-gray-800">{fmtDateTime(member.updatedAt)}</p>
                 </div>
                 {member.isDeleted && (
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">탈퇴일</label>
-                    <p className="text-sm text-red-500 font-medium">{formatDateTime(member.withdrawAt)}</p>
+                    <p className="text-sm text-red-500 font-medium">{fmtDateTime(member.withdrawAt)}</p>
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* 소셜 로그인 관리 */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h4 className="font-bold text-gray-800">소셜 로그인 연동</h4>
+            </div>
+            <div className="px-6 py-5">
+              {member.snsList && member.snsList.length > 0 ? (
+                <div className="space-y-3">
+                  {member.snsList.map((sns, idx) => {
+                    const isKakao = sns.provider?.toLowerCase() === 'kakao';
+                    const isNaver = sns.provider?.toLowerCase() === 'naver';
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg"
+                      >
+                        {/* 아이콘 */}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                          isKakao ? 'bg-yellow-400 text-yellow-900' : isNaver ? 'bg-green-500' : 'bg-gray-400'
+                        }`}>
+                          {isKakao ? 'K' : isNaver ? 'N' : '?'}
+                        </div>
+                        {/* 정보 */}
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-gray-800">
+                            {isKakao ? '카카오 로그인' : isNaver ? '네이버 로그인' : sns.provider}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            연동일: {sns.linkedAt ? fmtDateTime(sns.linkedAt) : '-'}
+                          </p>
+                        </div>
+                        {/* 상태 */}
+                        <span className="inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600">
+                          연동됨
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex items-center gap-6">
+                  {/* 카카오 */}
+                  <div className="flex items-center gap-3 p-4 border border-gray-100 rounded-lg flex-1">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-yellow-400 text-yellow-900 text-sm font-bold">K</div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">카카오 로그인</p>
+                      <p className="text-xs text-gray-400">연동되지 않음</p>
+                    </div>
+                  </div>
+                  {/* 네이버 */}
+                  <div className="flex items-center gap-3 p-4 border border-gray-100 rounded-lg flex-1">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-green-500 text-white text-sm font-bold">N</div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">네이버 로그인</p>
+                      <p className="text-xs text-gray-400">연동되지 않음</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -187,38 +257,62 @@ const AdminMemberDetailPage = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 text-gray-500 text-xs uppercase tracking-wider">
-                      <th className="px-6 py-3 w-40 text-left font-semibold">주문번호</th>
-                      <th className="px-4 py-3 w-32 text-center font-semibold">상태</th>
-                      <th className="px-4 py-3 text-left font-semibold">상품명</th>
-                      <th className="px-4 py-3 w-16 text-center font-semibold">수량</th>
+                      <th className="px-4 py-3 w-32 text-left font-semibold">주문번호</th>
+                      <th className="px-4 py-3 w-40 text-center font-semibold">판매자</th>
+                      <th className="px-4 py-3 text-left font-semibold">주문상품</th>
                       <th className="px-4 py-3 w-28 text-right font-semibold">결제금액</th>
-                      <th className="px-6 py-3 w-36 text-center font-semibold">주문일</th>
+                      <th className="px-4 py-3 w-28 text-center font-semibold">상태</th>
+                      <th className="px-4 py-3 w-36 text-center font-semibold">주문일시</th>
+                      <th className="px-4 py-3 w-20 text-center font-semibold">관리</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.map(order => (
                       <tr key={order.orderId} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors">
-                        <td className="px-6 py-4 text-left text-gray-700 font-medium text-xs">
-                          {order.tossOrderId || `ORDER_${order.orderId}`}
+                        {/* 주문번호 */}
+                        <td className="px-4 py-4 text-left text-gray-700 font-medium text-xs">
+                          ORDER_{order.orderId}
                         </td>
+                        {/* 판매자 */}
+                        <td className="px-4 py-4 text-center text-gray-500 text-xs">
+                          {order.sellerName || '-'}
+                        </td>
+                        {/* 주문상품 */}
+                        <td className="px-4 py-4 text-left text-gray-800">
+                          {order.items && order.items.length > 0 ? (
+                            <>
+                              {order.items[0].productName}
+                              {order.items.length > 1 && (
+                                <span className="text-gray-400 ml-1">
+                                  외 {order.items.length - 1}건
+                                </span>
+                              )}
+                            </>
+                          ) : '-'}
+                        </td>
+                        {/* 결제금액 */}
+                        <td className="px-4 py-4 text-right font-medium text-gray-800">
+                          {formatPrice(order.totalPrice)}원
+                        </td>
+                        {/* 상태 */}
                         <td className="px-4 py-4 text-center">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${statusStyle(order.status)}`}>
                             {statusLabel(order.status)}
                           </span>
                         </td>
-                        <td className="px-4 py-4 text-left text-gray-800">
-                          {order.items && order.items.length > 0 ? (
-                            <>
-                              {order.items[0].productName}
-                              {order.items.length > 1 && <span className="text-gray-400 ml-1">외 {order.items.length - 1}건</span>}
-                            </>
-                          ) : '-'}
+                        {/* 주문일시 */}
+                        <td className="px-4 py-4 text-center text-gray-400 text-xs">
+                          {fmtDateTime(order.createdAt)}
                         </td>
-                        <td className="px-4 py-4 text-center text-gray-600">
-                          {order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0}
+                        {/* 관리 */}
+                        <td className="px-4 py-4 text-center">
+                          <button
+                            onClick={() => window.open(`/admin/orders/${order.orderId}`, '_blank')}
+                            className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-gray-600 border border-gray-200 rounded hover:bg-gray-50 transition-colors whitespace-nowrap"
+                          >
+                            상세
+                          </button>
                         </td>
-                        <td className="px-4 py-4 text-right font-medium text-gray-800">{formatPrice(order.totalPrice)}원</td>
-                        <td className="px-6 py-4 text-center text-gray-400 text-xs">{formatDateTime(order.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>

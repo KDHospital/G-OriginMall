@@ -12,7 +12,16 @@ const menuGroups = [
     {
         label: 'MANAGEMENT',
         items: [
-            { path: '/admin/members', label: '회원 관리', icon: '👤' },
+            {
+                path: '/admin/members',
+                label: '회원 관리',
+                icon: '👤',
+                children: [
+                    { path: '/admin/members', label: '일반회원' },
+                    { path: '/admin/sellers', label: '판매회원' },
+                    { path: '/admin/admins', label: '관리자' },
+                ],
+            },
             { path: '/admin/products', label: '상품 목록', icon: '🛍️' },
             { path: '/admin/products/new', label: '상품 등록', icon: '➕' },
             { path: '/admin/orders', label: '주문 목록', icon: '📦' },
@@ -84,8 +93,23 @@ function AdminLayout({ children }) {
 
     // 현재 경로가 메뉴와 일치하는지 확인
     const isActive = (path) => {
-        if (path === '/admin') return location.pathname === '/admin';
-        return location.pathname === path || location.pathname.startsWith(path + '/');
+        const current = location.pathname;
+
+        // 완전 동일
+        if (current === path) return true;
+
+        // 하위 경로 허용할지 명확히 지정
+        const allowSubRoutes = [
+            '/admin/members',
+            '/admin/board'
+        ];
+
+        if (allowSubRoutes.includes(path)) {
+            return current.startsWith(path + '/');
+        }
+
+        return false;
+        
     };
 
     return (

@@ -71,7 +71,7 @@ const ProductListComponents = () => {
                 setLoading(true)
     
             // 1. 현재 페이지와 사이즈로 데이터 요청 (Spring Boot는 0페이지부터 시작하므로 page-1)
-                const response = await getProducts({ page: page - 1, size: 12, categoryId: categoryId ?? undefined, sort, });
+                const response = await getProducts({ page: page - 1, size: 12, categoryId: categoryId ?? undefined, sort: sort, });
                 console.log("백엔드 전체응답:", response.data)
                 const data = response.data
                 const totalPage = data.totalPages

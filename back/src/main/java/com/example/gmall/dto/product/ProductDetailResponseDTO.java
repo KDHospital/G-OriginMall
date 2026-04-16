@@ -27,6 +27,7 @@ public class ProductDetailResponseDTO {
     private String categoryName;
     private Long sellerId;
     private List<String> imageUrls;
+    private String detailImageUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
@@ -50,9 +51,17 @@ public class ProductDetailResponseDTO {
         this.categoryId        = p.getCategory().getCategoryId();
         this.categoryName      = p.getCategory().getCategoryName();
         this.sellerId          = p.getSeller().getId();
-        this.imageUrls         = p.getProductImages().stream()
-                                    .map(ProductImage::getImageUrl)  // 메서드 참조로 정리
-                                    .collect(Collectors.toList());
+        this.imageUrls = p.getProductImages().stream()
+                .filter(img -> img.getSortOrder() < 10)
+                .sorted((a, b) -> a.getSortOrder() - b.getSortOrder())
+                .map(ProductImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        this.detailImageUrl = p.getProductImages().stream()
+                .filter(img -> img.getSortOrder() == 10)
+                .map(ProductImage::getImageUrl)
+                .findFirst()
+                .orElse(null);
         this.createdAt         = p.getCreatedAt();
         this.updatedAt         = p.getUpdatedAt();
         //판매자 정보

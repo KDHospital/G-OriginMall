@@ -121,6 +121,14 @@ public class Member {
     public void changeTel(String tel) {this.tel = tel;}
     public void changePassword(String mpwd) {this.mpwd = mpwd;}
     public void changeGender(Byte gender) {this.gender =  gender;}
+    public void changeBusinessNo(String businessNo) {this.businessNo = businessNo;}
+    public void changeTaxInvoice(boolean taxInvoice) {this.taxInvoice = taxInvoice;}
+    public void changeCashReceiptNo(String cashReceiptNo) {this.cashReceiptNo = cashReceiptNo;}
+    public void changeSettlementName(String settlementName) {this.settlementName = settlementName;}
+    public void changeSettlementBank(String settlementBank) {this.settlementBank = settlementBank;}
+    public void changeBankAccount(String bankAccount) {this.bankAccount = bankAccount;}
+    public void changeDescription(String description) {this.description = description;}
+    public void changeIsVerified(boolean isVerified) {this.isVerified = isVerified;}
     public void changeDeleteStatus(boolean isDeleted) {
     	this.isDeleted = isDeleted;
     	if(isDeleted) {

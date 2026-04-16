@@ -26,7 +26,7 @@ public class EmailServiceImpl  implements EmailService{
 	//인증 코드 유효 시간 (3분)
 	private static final Long VERIFICATION_CODE_TTL = 180L;
 	
-	public void sendCode(String email) {
+	public void sendCode(String email , String tyep) {
 		// 6자리 난수 생성
 		String code = String.format("%06d", new Random().nextInt(1000000));
 		
@@ -35,8 +35,8 @@ public class EmailServiceImpl  implements EmailService{
 				code,
 				VERIFICATION_CODE_TTL,
 				TimeUnit.SECONDS);
-		sendEmail(email,code);
-		log.info("인증 코드 발송 완료: {} -> {}",email, code);
+		sendEmail(email,code,tyep);
+		log.info("인증 코드 발송 완료(타입:{}): {} -> {}",tyep,email, code);
 	}
 	
 	public boolean verifyCode(String email, String code) {
@@ -62,14 +62,20 @@ public class EmailServiceImpl  implements EmailService{
 		return false;
 	}
 	
-	private void sendEmail(String to, String code) {
+	private void sendEmail(String to, String code, String tyep) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(to);
+		if("PWD".equals(tyep)) {
+		message.setSubject("[G-OriginMall] 비밀번호 찾기 인증 번호입니다.");
+		message.setText("안녕하세요. G-OriginMall입니다.\n\n"+
+			"비밀번호 재설정을 위한 인증 번호: ["+code+"]\n\n"+
+					"3분 이내에 입력해 주세요");	
+		}else {
 		message.setSubject("[G-OriginMall] 회원가입 인증 번호입니다.");
 		message.setText("안녕하세요. G-OriginMall입니다.\n\n"+
-		"인증 번호: ["+code+"]\n\n"+
+		"회원가입 인증 번호: ["+code+"]\n\n"+
 				"3분 이내에 입력해 주세요");
-		
+		}
 	 try {
 		mailSender.send(message);
 	} catch (Exception e) {
