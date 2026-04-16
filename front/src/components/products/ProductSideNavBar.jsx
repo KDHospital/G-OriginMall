@@ -52,7 +52,7 @@ const ProductSideNavBar = () => {
             //2. 수산물
             case '냉장': 
                 return "snowflake"
-            case '건조':
+            case '수산가공':
                 return "microwave"
             //3. 축산물
             case '육류': 
