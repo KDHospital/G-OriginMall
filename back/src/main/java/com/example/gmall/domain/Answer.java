@@ -69,7 +69,7 @@ public class Answer {
     
  // --- 비즈니스 로직 메서드 (Setter 대신 사용) ---
 
-	 // 1. 답변 내용 수정 (매개변수 오타 수정)
+	 // 1. 답변 내용 수정
 	 public void updateContent(String content) {
 	     if (content == null || content.trim().isEmpty()) {
 	         throw new IllegalArgumentException("답변 내용은 비어있을 수 없습니다.");
