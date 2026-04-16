@@ -1,7 +1,7 @@
 import axios from "axios"
 
 // 서버주소만 관리하는 api
-export const API_SERVER_HOST = 'http://localhost:8080/api';
+export const API_SERVER_HOST = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 const axiosInstance = axios.create({
     baseURL: API_SERVER_HOST,           // Spring Boot 서버

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const NAVER_CLIENT_ID = 'WnsZfckbLjR_r3kvvmOI'
-const NAVER_REDIRECT_URI = 'http://localhost:5173/oauth/naver'
+const NAVER_REDIRECT_URI = `${import.meta.env.VITE_REDIRECT_URL}/oauth/naver`
 
 
 //랜덤 문자열(state) 생성 함수
@@ -19,7 +19,7 @@ export const getNaverAuthUrl = () => {
 //백엔드에 인가코드와 state전달
 export const getNaverLoginMessage = async (code , state) => {
     const response = await axios.get(
-        `http://localhost:8080/api/member/naver?code=${code}&state=${state}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/member/naver?code=${code}&state=${state}`,
         { withCredentials : true}
     )
     return response.data

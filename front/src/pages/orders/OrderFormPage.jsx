@@ -38,7 +38,7 @@ const DELIVERY_MEMO_OPTIONS = [
 // ─────────────────────────────────────────
 // toss client key
 // ─────────────────────────────────────────
-const TOSS_CLIENT_KEY = "test_ck_GePWvyJnrKOJawzLpP2OrgLzN97E";
+const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY;
 
 
 // ─────────────────────────────────────────
