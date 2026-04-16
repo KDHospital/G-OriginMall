@@ -57,6 +57,7 @@ gradle-app.setting
 
 # Sensitive Information
 application-local.properties
+application-prod.properties
 application-local.yml
 
 # 개인 실험용 테스트
