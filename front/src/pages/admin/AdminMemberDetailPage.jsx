@@ -45,7 +45,7 @@ const AdminMemberDetailPage = () => {
   };
 
   const statusLabel = (status) => {
-    const labels = { 0: '결제전', 1: '상품준비중', 2: '배송중', 3: '배송완료', 4: '취소/환불' };
+    const labels = { 0: '결제전', 1: '상품준비중', 2: '배송중', 3: '배송완료', 4: '취소/환불', 5: '결제실패' };
     return labels[status] || '알수없음';
   };
 
@@ -55,7 +55,8 @@ const AdminMemberDetailPage = () => {
       1: 'bg-blue-50 text-blue-600',
       2: 'bg-amber-50 text-amber-600',
       3: 'bg-emerald-50 text-emerald-600',
-      4: 'bg-red-50 text-red-500'
+      4: 'bg-red-50 text-red-500',
+      5: 'bg-orange-100 text-orange-500' 
     };
     return styles[status] || 'bg-gray-100 text-gray-500';
   };
