@@ -28,7 +28,7 @@ const TIMELINE_STEPS = [
 ];
 
 function OrderTimeline({ order, history }) {
-    if (order.status === 0 || order.status === 4) return null;
+    if (order.status === 0 || order.status === 4 || order.status === 5) return null;
 
     const getStepTime = (status) => {
         const found = history.find((h) => h.toStatus === status);
@@ -166,7 +166,7 @@ export default function MyOrderDetail() {
 
     if (!order) return null;
 
-    const canCancel = order.status < 2;
+    const canCancel = order.status < 2 && order.status !== 5;
 
     // 취소되지 않은 아이템만 합산
     const totalItemPrice = order.orderItems
@@ -330,6 +330,7 @@ export default function MyOrderDetail() {
                     </section>
 
                     {/* 배송지 정보 */}
+                    {order.status !== 5 && (
                     <section className="bg-white border border-gray-200 shadow-sm rounded-md p-6">
                         <h3 className="font-bold text-base mb-4">배송지 정보</h3>
                         <table className="w-full text-sm border-t border-gray-100">
@@ -353,8 +354,15 @@ export default function MyOrderDetail() {
                             </tbody>
                         </table>
                     </section>
+                    )}
 
                     {/* 결제 정보 */}
+                    {order.status === 5 ? (
+                        <section className="bg-red-50 border border-red-200 shadow-sm rounded-md p-6">
+                            <h3 className="font-bold text-base mb-2 text-red-600">결제 실패</h3>
+                            <p className="text-sm text-red-400">결제가 완료되지 않은 주문입니다.</p>
+                        </section>
+                    ) : (
                     <section className="bg-white border border-gray-200 shadow-sm rounded-md p-6">
                         <h3 className="font-bold text-base mb-4">결제 정보</h3>
                         <table className="w-full text-sm border-t border-gray-100">
@@ -370,7 +378,7 @@ export default function MyOrderDetail() {
                             </tbody>
                         </table>
                     </section>
-
+                    )}
                 </main>
             </div>
         </BasicLayout>
