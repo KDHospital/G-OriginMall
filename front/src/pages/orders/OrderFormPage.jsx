@@ -209,6 +209,11 @@ function TermsSection({ agreed, onChange }) {
 // ─────────────────────────────────────────
 function OrderSummaryPanel({ items, onSubmit, canSubmit }) {
   const totalItemPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  const totalListPrice = items.reduce((sum, i) => sum + i.listPrice * i.quantity, 0);
+
+  const totalDiscountPrice = items.reduce((sum, i) => sum + i.discountPrice * i.quantity, 0);
+
   const totalDeliveryFee = Object.values(
     items.reduce((acc, i) => {
       if (!acc[i.sellerId]) acc[i.sellerId] = i.deliveryFee;
@@ -246,16 +251,16 @@ function OrderSummaryPanel({ items, onSubmit, canSubmit }) {
 
       <div className="p-5 space-y-2 text-sm">
         <div className="flex justify-between text-gray-600">
-          <span>상품 금액</span>
-          <span>{formatPrice(totalItemPrice)}원</span>
+            <span>상품 금액</span>
+            <span>{formatPrice(totalListPrice)}원</span>
         </div>
         <div className="flex justify-between text-gray-600">
-          <span>배송비</span>
-          <span>+ {formatPrice(totalDeliveryFee)}원</span>
+            <span>배송비</span>
+            <span>+ {formatPrice(totalDeliveryFee)}원</span>
         </div>
         <div className="flex justify-between text-gray-600">
-          <span>할인</span>
-          <span className="text-red-500">- 0원</span>
+            <span>할인</span>
+            <span className="text-red-500">- {formatPrice(totalDiscountPrice)}원</span>
         </div>
         <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-gray-900 text-base">
           <span>최종 결제금액</span>
