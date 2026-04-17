@@ -10,15 +10,15 @@ const FooterMenu = () =>{
     const footerMenuItem = [
         {
             name:"김포시 특산물 쇼핑몰 소개",
-            path:"/"
+            path:"/aboutPage"
         },
         {
             name:"개인정보 처리 방침",
-            path:"/"
+            path:"/privacyPolicy"
         },
         {
             name:"이용약관",
-            path:"/"
+            path:"/termsPage"
         },
         {
             name:"고객센터",
