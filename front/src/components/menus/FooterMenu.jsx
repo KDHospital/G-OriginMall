@@ -40,6 +40,9 @@ const FooterMenu = () =>{
 
         navigate("sellersignup")
     }
+    const handleSnsBtn = () => {
+        alert("SNS는 준비 중입니다")
+    }
     return(
             <footer className="bg-slate-100 pt-20 pb-10 border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4">
@@ -50,15 +53,15 @@ const FooterMenu = () =>{
                             </div>
                             {/* 아이콘 링크 영역 인스타,블로그,등 */}
                             <div className="flex gap-4 items-center">
-                                <Link to={"/"} className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-colors" href="#">
+                                <button onClick={handleSnsBtn} className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                                     <span className="material-symbols-outlined text-lg">public</span>
-                                </Link>
-                                <Link to={"/"} className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-colors" href="#">
+                                </button>
+                                <button onClick={handleSnsBtn} className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                                     <span className="material-symbols-outlined text-lg">photo_camera</span>
-                                </Link>
-                                <Link to={"/"} className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-colors" href="#">
+                                </button>
+                                <button onClick={handleSnsBtn} className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                                     <span className="material-symbols-outlined text-lg">chat</span>
-                                </Link>
+                                </button>
                             </div>
                             {/* G-Origin-mall 정보 */}
                             <div className="border-slate-200 pt-10 text-xs text-slate-400">
