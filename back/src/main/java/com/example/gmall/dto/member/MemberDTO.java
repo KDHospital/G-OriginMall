@@ -21,7 +21,7 @@ public class MemberDTO {
 	private Byte gender;
 	private Byte role;
 	private Boolean social;
-	private boolean needsExtraInfo;
+	private Boolean needsExtraInfo;
 	private LocalDateTime created_at;
 
 }
