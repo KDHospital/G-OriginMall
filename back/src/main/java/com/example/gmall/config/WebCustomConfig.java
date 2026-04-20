@@ -2,6 +2,7 @@ package com.example.gmall.config;
 
 import java.io.File;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -20,6 +21,9 @@ public class WebCustomConfig implements WebMvcConfigurer {
     // 예) /var/www/gmall/uploads
     // ────────────────────────────────────────────────────────────────
     private static final String UPLOAD_ROOT = System.getProperty("user.dir") + "/uploads/";
+
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
     
     // ── 서버 시작 시 업로드 폴더 자동 생성 ──────────────────────────
     @PostConstruct
@@ -45,7 +49,7 @@ public class WebCustomConfig implements WebMvcConfigurer {
 		log.info("---------- cors start ---------");
 		
 		registry.addMapping("/api/**")
-				.allowedOrigins("http://localhost:5173")
+				.allowedOrigins(allowedOrigins)
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
 				.allowedHeaders("*")
 				.allowCredentials(true)

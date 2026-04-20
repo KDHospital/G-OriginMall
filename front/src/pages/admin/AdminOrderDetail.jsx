@@ -114,8 +114,8 @@ export default function AdminOrderDetail() {
     if (!order) return null;
 
     // 어드민 — status < 4(취소/환불)면 취소 가능
-    const canUpdateStatus = order.status >= 0 && order.status <= 2;
-    const canCancel = order.status < 4;
+    const canUpdateStatus = order.status >= 0 && order.status <= 2 && order.status !== 5;
+    const canCancel = order.status < 4 && order.status !== 5;
 
     // 취소되지 않은 아이템만 합산
     const totalItemPrice = order.orderItems
@@ -293,6 +293,7 @@ export default function AdminOrderDetail() {
                 </section>
 
                 {/* 배송지 정보 */}
+                {order.status !== 5 && (
                 <section className="bg-white rounded-md p-5 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-700 mb-4">배송지 정보</h3>
                     <table className="w-full text-sm border-t border-gray-100">
@@ -316,8 +317,15 @@ export default function AdminOrderDetail() {
                         </tbody>
                     </table>
                 </section>
+                )}
 
                 {/* 결제 정보 */}
+                {order.status === 5 ? (
+                    <section className="bg-red-50 border border-red-200 rounded-md p-5 shadow-sm">
+                        <h3 className="text-sm font-bold text-red-600 mb-2">결제 실패</h3>
+                        <p className="text-xs text-red-400">결제가 완료되지 않은 주문입니다.</p>
+                    </section>
+                ) : (
                 <section className="bg-white rounded-md p-5 shadow-sm">
                     <h3 className="text-sm font-bold text-gray-700 mb-4">결제 정보</h3>
                     <table className="w-full text-sm border-t border-gray-100">
@@ -333,6 +341,8 @@ export default function AdminOrderDetail() {
                         </tbody>
                     </table>
                 </section>
+                )}
+
             </div>
         </AdminLayout>
     );
