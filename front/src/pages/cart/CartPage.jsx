@@ -14,7 +14,6 @@ import { useCart } from "../../context/CartContext";
 const formatPrice = (n) => n?.toLocaleString("ko-KR") ?? "0";
 
 
-
 // ─────────────────────────────────────────
 // 진행 단계 컴포넌트
 // ─────────────────────────────────────────
@@ -55,6 +54,7 @@ function StepIndicator({ current = 1 }) {
 // 장바구니 상품 행
 // ─────────────────────────────────────────
 function CartItemRow({ item, checked, onCheck, onQuantityChange, onRemove }) {
+
   return (
     <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
       <td className="px-4 py-4 w-10">
@@ -109,14 +109,14 @@ function CartItemRow({ item, checked, onCheck, onQuantityChange, onRemove }) {
 // ─────────────────────────────────────────
 // 주문 요약 패널
 // ─────────────────────────────────────────
-function OrderSummary({ totalItemPrice, totalDeliveryFee, totalPrice, onOrder }) {
+function OrderSummary({ totalListPrice, totalDiscountPrice, totalDeliveryFee, totalPrice, onOrder }) {
   return (
     <div className="border border-gray-200 rounded p-5 bg-white sticky top-6">
       <h3 className="text-base font-bold text-gray-800 mb-4">주문 요약</h3>
       <div className="space-y-3 text-sm">
         <div className="flex justify-between text-gray-600">
           <span>상품 금액</span>
-          <span>{formatPrice(totalItemPrice)}원</span>
+          <span>{formatPrice(totalListPrice)}원</span>
         </div>
         <div className="flex justify-between text-gray-600">
           <span>배송비</span>
@@ -124,7 +124,7 @@ function OrderSummary({ totalItemPrice, totalDeliveryFee, totalPrice, onOrder })
         </div>
         <div className="flex justify-between text-gray-600">
           <span>할인</span>
-          <span className="text-red-500">- 0원</span>
+          <span className="text-red-500">- {formatPrice(totalDiscountPrice)}원</span>
         </div>
         <div className="border-t border-gray-200 pt-3 flex justify-between font-bold text-gray-900 text-base">
           <span>최종 결제금액</span>
@@ -171,6 +171,10 @@ export default function CartPage() {
   const checkedItems = items.filter((i) => checkedIds.includes(i.cartItemId));
 
   const totalItemPrice = checkedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+  const totalListPrice = checkedItems.reduce((sum, i) => sum + i.listPrice * i.quantity, 0);
+
+  const totalDiscountPrice = checkedItems.reduce((sum, i) => sum + i.discountPrice * i.quantity, 0);
 
   const totalDeliveryFee = Object.values(
     checkedItems.reduce((acc, i) => {
@@ -327,10 +331,11 @@ export default function CartPage() {
 
               <div className="w-64 flex-shrink-0">
                 <OrderSummary
-                  totalItemPrice={totalItemPrice}
-                  totalDeliveryFee={totalDeliveryFee}
-                  totalPrice={totalPrice}
-                  onOrder={handleOrder}
+                    totalListPrice={totalListPrice}
+                    totalDiscountPrice={totalDiscountPrice}
+                    totalDeliveryFee={totalDeliveryFee}
+                    totalPrice={totalPrice}
+                    onOrder={handleOrder}
                 />
               </div>
             </div>

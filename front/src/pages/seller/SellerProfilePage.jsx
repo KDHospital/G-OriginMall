@@ -55,7 +55,7 @@ const SellerProfilePage = () => {
                                 아이디 
                                 <span className="text-gray-300 ml-1">login_id</span>
                             </label>
-                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-green-400">
+                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 bg-gray-100">
                                 {member.loginId}
                             </div>
                         </div>
@@ -64,7 +64,7 @@ const SellerProfilePage = () => {
                                 이름 
                                 <span className="text-gray-300 ml-1">mname</span>
                             </label>
-                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-green-400">
+                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 bg-gray-100">
                                 {member.mname}
                             </div>                            
                         </div>
@@ -73,7 +73,7 @@ const SellerProfilePage = () => {
                                 연락처 
                                 <span className="text-gray-300 ml-1">tel</span>
                             </label>
-                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-green-400">
+                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 bg-gray-100">
                                 {formatPhoneNumber(member.tel)}
                             </div>                            
                         </div>
@@ -82,7 +82,7 @@ const SellerProfilePage = () => {
                                 성별 
                                 <span className="text-gray-300 ml-1">gender</span>
                             </label>
-                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-green-400">
+                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 bg-gray-100">
                                 {genderMap[member.gender] || "정보 없음"}
                             </div>                            
                         </div>
@@ -91,8 +91,8 @@ const SellerProfilePage = () => {
                                 가입일 
                                 <span className="text-gray-300 ml-1">created_at</span>
                             </label>
-                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:border-green-400">
-                                222
+                            <div className="w-full border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 bg-gray-100">
+                                {member.created_at ? member.created_at.split('T')[0] : 정보없음}
                             </div>                            
                         </div>
                     </div>

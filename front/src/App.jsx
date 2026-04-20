@@ -14,6 +14,9 @@ import CertifiedListPage from './pages/products/CertifiedListPage';
 import CertifiedDetailPage from './pages/products/CertifiedDetailPage';
 import ExhibitionListPage from './pages/products/ExhibitionListPage';
 import ExhibitionDetailPage from './pages/products/ExhibitionDetailPage';
+import AboutPage from './pages/main/AboutPage';
+import TermsPage from './pages/main/TermsPage';
+import PrivacyPolicyPage from './pages/main/PrivacyPolicyPage';
 
 import OrderSuccessPage from './pages/orders/OrderSuccessPage';
 import OrderFailPage from './pages/orders/OrderFailPage';
@@ -89,6 +92,9 @@ function App() {
         <Routes>
           {/* 메인 */}
           <Route path="/" element={<MainPage />} />
+          <Route path="/aboutPage" element={<AboutPage />} />
+          <Route path="/termsPage" element={<TermsPage />} />
+          <Route path="/privacyPolicy" element={<PrivacyPolicyPage />} />
 
           {/* 회원(구매자) - 유재영 담당 */}
           <Route path='/signup' element={<UserSignupPage />} />
