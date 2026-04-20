@@ -68,7 +68,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                         .receiverName(o.getReceiverName())
                         .totalPrice(o.getTotalPrice())
                         .status(o.getStatus())
-                        .statusLabel(switch (o.getStatus()) {
+                        .statusLabel(switch (o.getStatus().intValue()) {
                             case 0 -> "결제전";
                             case 1 -> "상품준비중";
                             case 2 -> "배송중";
