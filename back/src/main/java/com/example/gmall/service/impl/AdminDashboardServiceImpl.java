@@ -68,12 +68,13 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                         .receiverName(o.getReceiverName())
                         .totalPrice(o.getTotalPrice())
                         .status(o.getStatus())
-                        .statusLabel(switch (o.getStatus()) {
+                        .statusLabel(switch (o.getStatus().intValue()) {
                             case 0 -> "결제전";
                             case 1 -> "상품준비중";
                             case 2 -> "배송중";
                             case 3 -> "배송완료";
                             case 4 -> "취소/환불";
+                            case 5 -> "결제실패";
                             default -> "알 수 없음";
                         })
                         .createdAt(o.getCreatedAt().toString().replace("T", " ").substring(0, 16))
