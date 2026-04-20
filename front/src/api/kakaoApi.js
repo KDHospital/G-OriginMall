@@ -7,7 +7,7 @@ export const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id
 
 // 백에서 넘어오는 인가 코드를 전달하는 함수
 export const getKakaoLoginMessage = async (code) => {
-    const response = await axios.get(`${import.meta.env.VITE_REDIRECT_URL}/api/member/kakao?code=${code}`,{
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/member/kakao?code=${code}`,{
         withCredentials: true
 })
    
