@@ -20,7 +20,7 @@ public class MemberDTO {
 	private String tel;
 	private Byte gender;
 	private Byte role;
-	private boolean social;
+	private Boolean social;
 	private boolean needsExtraInfo;
 	private LocalDateTime created_at;
 
