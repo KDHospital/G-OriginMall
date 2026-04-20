@@ -253,25 +253,27 @@ export default function SellerOrderDetail() {
                     </table>
 
                     {/* 결제 금액 요약 */}
-                    <div className="px-5 py-4 border-t border-gray-100 flex justify-end">
-                        <div className="text-sm space-y-1 text-right">
-                            <p className="text-gray-500">
-                                상품 금액 <span className="text-gray-800 font-medium ml-4">
-                                    {totalItemPrice?.toLocaleString("ko-KR")}원
-                                </span>
-                            </p>
-                            <p className="text-gray-500">
-                                배송비 <span className="text-gray-800 font-medium ml-4">
-                                    + {deliveryFee > 0 ? deliveryFee?.toLocaleString("ko-KR") : 0}원
-                                </span>
-                            </p>
-                            <p className="text-base font-bold text-gray-900 pt-1 border-t border-gray-100">
-                                최종 결제금액 <span className="ml-4">
-                                    {order.totalPrice?.toLocaleString("ko-KR")}원
-                                </span>
-                            </p>
+                    {order.status !== 4 && order.status !== 5 && (
+                        <div className="px-5 py-4 border-t border-gray-100 flex justify-end">
+                            <div className="text-sm space-y-1 text-right">
+                                <p className="text-gray-500">
+                                    상품 금액 <span className="text-gray-800 font-medium ml-4">
+                                        {totalItemPrice?.toLocaleString("ko-KR")}원
+                                    </span>
+                                </p>
+                                <p className="text-gray-500">
+                                    배송비 <span className="text-gray-800 font-medium ml-4">
+                                        + {deliveryFee > 0 ? deliveryFee?.toLocaleString("ko-KR") : 0}원
+                                    </span>
+                                </p>
+                                <p className="text-base font-bold text-gray-900 pt-1 border-t border-gray-100">
+                                    최종 결제금액 <span className="ml-4">
+                                        {order.totalPrice?.toLocaleString("ko-KR")}원
+                                    </span>
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </section>
 
                 {/* 배송지 정보 */}
