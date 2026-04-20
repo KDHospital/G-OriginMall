@@ -319,8 +319,8 @@ export default function CartPage() {
                 <div className="mt-4">
                   <button
                     onClick={() => {
-                      // TODO: navigate('/products')
-                      alert("상품 목록으로 이동합니다.");
+                      navigate('/products');
+                      //alert("상품 목록으로 이동합니다.");
                     }}
                     className="px-4 py-2 text-sm border border-gray-300 rounded text-gray-600 hover:bg-gray-100 transition-colors"
                   >
