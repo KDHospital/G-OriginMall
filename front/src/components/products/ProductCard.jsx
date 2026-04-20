@@ -31,7 +31,7 @@ const ProductCard = ({item}) => {
                 <h3 className="font-manrope font-bold text-lg text-on-surface truncate">{item.pname}</h3>
                 <div className="flex justify-between">
                     <p className="font-manrope text-xs text-on-surface-variant line-clamp-1 italic">{item.categoryName}</p>
-                    <div className="flex items-center items-center">
+                    <div className="flex items-center">
                         {item.certified ? <span className={`text-xs px-2 py-1 mr-1 rounded-full font-medium bg-yellow-100 text-yellow-600}`}>금빛나루 인증</span>: <></>}
                         {item.exhibition ? <span className={`text-xs px-2 py-1 rounded-full font-medium bg-green-100 text-green-600}`}>기획전 상품</span>: <></>}
                     </div>

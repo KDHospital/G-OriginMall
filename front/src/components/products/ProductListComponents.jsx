@@ -89,7 +89,9 @@ const ProductListComponents = () => {
                     prev: !data.first,
                     next: !data.last,
                     current: current,
-                    totalCount: data.totalElements
+                    totalCount: data.totalElements,
+                    prevPage: start - 1,
+                    nextPage: start + 10,
                 });
                 setProduct(data.content);
             } catch (err) {
