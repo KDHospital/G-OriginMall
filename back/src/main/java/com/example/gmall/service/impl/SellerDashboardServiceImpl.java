@@ -1,6 +1,7 @@
 package com.example.gmall.service.impl;
 
 import com.example.gmall.dto.manage.SellerDashboardResponseDTO;
+import com.example.gmall.dto.manage.SellerDashboardResponseDTO.DailySalesDTO;
 import com.example.gmall.dto.manage.SellerDashboardResponseDTO.RecentOrderDTO;
 import com.example.gmall.dto.manage.SellerDashboardResponseDTO.RecentProductDTO;
 import com.example.gmall.repository.MemberRepository;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,6 +93,27 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
                         })
                         .build())
                 .collect(Collectors.toList());
+           
+        // 최근 7일 매출
+        List<DailySalesDTO> weeklySales = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            LocalDateTime start = LocalDate.now().minusDays(i).atStartOfDay();
+            LocalDateTime end = start.plusDays(1).minusSeconds(1);
+            long revenue = ordersRepository.sumTotalPriceBySellerIdAndCreatedAtBetween(sellerId, start, end);
+            weeklySales.add(DailySalesDTO.builder()
+                    .date(LocalDate.now().minusDays(i).toString().substring(5)) // "04-15" 형식
+                    .revenue(revenue)
+                    .build());
+        }
+
+        // 주문 상태 현황
+        Map<String, Long> orderStatusCount = new LinkedHashMap<>();
+        orderStatusCount.put("결제전",     ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 0));
+        orderStatusCount.put("상품준비중", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 1));
+        orderStatusCount.put("배송중",     ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 2));
+        orderStatusCount.put("배송완료",   ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 3));
+        orderStatusCount.put("취소/환불",  ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 4));
+        orderStatusCount.put("결제실패",   ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 5));
 
         return SellerDashboardResponseDTO.builder()
                 .todayOrders(todayOrders)
@@ -98,6 +123,12 @@ public class SellerDashboardServiceImpl implements SellerDashboardService {
                 .pendingOrders(pendingOrders)
                 .recentOrders(recentOrders)
                 .recentProducts(recentProducts)
+                .weeklySales(weeklySales)
+                .orderStatusCount(orderStatusCount)
                 .build();
     }
+    
+    
+    
+    
 }

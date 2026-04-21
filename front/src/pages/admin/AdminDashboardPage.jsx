@@ -3,6 +3,18 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../layouts/AdminLayout";
 import axiosInstance from "../../api/axios";
 
+import { Line, Doughnut } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    CategoryScale, LinearScale, PointElement,
+    LineElement, ArcElement, Tooltip, Legend
+} from "chart.js";
+
+ChartJS.register(
+    CategoryScale, LinearScale, PointElement,
+    LineElement, ArcElement, Tooltip, Legend
+);
+
 // ─────────────────────────────────────────
 // 상태 배지
 // ─────────────────────────────────────────
@@ -71,25 +83,99 @@ function AdminDashboardPage() {
                 ))}
             </div>
 
-            {/* 차트 영역 — 후순위 */}
+            {/* 차트 영역 */}
             <div className="grid grid-cols-2 gap-4 mb-5">
+                {/* 최근 7일 매출 — 라인 차트 */}
                 <div className="bg-white rounded-md p-4 shadow-sm">
                     <div className="flex justify-between items-center mb-3">
                         <span className="text-sm font-bold text-gray-700">최근 7일 매출</span>
-                        <span className="text-xs text-gray-400">Chart.js 후순위</span>
+                        <span className="text-xs text-gray-400">단위: 원</span>
                     </div>
-                    <div className="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">
-                        📊 매출 통계 차트 (후순위 구현 예정)
-                    </div>
+                    {dashboard?.weeklySales?.length > 0 ? (
+                        <Line
+                            data={{
+                                labels: dashboard.weeklySales.map((d) => d.date),
+                                datasets: [{
+                                    label: "매출",
+                                    data: dashboard.weeklySales.map((d) => d.revenue),
+                                    borderColor: "#1d4ed8",
+                                    backgroundColor: "rgba(29,78,216,0.1)",
+                                    tension: 0.3,
+                                    fill: true,
+                                    pointBackgroundColor: "#1d4ed8",
+                                }],
+                            }}
+                            options={{
+                                responsive: true,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            precision: 0,
+                                            callback: (v) => v.toLocaleString("ko-KR") + "원",
+                                            font: { size: 10 },
+                                        },
+                                    },
+                                    x: { ticks: { font: { size: 10 } } },
+                                },
+                            }}
+                        />
+                    ) : (
+                        <div className="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">
+                            데이터 없음
+                        </div>
+                    )}
                 </div>
+
+                {/* 주문 상태 현황 — 도넛 차트 */}
                 <div className="bg-white rounded-md p-4 shadow-sm">
                     <div className="flex justify-between items-center mb-3">
                         <span className="text-sm font-bold text-gray-700">주문 상태 현황</span>
                         <span className="text-xs text-gray-400">전체 수량 기준</span>
                     </div>
-                    <div className="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">
-                        📦 주문 상태 차트 (후순위 구현 예정)
-                    </div>
+                    {dashboard?.orderStatusCount ? (
+                        <div className="flex flex-col items-center gap-10 justify-center h-full">
+                            <div className="w-50 h-50">
+                                <Doughnut
+                                    data={{
+                                        labels: Object.keys(dashboard.orderStatusCount),
+                                        datasets: [{
+                                            data: Object.values(dashboard.orderStatusCount),
+                                            backgroundColor: [
+                                                "#e5e7eb", "#bfdbfe", "#fef08a",
+                                                "#bbf7d0", "#fecaca", "#fed7aa"
+                                            ],
+                                            borderWidth: 1,
+                                        }],
+                                    }}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { legend: { display: false } },
+                                    }}
+                                />
+                            </div>
+                            <div className="grid grid-cols-3 gap-x-4 gap-y-2 w-full text-xs">
+                                {Object.entries(dashboard.orderStatusCount).map(([label, count], idx) => (
+                                    <div key={label} className="flex items-center gap-1.5">
+                                        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{
+                                            backgroundColor: [
+                                                "#e5e7eb", "#bfdbfe", "#fef08a",
+                                                "#bbf7d0", "#fecaca", "#fed7aa"
+                                            ][idx]
+                                        }} />
+                                        <span className="text-gray-500">{label}</span>
+                                        <span className="font-medium text-gray-800 ml-auto">{count}건</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-40 bg-gray-50 rounded flex items-center justify-center text-gray-400 text-sm">
+                            데이터 없음
+                        </div>
+                    )}
                 </div>
             </div>
 
