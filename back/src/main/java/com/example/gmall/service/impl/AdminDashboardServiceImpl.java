@@ -2,6 +2,7 @@ package com.example.gmall.service.impl;
 
 import com.example.gmall.domain.Member;
 import com.example.gmall.dto.manage.AdminDashboardResponseDTO;
+import com.example.gmall.dto.manage.AdminDashboardResponseDTO.DailySalesDTO;
 import com.example.gmall.dto.manage.AdminDashboardResponseDTO.RecentMemberDTO;
 import com.example.gmall.dto.manage.AdminDashboardResponseDTO.RecentOrderDTO;
 import com.example.gmall.repository.MemberRepository;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,6 +96,28 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                         .createdAt(m.getCreatedAt().toString().replace("T", " ").substring(0, 16))
                         .build())
                 .collect(Collectors.toList());
+        
+        
+        // 최근 7일 매출
+        List<DailySalesDTO> weeklySales = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            LocalDateTime start = LocalDate.now().minusDays(i).atStartOfDay();
+            LocalDateTime end = start.plusDays(1).minusSeconds(1);
+            long revenue = ordersRepository.sumTotalPriceByCreatedAtBetween(start, end);
+            weeklySales.add(DailySalesDTO.builder()
+                    .date(LocalDate.now().minusDays(i).toString().substring(5))
+                    .revenue(revenue)
+                    .build());
+        }
+
+        // 주문 상태 현황
+        Map<String, Long> orderStatusCount = new LinkedHashMap<>();
+        orderStatusCount.put("결제전",     ordersRepository.countByStatus((byte) 0));
+        orderStatusCount.put("상품준비중", ordersRepository.countByStatus((byte) 1));
+        orderStatusCount.put("배송중",     ordersRepository.countByStatus((byte) 2));
+        orderStatusCount.put("배송완료",   ordersRepository.countByStatus((byte) 3));
+        orderStatusCount.put("취소/환불",  ordersRepository.countByStatus((byte) 4));
+        orderStatusCount.put("결제실패",   ordersRepository.countByStatus((byte) 5));
 
         return AdminDashboardResponseDTO.builder()
                 .todayOrders(todayOrders)
@@ -103,6 +129,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .recentMembers(recentMembers)
                 .totalRevenue(totalRevenue)
                 .realRevenue(realRevenue)
+                .weeklySales(weeklySales)
+                .orderStatusCount(orderStatusCount)
                 .build();
     }
 }
