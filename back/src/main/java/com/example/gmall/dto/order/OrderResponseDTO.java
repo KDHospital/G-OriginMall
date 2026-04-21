@@ -40,9 +40,11 @@ public class OrderResponseDTO {
         this.orderGroupId = orders.getOrderGroupId();
         this.memberId = orders.getMember().getId();
         this.sellerId = orders.getSeller().getId();
-        this.sellerName = orders.getSeller().getSettlementName() != null
-                ? orders.getSeller().getSettlementName()
-                : orders.getSeller().getMname();
+        this.sellerName = (orders.getSeller().getDescription() != null && !orders.getSeller().getDescription().isBlank())
+                ? orders.getSeller().getDescription()
+                : (orders.getSeller().getMname() != null && !orders.getSeller().getMname().isBlank())
+                    ? orders.getSeller().getMname()
+                    : orders.getSeller().getSettlementName();
         this.totalPrice = orders.getTotalPrice();
         this.status = orders.getStatus();
         this.statusLabel = switch (orders.getStatus()) {
