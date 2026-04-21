@@ -53,8 +53,12 @@ public class PostServiceImpl implements PostService {
     }
 
     private boolean isAdmin() {
-        return SecurityContextHolder.getContext().getAuthentication()
-                .getAuthorities().stream()
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()
+                || "anonymousUser".equals(auth.getPrincipal())) {
+            return false;
+        }
+        return auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
@@ -100,13 +104,15 @@ public class PostServiceImpl implements PostService {
 
         Integer boardId = post.getBoard().getBoardId();
 
-        if (boardId == BOARD_NOTICE) {
-            post.incrementViewCount();
-            return PostDetailResponseDTO.from(post);
+        // 비공개 공지사항 → 관리자만 조회 가능
+        if (boardId == BOARD_NOTICE && !post.isPublic()) {
+            if (!isAdmin()) {
+                throw new AccessDeniedException("비공개 공지사항은 관리자만 확인할 수 있습니다.");
+            }
         }
 
+        // 비공개 고객문의 → 작성자 본인 또는 관리자만 조회 가능
         if (boardId == BOARD_QNA && !post.isPublic()) {
-            // 비밀글인 경우 작성자 본인 또는 관리자만 조회 가능
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || "anonymousUser".equals(auth.getPrincipal())) {
                 throw new AccessDeniedException("해당 게시물은 작성자 본인과 관리자만 확인할 수 있습니다.");
@@ -174,7 +180,14 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDTO<PostListResponseDTO> getBoardList(String keyword, Pageable pageable) {
-        Page<PostListResponseDTO> result = postRepository.getPostList(BOARD_NOTICE, keyword, pageable);
+        // 사이트 공지사항 목록: 관리자가 아니면 공개글만 조회
+        boolean admin = isAdmin();
+        Boolean isPublicFilter = admin ? null : Boolean.TRUE;
+        log.info("[getBoardList] isAdmin={}, isPublicFilter={}, keyword={}", admin, isPublicFilter, keyword);
+
+        Page<PostListResponseDTO> result = postRepository.getPostList(BOARD_NOTICE, keyword, null, isPublicFilter, pageable);
+
+        log.info("[getBoardList] 결과 건수={}, 전체={}", result.getContent().size(), result.getTotalElements());
 
         return PageResponseDTO.<PostListResponseDTO>withAll()
                 .dtoList(result.getContent())
