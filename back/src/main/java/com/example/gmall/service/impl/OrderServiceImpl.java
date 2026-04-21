@@ -829,7 +829,10 @@ public class OrderServiceImpl implements OrderService {
             // 재고 복구
             o.getOrderItems().stream()
                     .filter(item -> !item.isCancelled())
-                    .forEach(item -> item.getProduct().restoreStock(item.getQuantity()));
+                    .forEach(item -> {
+                    	item.getProduct().restoreStock(item.getQuantity());
+                    	item.cancel();
+                    });
 
             // 상태 이력 저장
             OrderStatusHistory history = OrderStatusHistory.builder()

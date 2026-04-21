@@ -113,7 +113,7 @@ const ProductInfo = ({product}) => {
             </div>
             <div className="space-y-6">
                 <div>
-                    <span className="text-s text-primary font-bold">현재 재고 수량 : {MAX_QTY}개</span>
+                    {product.soldStatus === 2 ? <></> : <span className="text-s text-primary font-bold">현재 재고 수량 : {MAX_QTY}개</span>}
                 </div>
                 <div className="flex items-center gap-6">
                     <span className="font-bold uppercase text-xs tracking-widest text-on-surface-variant">수량</span>
@@ -128,10 +128,10 @@ const ProductInfo = ({product}) => {
                     )}
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                    {product.stock === 0 ?<button disabled className="flex-1 bg-gradient-to-br bg-gray-300 text-gray-400 py-4 rounded-xl font-bold text-lg">
+                    {(product.stock === 0 || product.soldStatus === 2) ?<button disabled className="flex-1 bg-gradient-to-br bg-gray-300 text-gray-400 py-4 rounded-xl font-bold text-lg">
                         품절</button> :<button onClick={handleBuyNow} className="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all active:scale-95">
                         구매하기</button>}
-                    {product.stock === 0 ? <></>: <button
+                    {(product.stock === 0 || product.soldStatus === 2) ? <></>: <button
                     onClick={handleAddToCart}
                     disabled={product.soldStatus !== 0}
                     className="flex-1 bg-surface-container-highest text-primary py-4 rounded-xl font-bold text-lg hover:bg-surface-container-high transition-all active:scale-95">
@@ -139,7 +139,7 @@ const ProductInfo = ({product}) => {
                     </button>}
 
                     {/* 품절 안내 */}
-                    {product.soldStatus === 2 && (
+                    {(product.stock === 0 || product.soldStatus === 2) && (
                         <p className="text-center text-error font-bold leading-[60px]">현재 품절된 상품입니다.</p>
                     )}
                 </div>

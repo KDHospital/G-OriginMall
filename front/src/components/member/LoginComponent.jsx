@@ -62,7 +62,7 @@ const LoginComponent = () => {
     }
 
     return(
-        <div className="max-w-md mx-auto mt-20 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
+        <div className="max-w-md mx-auto mt-20 mb-10 p-8 bg-white rounded-3xl shadow-2xl border border-green-50 relative overflow-hidden">
 
     <div className="text-3xl mb-10 font-black text-green-700 text-center tracking-tight">로그인</div>
 

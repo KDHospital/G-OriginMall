@@ -109,7 +109,7 @@ const ModifyComponent = () =>{
     if(loading) return <div className="text-center mt-10 font-bold text-gray-500">정보를 불러오는 중입니다.</div>
 
     return(
-        <div className="max-w-lg mx-auto border-2 border-green-100 mt-10 p-8 bg-white shadow-xl rounded-2xl">
+        <div className="max-w-lg mx-auto mb-10 border-2 border-green-100 mt-10 p-8 bg-white shadow-xl rounded-2xl">
         <h2 className="text-3xl mb-8 font-black text-green-700 text-center">회원 정보 수정</h2>
 
         <div className="space-y-6"> {/* 간격을 위해 space-y-6으로 변경 */}

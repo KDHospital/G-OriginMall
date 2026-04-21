@@ -20,8 +20,8 @@ public class MemberDTO {
 	private String tel;
 	private Byte gender;
 	private Byte role;
-	private boolean social;
-	private boolean needsExtraInfo;
+	private Boolean social;
+	private Boolean needsExtraInfo;
 	private LocalDateTime created_at;
 
 }

@@ -327,6 +327,8 @@ export default function OrderFormPage() {
       return;
     }
 
+    let orderId = null;
+
 
     const orderData = {
       orderItems: orderItems.map((i) => ({
@@ -346,7 +348,7 @@ export default function OrderFormPage() {
       // 1. 주문 생성
       const res = await axiosInstance.post("/orders", orderData);
       const createdOrders = res.data; // List<OrderResponseDTO>
-      const orderId = createdOrders[0]?.orderId;
+      orderId = createdOrders[0]?.orderId;
       const totalAmount = createdOrders.reduce((sum, o) => sum + o.totalPrice, 0);
 
       // 2. 토스 SDK 초기화
@@ -372,6 +374,9 @@ export default function OrderFormPage() {
     } catch (err) {
       // 사용자가 결제창 닫은 경우도 여기로 들어옴
       if (err.code === "USER_CANCEL") {
+        if(orderId) {
+          await axiosInstance.patch(`/orders/${orderId}/fail`).catch(() => {});
+        }
         alert("결제가 취소되었습니다.");
         return;
       }

@@ -133,7 +133,7 @@ useEffect(() => {
 
 
     return (
-    <div className="max-w-lg mx-auto border-2 border-green-200 mt-10 p-8 bg-white shadow-lg rounded-lg">
+    <div className="max-w-lg mx-auto mb-10 border-2 border-green-200 mt-10 p-8 bg-white shadow-lg rounded-lg">
       
         <div className="text-3xl mb-8 font-extrabold text-green-600 text-center">회원가입</div>
         

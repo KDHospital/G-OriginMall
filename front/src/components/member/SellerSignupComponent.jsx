@@ -158,7 +158,7 @@ const handleClickSignup = async () => {
 }
 
 return(
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-6 font-sans">
+    <div className="flex justify-center mb-10 items-center min-h-screen bg-gray-50 p-6 font-sans">
         <div className="w-full max-w-2xl bg-white border-2 border-green-200 rounded-lg shadow-2xl p-10">
             {/* 제목: 그린 포인트 바 */}
             <h2 className="text-3xl font-black text-gray-800 mb-8 border-b-4 border-green-500 pb-2">입점 신청</h2>
