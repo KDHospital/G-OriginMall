@@ -71,15 +71,12 @@ public class BannerServiceImpl implements BannerService {
  // ── 어드민 - 배너 수정 ─────────────────────────────
     @Transactional
     public BannerResponseDTO updateBanner(Integer bannerId, MultipartFile imageFile, BannerRequestDTO dto) {
-
         Banner banner = findBannerById(bannerId);
-
         int newOrder = dto.getSortOrder();
         int oldOrder = banner.getSortOrder();
 
         // ── 같은 순서면 자리 이동 없이 내용만 수정 ─────────────
         if (newOrder == oldOrder) {
-
             // 이미지 처리
             if (imageFile != null && !imageFile.isEmpty()) {
                 String newImageUrl = fileUploadService.uploadBannerImage(imageFile);
@@ -87,14 +84,12 @@ public class BannerServiceImpl implements BannerService {
             } else if (dto.getImageUrl() != null) {
                 banner.updateImageUrl(dto.getImageUrl());
             }
-
             banner.updateBanner(
                     banner.getImageUrl(),
                     dto.getLinkUrl(),
                     oldOrder,
                     dto.getIsActive()
             );
-
             return new BannerResponseDTO(bannerRepository.save(banner));
         }
 
