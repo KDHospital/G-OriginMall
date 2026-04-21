@@ -33,6 +33,7 @@ const TABS = [
     { label: "배송중", status: 2 },
     { label: "배송완료", status: 3 },
     { label: "취소/환불", status: 4 },
+    { label: "결제실패", status: 5 },
 ];
 
 // ─────────────────────────────────────────
