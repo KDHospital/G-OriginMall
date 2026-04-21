@@ -248,12 +248,14 @@ public class AdminMemberController {
 		}
 
 		Number genderNum = (Number) body.getOrDefault("gender", 0);
-		String businessNo = (String) body.getOrDefault("businessNo", "");
+		// 선택 텍스트 필드: 빈 문자열은 null 로 저장
+		String businessNo = toNullIfBlank(body.get("businessNo"));
+		String cashReceiptNo = toNullIfBlank(body.get("cashReceiptNo"));
+		String description = toNullIfBlank(body.get("description"));
+		String settlementName = toNullIfBlank(body.get("settlementName"));
+		String settlementBank = toNullIfBlank(body.get("settlementBank"));
+		String bankAccount = toNullIfBlank(body.get("bankAccount"));
 		Boolean taxInvoice = (Boolean) body.getOrDefault("taxInvoice", false);
-		String cashReceiptNo = (String) body.getOrDefault("cashReceiptNo", "");
-		String settlementName = (String) body.getOrDefault("settlementName", "");
-		String settlementBank = (String) body.getOrDefault("settlementBank", "");
-		String bankAccount = (String) body.getOrDefault("bankAccount", "");
 		Boolean isVerified = (Boolean) body.getOrDefault("isVerified", false);
 
 		Member seller = Member.builder()
@@ -263,6 +265,7 @@ public class AdminMemberController {
 				.businessNo(businessNo).businessVerified(false)
 				.taxInvoice(taxInvoice != null && taxInvoice)
 				.cashReceiptNo(cashReceiptNo)
+				.description(description)
 				.settlementName(settlementName).settlementBank(settlementBank).bankAccount(bankAccount)
 				.isVerified(isVerified != null && isVerified)
 				.build();
@@ -302,18 +305,28 @@ public class AdminMemberController {
 				seller.changePassword(passwordEncoder.encode(newPwd));
 			}
 		}
-		// 사업자 정보
-		if (body.containsKey("businessNo")) seller.changeBusinessNo((String) body.get("businessNo"));
+		// 사업자 정보 (빈 문자열은 null로 저장)
+		if (body.containsKey("businessNo")) seller.changeBusinessNo(toNullIfBlank(body.get("businessNo")));
 		if (body.containsKey("taxInvoice")) seller.changeTaxInvoice((Boolean) body.get("taxInvoice"));
-		if (body.containsKey("cashReceiptNo")) seller.changeCashReceiptNo((String) body.get("cashReceiptNo"));
-		if (body.containsKey("description")) seller.changeDescription((String) body.get("description"));
+		if (body.containsKey("cashReceiptNo")) seller.changeCashReceiptNo(toNullIfBlank(body.get("cashReceiptNo")));
+		if (body.containsKey("description")) seller.changeDescription(toNullIfBlank(body.get("description")));
 		if (body.containsKey("isVerified")) seller.changeIsVerified((Boolean) body.get("isVerified"));
-		// 정산 정보
-		if (body.containsKey("settlementName")) seller.changeSettlementName((String) body.get("settlementName"));
-		if (body.containsKey("settlementBank")) seller.changeSettlementBank((String) body.get("settlementBank"));
-		if (body.containsKey("bankAccount")) seller.changeBankAccount((String) body.get("bankAccount"));
+		// 정산 정보 (빈 문자열은 null로 저장)
+		if (body.containsKey("settlementName")) seller.changeSettlementName(toNullIfBlank(body.get("settlementName")));
+		if (body.containsKey("settlementBank")) seller.changeSettlementBank(toNullIfBlank(body.get("settlementBank")));
+		if (body.containsKey("bankAccount")) seller.changeBankAccount(toNullIfBlank(body.get("bankAccount")));
 
 		return ResponseEntity.ok(Map.of("message", "판매회원 정보가 수정되었습니다."));
+	}
+
+	/**
+	 * 빈 문자열("") 또는 공백만 있는 문자열을 null 로 변환.
+	 * 선택 텍스트 필드가 클리어될 때 DB에 ""가 아닌 NULL이 저장되도록 정규화한다.
+	 */
+	private String toNullIfBlank(Object value) {
+		if (value == null) return null;
+		String str = value.toString();
+		return str.isBlank() ? null : str;
 	}
 
 	// [관리자] 회원 삭제 (비활성화)
