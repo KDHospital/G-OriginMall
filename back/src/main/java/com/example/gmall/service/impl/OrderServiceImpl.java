@@ -414,6 +414,7 @@ public class OrderServiceImpl implements OrderService {
         count.put("status2", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 2));
         count.put("status3", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 3));
         count.put("status4", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 4));
+        count.put("status5", ordersRepository.countBySellerIdAndStatus(sellerId, (byte) 5));
         return count;
     }
 
@@ -521,6 +522,7 @@ public class OrderServiceImpl implements OrderService {
         count.put("status2", ordersRepository.countByStatus((byte) 2));
         count.put("status3", ordersRepository.countByStatus((byte) 3));
         count.put("status4", ordersRepository.countByStatus((byte) 4));
+        count.put("status5", ordersRepository.countByStatus((byte) 5));
         return count;
     }
 

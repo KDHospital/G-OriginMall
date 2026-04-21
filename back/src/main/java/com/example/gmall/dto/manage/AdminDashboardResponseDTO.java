@@ -3,6 +3,7 @@ package com.example.gmall.dto.manage;
 import lombok.Builder;
 import lombok.Getter;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder
@@ -12,6 +13,10 @@ public class AdminDashboardResponseDTO {
     private long totalMembers;
     private long activeProducts;
     private long soldOutProducts;
+    
+    private List<DailySalesDTO> weeklySales;
+    private Map<String, Long> orderStatusCount;
+    
     private List<RecentOrderDTO> recentOrders;
     private List<RecentMemberDTO> recentMembers;
     
@@ -39,5 +44,12 @@ public class AdminDashboardResponseDTO {
         private String mname;
         private String loginId;
         private String createdAt;
+    }
+    
+    @Getter
+    @Builder
+    public static class DailySalesDTO {
+        private String date;
+        private long revenue;
     }
 }

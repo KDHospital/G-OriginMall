@@ -65,7 +65,7 @@ const FindPwdComponent= () => {
     }
 
     const handleResetPwd = () => {
-        if(info.nmpwd.length < 8) return alert("비밀번호는 8자 이상잉어야 합니다.")
+        if(info.nmpwd.length < 8) return alert("비밀번호는 8자 이상이어야 합니다.")
 
             resetPassword({loginId:info.loginId , nmpwd: info.nmpwd})
             .then(()=> {
