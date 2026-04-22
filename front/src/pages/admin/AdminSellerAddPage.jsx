@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
-import { adminCreateSeller } from '../../api/memberApi';
+import { adminCreateSeller, adminCheckLoginId, adminCheckEmail } from '../../api/memberApi';
+import {
+  pwdRegex, emailRegex, PWD_ERROR_MSG,
+  formatTelInput, formatBizNoInput
+} from '../../util/adminFormatUtil';
+import { Field } from '../../components/admin/AdminFormFields';
 
 const inputClass = "w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all";
-
-const Field = ({ label, children, span2, required }) => (
-  <div className={span2 ? 'col-span-2' : ''}>
-    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-      {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-    </label>
-    {children}
-  </div>
-);
 
 const AdminSellerAddPage = () => {
   const navigate = useNavigate();
@@ -24,38 +20,56 @@ const AdminSellerAddPage = () => {
     settlementName: '', settlementBank: '', bankAccount: '', isVerified: false, description: ''
   });
 
-  // 입력 포맷
-  const formatTel = (v) => {
-    const n = v.replace(/[^0-9]/g, '').slice(0, 11);
-    if (n.length <= 3) return n;
-    if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`;
-  };
-
-  const formatBizNo = (v) => {
-    const n = v.replace(/[^0-9]/g, '').slice(0, 10);
-    if (n.length <= 3) return n;
-    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`;
-  };
+  // 중복 확인 상태
+  const [idCheck, setIdCheck] = useState({ state: 'idle', value: '', message: '' });
+  const [emailCheck, setEmailCheck] = useState({ state: 'idle', value: '', message: '' });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') setForm({ ...form, [name]: checked });
-    else if (name === 'tel') setForm({ ...form, tel: formatTel(value) });
-    else if (name === 'businessNo') setForm({ ...form, businessNo: formatBizNo(value) });
+    else if (name === 'tel') setForm({ ...form, tel: formatTelInput(value) });
+    else if (name === 'businessNo') setForm({ ...form, businessNo: formatBizNoInput(value) });
     else if (name === 'gender') setForm({ ...form, gender: Number(value) });
     else setForm({ ...form, [name]: value });
+    // 값이 변경되면 중복 확인 상태 리셋
+    if (name === 'loginId') setIdCheck({ state: 'idle', value: '', message: '' });
+    if (name === 'email') setEmailCheck({ state: 'idle', value: '', message: '' });
   };
 
-  const pwdRegex = /^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*]).{8,20}$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // 아이디 중복 확인
+  const handleCheckLoginId = async () => {
+    const loginId = form.loginId.trim();
+    if (!loginId) { alert('아이디를 입력해주세요.'); return; }
+    setIdCheck({ state: 'checking', value: loginId, message: '' });
+    try {
+      const res = await adminCheckLoginId(loginId);
+      setIdCheck({ state: res.available ? 'available' : 'duplicate', value: loginId, message: res.message });
+    } catch (error) {
+      setIdCheck({ state: 'idle', value: '', message: '' });
+      alert('중복이 확인되어 다시 입력해주세요.');
+    }
+  };
+
+  // 이메일 중복 확인
+  const handleCheckEmail = async () => {
+    const email = form.email.trim();
+    if (!email) { alert('이메일을 입력해주세요.'); return; }
+    if (!emailRegex.test(email)) { alert('올바른 이메일 형식이 아닙니다.'); return; }
+    setEmailCheck({ state: 'checking', value: email, message: '' });
+    try {
+      const res = await adminCheckEmail(email);
+      setEmailCheck({ state: res.available ? 'available' : 'duplicate', value: email, message: res.message });
+    } catch (error) {
+      setEmailCheck({ state: 'idle', value: '', message: '' });
+      alert('중복이 확인되어 다시 입력해주세요.');
+    }
+  };
 
   const errors = {
     loginId: !form.loginId.trim() ? '아이디를 입력해주세요.' : '',
     mname: !form.mname.trim() ? '담당자명을 입력해주세요.' : '',
     email: !form.email.trim() ? '이메일을 입력해주세요.' : (!emailRegex.test(form.email) ? '올바른 이메일 형식이 아닙니다.' : ''),
-    mpwd: !form.mpwd ? '비밀번호를 입력해주세요.' : (!pwdRegex.test(form.mpwd) ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : ''),
+    mpwd: !form.mpwd ? '비밀번호를 입력해주세요.' : (!pwdRegex.test(form.mpwd) ? PWD_ERROR_MSG : ''),
     mpwdConfirm: !form.mpwdConfirm ? '비밀번호 확인을 입력해주세요.' : (form.mpwd !== form.mpwdConfirm ? '비밀번호가 일치하지 않습니다.' : ''),
     tel: !form.tel.trim() ? '연락처를 입력해주세요.' : '',
     settlementName: !form.settlementName.trim() ? '예금주를 입력해주세요.' : '',
@@ -70,6 +84,16 @@ const AdminSellerAddPage = () => {
     setSubmitted(true);
     const hasAnyError = Object.values(errors).some(e => e);
     if (hasAnyError) return;
+
+    // 중복 확인 검증
+    if (idCheck.state !== 'available' || idCheck.value !== form.loginId.trim()) {
+      alert('아이디 중복 확인을 완료해주세요.');
+      return;
+    }
+    if (emailCheck.state !== 'available' || emailCheck.value !== form.email.trim()) {
+      alert('이메일 중복 확인을 완료해주세요.');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -111,21 +135,35 @@ const AdminSellerAddPage = () => {
             <div className="px-6 py-4 border-b border-gray-100"><h4 className="font-bold text-gray-800">기본 정보</h4></div>
             <div className="p-6 grid grid-cols-2 gap-6" autoComplete="off">
               <Field label="아이디 (로그인 ID)" span2 required>
-                <input name="loginId" value={form.loginId} onChange={handleChange} type="text" placeholder="example@email.com" autoComplete="off" className={`${inputClass} max-w-md${errorClass('loginId')}`} />
+                <div className="flex gap-2 max-w-md">
+                  <input name="loginId" value={form.loginId} onChange={handleChange} type="text" placeholder="example@email.com" autoComplete="off" className={`${inputClass} flex-1${errorClass('loginId')}`} />
+                  <button type="button" onClick={handleCheckLoginId} disabled={idCheck.state === 'checking'} className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 whitespace-nowrap">
+                    {idCheck.state === 'checking' ? '확인 중...' : '중복 확인'}
+                  </button>
+                </div>
                 {hasError('loginId') && <p className="text-xs text-red-500 mt-1.5">{errors.loginId}</p>}
+                {idCheck.state === 'available' && idCheck.value === form.loginId.trim() && <p className="text-xs text-emerald-600 mt-1.5">✓ {idCheck.message}</p>}
+                {idCheck.state === 'duplicate' && idCheck.value === form.loginId.trim() && <p className="text-xs text-red-500 mt-1.5">✗ {idCheck.message}</p>}
               </Field>
               <Field label="담당자명" required>
                 <input name="mname" value={form.mname} onChange={handleChange} type="text" placeholder="담당자명" className={`${inputClass}${errorClass('mname')}`} />
                 {hasError('mname') && <p className="text-xs text-red-500 mt-1.5">{errors.mname}</p>}
               </Field>
               <Field label="이메일" required>
-                <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="example@email.com" autoComplete="off" className={`${inputClass}${errorClass('email')}`} />
+                <div className="flex gap-2">
+                  <input name="email" value={form.email} onChange={handleChange} type="email" placeholder="example@email.com" autoComplete="off" className={`${inputClass} flex-1${errorClass('email')}`} />
+                  <button type="button" onClick={handleCheckEmail} disabled={emailCheck.state === 'checking'} className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 whitespace-nowrap">
+                    {emailCheck.state === 'checking' ? '확인 중...' : '중복 확인'}
+                  </button>
+                </div>
                 {hasError('email') && <p className="text-xs text-red-500 mt-1.5">{errors.email}</p>}
+                {emailCheck.state === 'available' && emailCheck.value === form.email.trim() && <p className="text-xs text-emerald-600 mt-1.5">✓ {emailCheck.message}</p>}
+                {emailCheck.state === 'duplicate' && emailCheck.value === form.email.trim() && <p className="text-xs text-red-500 mt-1.5">✗ {emailCheck.message}</p>}
               </Field>
               <Field label="비밀번호" required>
                 <input name="mpwd" value={form.mpwd} onChange={handleChange} type="password" placeholder="8~20자, 영문+숫자 또는 특수문자" autoComplete="new-password"
                   className={`${inputClass}${errorClass('mpwd') || (form.mpwd && !pwdRegex.test(form.mpwd) ? ' border-red-300' : '')}`} />
-                {(hasError('mpwd') || (form.mpwd && !pwdRegex.test(form.mpwd))) && <p className="text-xs text-red-500 mt-1.5">{errors.mpwd || '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.'}</p>}
+                {(hasError('mpwd') || (form.mpwd && !pwdRegex.test(form.mpwd))) && <p className="text-xs text-red-500 mt-1.5">{errors.mpwd || PWD_ERROR_MSG}</p>}
               </Field>
               <Field label="비밀번호 확인" required>
                 <input name="mpwdConfirm" value={form.mpwdConfirm} onChange={handleChange} type="password" placeholder="비밀번호 재입력" autoComplete="new-password"

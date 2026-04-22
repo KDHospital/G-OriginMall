@@ -35,7 +35,6 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @Log4j2
-@Transactional
 public class AdminMemberController {
 
 	private final MemberService memberService;
@@ -44,6 +43,28 @@ public class AdminMemberController {
 	private final ProductRepository productRepository;
 	private final OrdersRepository ordersRepository;
 	private final PasswordEncoder passwordEncoder;
+
+	// [관리자] 아이디 중복 확인
+	@GetMapping("/check-id")
+	@Transactional(readOnly = true)
+	public ResponseEntity<?> checkLoginIdDuplicate(@RequestParam("loginId") String loginId) {
+		boolean exists = memberRepository.existsByLoginId(loginId);
+		return ResponseEntity.ok(Map.of(
+				"available", !exists,
+				"message", exists ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다."
+		));
+	}
+
+	// [관리자] 이메일 중복 확인
+	@GetMapping("/check-email")
+	@Transactional(readOnly = true)
+	public ResponseEntity<?> checkEmailDuplicate(@RequestParam("email") String email) {
+		boolean exists = memberRepository.existsByEmail(email);
+		return ResponseEntity.ok(Map.of(
+				"available", !exists,
+				"message", exists ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다."
+		));
+	}
 
 	// [관리자] 일반회원(role=0) 목록 조회
 	@GetMapping("/members")
@@ -176,6 +197,7 @@ public class AdminMemberController {
 
 	// [관리자] 회원 등록
 	@PostMapping("/members")
+	@Transactional
 	public ResponseEntity<?> createMember(@RequestBody Map<String, Object> body) {
 		String loginId = (String) body.get("loginId");
 		String mname = (String) body.get("mname");
@@ -208,6 +230,7 @@ public class AdminMemberController {
 
 	// [관리자] 회원 수정
 	@PutMapping("/members/{memberId}")
+	@Transactional
 	public ResponseEntity<?> updateMember(
 			@PathVariable("memberId") Long memberId,
 			@RequestBody Map<String, Object> body) {
@@ -233,6 +256,7 @@ public class AdminMemberController {
 
 	// [관리자] 판매회원 등록
 	@PostMapping("/sellers")
+	@Transactional
 	public ResponseEntity<?> createSeller(@RequestBody Map<String, Object> body) {
 		String loginId = (String) body.get("loginId");
 		String mname = (String) body.get("mname");
@@ -276,6 +300,7 @@ public class AdminMemberController {
 
 	// [관리자] 판매회원 수정
 	@PutMapping("/sellers/{memberId}")
+	@Transactional
 	public ResponseEntity<?> updateSeller(
 			@PathVariable("memberId") Long memberId,
 			@RequestBody Map<String, Object> body) {
@@ -331,6 +356,7 @@ public class AdminMemberController {
 
 	// [관리자] 회원 삭제 (비활성화)
 	@PostMapping("/members/{memberId}/delete")
+	@Transactional
 	public ResponseEntity<?> deleteMember(@PathVariable("memberId") Long memberId) {
 		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new NoSuchElementException("회원을 찾을 수 없습니다."));
@@ -360,6 +386,7 @@ public class AdminMemberController {
 	}
 	
 	@GetMapping("/seller-list")
+	@Transactional(readOnly = true)
 	public ResponseEntity<?> getPendingSellers() {
 		log.info("승인 대기 중인 판매자 목록 조회");
 		
@@ -553,6 +580,7 @@ public class AdminMemberController {
 
 	// [관리자] 관리자 계정 생성
 	@PostMapping("/admins")
+	@Transactional
 	public ResponseEntity<?> createAdmin(@RequestBody Map<String, Object> body) {
 		String loginId = (String) body.get("loginId");
 		String mname = (String) body.get("mname");
@@ -584,6 +612,7 @@ public class AdminMemberController {
 
 	// [관리자] 관리자 계정 수정
 	@PutMapping("/admins/{memberId}")
+	@Transactional
 	public ResponseEntity<?> updateAdmin(
 			@PathVariable("memberId") Long memberId,
 			@RequestBody Map<String, Object> body) {
@@ -605,6 +634,7 @@ public class AdminMemberController {
 
 	// [관리자] 관리자 계정 삭제
 	@PostMapping("/admins/{memberId}/delete")
+	@Transactional
 	public ResponseEntity<?> deleteAdmin(@PathVariable("memberId") Long memberId) {
 		Member admin = memberRepository.findById(memberId)
 				.orElseThrow(() -> new NoSuchElementException("관리자를 찾을 수 없습니다."));

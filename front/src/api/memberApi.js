@@ -97,6 +97,18 @@ export const adminCreateMember = async (data) => {
     return response.data;
 };
 
+// [어드민] 아이디 중복 확인 (응답: { available: boolean, message: string })
+export const adminCheckLoginId = async (loginId) => {
+    const response = await axiosInstance.get('/admin/check-id', { params: { loginId } });
+    return response.data;
+};
+
+// [어드민] 이메일 중복 확인 (응답: { available: boolean, message: string })
+export const adminCheckEmail = async (email) => {
+    const response = await axiosInstance.get('/admin/check-email', { params: { email } });
+    return response.data;
+};
+
 // [어드민] 회원 주문 목록 조회
 export const adminGetMemberOrders = async (memberId, page = 0, size = 5) => {
     const response = await axiosInstance.get(`/admin/members/${memberId}/orders`, { params: { page, size } });

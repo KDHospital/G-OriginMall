@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBoard, fetchInquiries, adminRemovePost } from '../../api/boardApi';
+import { fetchAdminBoard, fetchAdminInquiries, adminRemovePost } from '../../api/boardApi';
 import PaginationComponent from '../support/PaginationComponent';
+import { BOARD_NOTICE, isNoticeBoard } from '../../util/boardConstants';
 
 const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
-  const isNotice = boardId === 1;
+  const isNotice = isNoticeBoard(boardId);
 
   const [posts, setPosts] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -23,8 +24,8 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     setLoading(true);
     try {
       const data = isNotice
-        ? await fetchBoard(page - 1, itemsPerPage, searchKeyword)
-        : await fetchInquiries(page - 1, itemsPerPage, searchKeyword, answerFilter, publicFilter);
+        ? await fetchAdminBoard(page - 1, itemsPerPage, searchKeyword)
+        : await fetchAdminInquiries(page - 1, itemsPerPage, searchKeyword, answerFilter, publicFilter);
       setPosts(data.dtoList || []);
       setTotalItems(data.totalCount || 0);
     } catch (error) {
@@ -126,7 +127,7 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
     const style = hasAnswer
       ? 'bg-emerald-50 text-emerald-600'
       : 'bg-amber-50 text-amber-600';
-    const label = hasAnswer ? '답변완료' : '대기중';
+    const label = hasAnswer ? '답변완료' : '답변대기';
     return (
       <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-semibold ${style}`}>
         {label}
@@ -156,8 +157,8 @@ const BoardListComponent = ({ boardId, onMoveToRead, onMoveToAdd }) => {
               className={selectClass}
             >
               <option value="">답변 상태 전체</option>
-              <option value="false">답변 대기</option>
-              <option value="true">답변 완료</option>
+              <option value="false">답변대기</option>
+              <option value="true">답변완료</option>
             </select>
             <select
               value={filterPublic === null ? '' : String(filterPublic)}
