@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getBoardOne, adminRemovePost, addAnswer } from '../../api/boardApi';
+import { getAdminBoardOne, adminRemovePost, addAnswer } from '../../api/boardApi';
+import { isInquiryBoard } from '../../util/boardConstants';
 
 const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
   const [post, setPost] = useState(null);
@@ -14,7 +15,7 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
   const loadPost = () => {
     if (!postId) return;
     setLoading(true);
-    getBoardOne(postId)
+    getAdminBoardOne(postId)
       .then(data => {
         setPost(data);
         setIsEditingAnswer(false);
@@ -73,7 +74,7 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
   if (loading) return <div className="py-24 text-center text-gray-400">데이터를 불러오는 중입니다...</div>;
   if (!post) return <div className="py-24 text-center text-gray-400">게시글을 찾을 수 없습니다.</div>;
 
-  const isInquiry = post.boardId === 2;
+  const isInquiry = isInquiryBoard(post.boardId);
   const hasAnswer = post.answers && post.answers.length > 0;
 
   // 공통 스타일
@@ -119,7 +120,7 @@ const BoardReadComponent = ({ postId, onMoveToList, onMoveToModify }) => {
         <div className="px-6 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5 mb-3">
             {badge(post.isPublic, 'bg-blue-50 text-blue-600', 'bg-gray-100 text-gray-500', '공개', '비공개')}
-            {isInquiry && badge(hasAnswer, 'bg-emerald-50 text-emerald-600', 'bg-amber-50 text-amber-600', '답변완료', '대기중')}
+            {isInquiry && badge(hasAnswer, 'bg-emerald-50 text-emerald-600', 'bg-amber-50 text-amber-600', '답변완료', '답변대기')}
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-3">
             {post.title}

@@ -4,13 +4,14 @@ import BasicLayout from '../../layouts/BasicLayout';
 import UserSupportComponent from '../../components/support/UserSupportComponent';
 import PaginationComponent from '../../components/support/PaginationComponent';
 import { fetchBoard } from '../../api/boardApi';
+import { DEFAULT_ITEMS_PER_PAGE } from '../../util/boardConstants';
 
 const BoardListPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const currentPage = parseInt(searchParams.get('page')) || 1;
-  const itemsPerPage = 10;
+  const itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
   const [totalItems, setTotalItems] = useState(0);
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(false);

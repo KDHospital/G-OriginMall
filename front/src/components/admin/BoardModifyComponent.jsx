@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getBoardOne, adminUpdatePost } from '../../api/boardApi';
+import { getAdminBoardOne, adminUpdatePost } from '../../api/boardApi';
+import { isNoticeBoard } from '../../util/boardConstants';
 
 const BoardModifyComponent = ({ bno, onMoveToRead }) => {
   const [post, setPost] = useState({
@@ -14,7 +15,7 @@ const BoardModifyComponent = ({ bno, onMoveToRead }) => {
   useEffect(() => {
     if (!bno) return;
     setFetching(true);
-    getBoardOne(bno)
+    getAdminBoardOne(bno)
       .then(data => {
         setPost({
           title: data.title || '',
@@ -71,7 +72,7 @@ const BoardModifyComponent = ({ bno, onMoveToRead }) => {
           <button onClick={() => onMoveToRead(bno)} className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-1 flex items-center gap-1">
             <span>←</span> 돌아가기
           </button>
-          <h2 className="text-2xl font-bold text-gray-900">{post.boardId === 1 ? '공지사항' : '고객문의'} 수정</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{isNoticeBoard(post.boardId) ? '공지사항' : '고객문의'} 수정</h2>
         </div>
         <div className="flex gap-2">
           <button onClick={() => onMoveToRead(bno)} className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">취소</button>

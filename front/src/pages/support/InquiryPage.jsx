@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BasicLayout from '../../layouts/BasicLayout';
 import UserSupportComponent from '../../components/support/UserSupportComponent';
 import PaginationComponent from '../../components/support/PaginationComponent';
-import InquiryAddModal from './InquiryAddModal'; 
+import InquiryAddModal from './InquiryAddModal';
 import { fetchInquiries, getBoardOne } from '../../api/boardApi';
-
-const maskName = (name) => {
-  if (!name) return '익명';
-  const isEnglish = /^[a-zA-Z\s]+$/.test(name);
-  if (isEnglish) {
-    return name.split(' ').map(word => {
-      if (word.length <= 2) return word[0] + '*';
-      return word[0] + '*'.repeat(word.length - 2) + word[word.length - 1];
-    }).join(' ');
-  }
-  if (name.length === 1) return '*';
-  if (name.length === 2) return name[0] + '*';
-  if (name.length === 3) return name[0] + '*' + name[2];
-  return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
-};
+import useAuth from '../../hooks/useAuth';
+import { maskName } from '../../util/stringUtil';
+import { DEFAULT_ITEMS_PER_PAGE } from '../../util/boardConstants';
 
 const InquiryPage = () => {
   const [openIdx, setOpenIdx] = useState(null);
@@ -28,25 +17,22 @@ const InquiryPage = () => {
   const [inquiries, setInquiries] = useState([]);
   
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0); 
-  const itemsPerPage = 10;
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
 
-  // 1. 로그인 유저 정보 추출 (localStorage의 id: 2번 확인)
-  const getLoginUserInfo = () => {
-    const data = localStorage.getItem("member");
-    if (!data) return null;
-    try {
-      const parsedData = JSON.parse(data);
-      return {
-        id: parsedData.memberId || parsedData.id || parsedData.mid,
-        name: parsedData.mname
-      };
-    } catch (error) {
-      return null;
+  // 로그인 사용자 정보 (인증 유틸 사용)
+  const { isLoggedIn, memberId: currentMemberId, checkOwner } = useAuth();
+  const navigate = useNavigate();
+
+  // 문의하기 버튼 클릭 핸들러 (비회원은 로그인 페이지로 유도)
+  const handleOpenModal = () => {
+    if (!isLoggedIn) {
+      alert("고객문의는 회원가입 후 등록이 가능합니다.");
+      navigate('/login');
+      return;
     }
+    setIsModalOpen(true);
   };
-
-  const currentUser = getLoginUserInfo();
 
   const loadData = async (pageNumber) => {
     try {
@@ -67,8 +53,8 @@ const InquiryPage = () => {
         <div className="w-full -mt-[62px]"> 
           <div className="flex justify-between items-center pb-6 border-b border-gray-100">
             <h2 className="text-[22px] font-bold text-[#1D3C28]">고객문의</h2>
-            <button 
-              onClick={() => setIsModalOpen(true)} 
+            <button
+              onClick={handleOpenModal}
               className="px-5 py-2.5 bg-[#1D3C28] text-white text-[13px] rounded-sm hover:bg-[#2d5a3c]"
             >
               문의하기
@@ -89,12 +75,8 @@ const InquiryPage = () => {
               <tbody>
                 {inquiries.length > 0 ? inquiries.map((item, idx) => {
                   const virtualNumber = totalItems - (currentPage - 1) * itemsPerPage - idx;
-                  
                   const isPublic = item.isPublic === true;
-
-                  const writerId = item.memberId;
-                  
-                  const isOwner = currentUser && writerId && String(writerId) === String(currentUser.id);
+                  const isOwner = checkOwner(item.memberId);
 
                   return (
                     <React.Fragment key={item.postId || idx}>

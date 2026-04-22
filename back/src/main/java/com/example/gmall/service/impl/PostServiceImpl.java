@@ -104,24 +104,22 @@ public class PostServiceImpl implements PostService {
 
         Integer boardId = post.getBoard().getBoardId();
 
-        // 비공개 공지사항 → 관리자만 조회 가능
+        // [사이트] 비공개 공지사항 → 모두 차단 (관리자도 어드민 페이지에서만 조회 가능)
         if (boardId == BOARD_NOTICE && !post.isPublic()) {
-            if (!isAdmin()) {
-                throw new AccessDeniedException("비공개 공지사항은 관리자만 확인할 수 있습니다.");
-            }
+            throw new AccessDeniedException("비공개 공지사항입니다.");
         }
 
-        // 비공개 고객문의 → 작성자 본인 또는 관리자만 조회 가능
+        // [사이트] 비공개 고객문의 → 작성자 본인만 조회 가능 (관리자도 어드민 페이지에서만 조회 가능)
         if (boardId == BOARD_QNA && !post.isPublic()) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || "anonymousUser".equals(auth.getPrincipal())) {
-                throw new AccessDeniedException("해당 게시물은 작성자 본인과 관리자만 확인할 수 있습니다.");
+                throw new AccessDeniedException("비공개 게시물은 작성자 본인만 확인할 수 있습니다.");
             }
             Long currentMemberId = ((Number) auth.getPrincipal()).longValue();
             boolean isOwner = post.getMember().getId().equals(currentMemberId);
 
-            if (!isOwner && !isAdmin()) {
-                throw new AccessDeniedException("해당 게시물은 작성자 본인과 관리자만 확인할 수 있습니다.");
+            if (!isOwner) {
+                throw new AccessDeniedException("비공개 게시물은 작성자 본인만 확인할 수 있습니다.");
             }
         }
 
@@ -180,19 +178,66 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDTO<PostListResponseDTO> getBoardList(String keyword, Pageable pageable) {
-        // 사이트 공지사항 목록: 관리자가 아니면 공개글만 조회
-        boolean admin = isAdmin();
-        Boolean isPublicFilter = admin ? null : Boolean.TRUE;
-        log.info("[getBoardList] isAdmin={}, isPublicFilter={}, keyword={}", admin, isPublicFilter, keyword);
-
-        Page<PostListResponseDTO> result = postRepository.getPostList(BOARD_NOTICE, keyword, null, isPublicFilter, pageable);
-
-        log.info("[getBoardList] 결과 건수={}, 전체={}", result.getContent().size(), result.getTotalElements());
+        // [사이트] 공지사항 목록: 공개글만 조회 (비공개는 어드민 페이지에서만 조회)
+        Page<PostListResponseDTO> result = postRepository.getPostList(
+                BOARD_NOTICE, keyword, null, Boolean.TRUE, pageable);
 
         return PageResponseDTO.<PostListResponseDTO>withAll()
                 .dtoList(result.getContent())
                 .totalCount(result.getTotalElements())
                 .build();
+    }
+
+    // ========== [관리자 전용] 공개/비공개 모두 조회 ==========
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDTO<PostListResponseDTO> getBoardListForAdmin(String keyword, Pageable pageable) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        }
+        // 비공개 포함 전체 조회
+        Page<PostListResponseDTO> result = postRepository.getPostList(
+                BOARD_NOTICE, keyword, null, null, pageable);
+
+        return PageResponseDTO.<PostListResponseDTO>withAll()
+                .dtoList(result.getContent())
+                .totalCount(result.getTotalElements())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDTO<PostListResponseDTO> getInquiryListForAdmin(String keyword, Boolean hasAnswer, Boolean isPublic, Pageable pageable) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        }
+        // 필터 조건(hasAnswer, isPublic)을 그대로 적용
+        Page<PostListResponseDTO> result = postRepository.getPostList(
+                BOARD_QNA, keyword, hasAnswer, isPublic, pageable);
+
+        return PageResponseDTO.<PostListResponseDTO>withAll()
+                .dtoList(result.getContent())
+                .totalCount(result.getTotalElements())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public PostDetailResponseDTO getPostForAdmin(Long id) {
+        if (!isAdmin()) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        }
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
+
+        if (post.isDeleted()) {
+            throw new NoSuchElementException("삭제된 게시글입니다.");
+        }
+
+        // 관리자는 비공개 여부와 상관없이 모두 조회 가능
+        post.incrementViewCount();
+        return PostDetailResponseDTO.from(post);
     }
 
     @Override

@@ -1,29 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
-import { adminCreateMember } from '../../api/memberApi';
-import { formatTelInput, pwdRegex, emailRegex, PWD_ERROR_MSG } from '../../util/adminFormatUtil';
-
-// 공통 스타일
-const inputBase = "w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all";
-const errStyle = "border-red-300 focus:border-red-300 focus:ring-red-100";
-const normalStyle = "border-gray-200 focus:border-blue-300 focus:ring-blue-100";
-const btnPrimary = "px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors";
-const btnSecondary = "px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
-
-// 라벨 컴포넌트
-const Label = ({ text, required }) => (
-  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-    {text}
-    {required && <span className="text-red-500 ml-0.5">*</span>}
-  </label>
-);
-
-// 에러 메시지 컴포넌트
-const ErrorMsg = ({ msg }) => {
-  if (!msg) return null;
-  return <p className="text-xs text-red-500 mt-1.5">{msg}</p>;
-};
+import { adminCreateMember, adminCheckLoginId, adminCheckEmail } from '../../api/memberApi';
+import {
+  formatTelInput, pwdRegex, emailRegex, PWD_ERROR_MSG,
+  INPUT_BASE, INPUT_ERR, INPUT_OK, BTN_PRIMARY, BTN_SECONDARY
+} from '../../util/adminFormatUtil';
+import { Label, ErrorMsg } from '../../components/admin/AdminFormFields';
 
 const AdminMemberAddPage = () => {
   const navigate = useNavigate();
@@ -34,6 +17,12 @@ const AdminMemberAddPage = () => {
     tel: '', email: '', gender: 0
   });
 
+  // 중복 확인 상태
+  // state: 'idle' | 'checking' | 'available' | 'duplicate'
+  // value: 마지막 확인 시점의 값 (입력값 변경 시 상태 리셋용)
+  const [idCheck, setIdCheck] = useState({ state: 'idle', value: '', message: '' });
+  const [emailCheck, setEmailCheck] = useState({ state: 'idle', value: '', message: '' });
+
   // 입력 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +32,55 @@ const AdminMemberAddPage = () => {
       setForm({ ...form, gender: Number(value) });
     } else {
       setForm({ ...form, [name]: value });
+      // 값이 변경되면 중복 확인 상태 리셋
+      if (name === 'loginId') setIdCheck({ state: 'idle', value: '', message: '' });
+      if (name === 'email') setEmailCheck({ state: 'idle', value: '', message: '' });
+    }
+  };
+
+  // 아이디 중복 확인
+  const handleCheckLoginId = async () => {
+    const loginId = form.loginId.trim();
+    if (!loginId) {
+      alert('아이디를 입력해주세요.');
+      return;
+    }
+    setIdCheck({ state: 'checking', value: loginId, message: '' });
+    try {
+      const res = await adminCheckLoginId(loginId);
+      setIdCheck({
+        state: res.available ? 'available' : 'duplicate',
+        value: loginId,
+        message: res.message
+      });
+    } catch (error) {
+      setIdCheck({ state: 'idle', value: '', message: '' });
+      alert('중복이 확인되어 다시 입력해주세요.');
+    }
+  };
+
+  // 이메일 중복 확인
+  const handleCheckEmail = async () => {
+    const email = form.email.trim();
+    if (!email) {
+      alert('이메일을 입력해주세요.');
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+    setEmailCheck({ state: 'checking', value: email, message: '' });
+    try {
+      const res = await adminCheckEmail(email);
+      setEmailCheck({
+        state: res.available ? 'available' : 'duplicate',
+        value: email,
+        message: res.message
+      });
+    } catch (error) {
+      setEmailCheck({ state: 'idle', value: '', message: '' });
+      alert('중복이 확인되어 다시 입력해주세요.');
     }
   };
 
@@ -69,13 +107,23 @@ const AdminMemberAddPage = () => {
     if (f === 'mpwdConfirm') return form.mpwdConfirm && form.mpwd !== form.mpwdConfirm;
     return false;
   };
-  const cls = (f) => `${inputBase} ${hasErr(f) || liveErr(f) ? errStyle : normalStyle}`;
+  const cls = (f) => `${INPUT_BASE} ${hasErr(f) || liveErr(f) ? INPUT_ERR : INPUT_OK}`;
   const errMsg = (f) => (hasErr(f) || liveErr(f)) ? (errs[f] || '') : '';
 
   // 등록 핸들러
   const handleSubmit = async () => {
     setSubmitted(true);
     if (Object.values(errs).some(e => e)) return;
+
+    // 중복 확인 검증
+    if (idCheck.state !== 'available' || idCheck.value !== form.loginId.trim()) {
+      alert('아이디 중복 확인을 완료해주세요.');
+      return;
+    }
+    if (emailCheck.state !== 'available' || emailCheck.value !== form.email.trim()) {
+      alert('이메일 중복 확인을 완료해주세요.');
+      return;
+    }
 
     setSaving(true);
     try {
@@ -117,10 +165,10 @@ const AdminMemberAddPage = () => {
               <h2 className="text-2xl font-bold text-gray-900">회원 등록</h2>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => navigate('/admin/members')} className={btnSecondary}>
+              <button onClick={() => navigate('/admin/members')} className={BTN_SECONDARY}>
                 취소
               </button>
-              <button onClick={handleSubmit} disabled={saving} className={btnPrimary}>
+              <button onClick={handleSubmit} disabled={saving} className={BTN_PRIMARY}>
                 {saving ? '등록 중...' : '등록'}
               </button>
             </div>
@@ -133,16 +181,32 @@ const AdminMemberAddPage = () => {
               {/* 아이디 */}
               <div>
                 <Label text="아이디 (로그인 ID)" required />
-                <input
-                  name="loginId"
-                  value={form.loginId}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder="example@email.com"
-                  autoComplete="off"
-                  className={`${cls('loginId')} max-w-md`}
-                />
+                <div className="flex gap-2 max-w-md">
+                  <input
+                    name="loginId"
+                    value={form.loginId}
+                    onChange={handleChange}
+                    type="text"
+                    placeholder="example@email.com"
+                    autoComplete="off"
+                    className={`${cls('loginId')} flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCheckLoginId}
+                    disabled={idCheck.state === 'checking'}
+                    className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 whitespace-nowrap"
+                  >
+                    {idCheck.state === 'checking' ? '확인 중...' : '중복 확인'}
+                  </button>
+                </div>
                 <ErrorMsg msg={errMsg('loginId')} />
+                {idCheck.state === 'available' && idCheck.value === form.loginId.trim() && (
+                  <p className="text-xs text-emerald-600 mt-1.5">✓ {idCheck.message}</p>
+                )}
+                {idCheck.state === 'duplicate' && idCheck.value === form.loginId.trim() && (
+                  <p className="text-xs text-red-500 mt-1.5">✗ {idCheck.message}</p>
+                )}
               </div>
 
               {/* 이름 + 이메일 */}
@@ -161,16 +225,32 @@ const AdminMemberAddPage = () => {
                 </div>
                 <div>
                   <Label text="이메일" required />
-                  <input
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    type="email"
-                    placeholder="example@email.com"
-                    autoComplete="off"
-                    className={cls('email')}
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      type="email"
+                      placeholder="example@email.com"
+                      autoComplete="off"
+                      className={`${cls('email')} flex-1`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCheckEmail}
+                      disabled={emailCheck.state === 'checking'}
+                      className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 whitespace-nowrap"
+                    >
+                      {emailCheck.state === 'checking' ? '확인 중...' : '중복 확인'}
+                    </button>
+                  </div>
                   <ErrorMsg msg={errMsg('email')} />
+                  {emailCheck.state === 'available' && emailCheck.value === form.email.trim() && (
+                    <p className="text-xs text-emerald-600 mt-1.5">✓ {emailCheck.message}</p>
+                  )}
+                  {emailCheck.state === 'duplicate' && emailCheck.value === form.email.trim() && (
+                    <p className="text-xs text-red-500 mt-1.5">✗ {emailCheck.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -225,7 +305,7 @@ const AdminMemberAddPage = () => {
                     name="gender"
                     value={form.gender}
                     onChange={handleChange}
-                    className={`${inputBase} bg-white ${normalStyle}`}
+                    className={`${INPUT_BASE} bg-white ${INPUT_OK}`}
                   >
                     <option value={0}>미지정</option>
                     <option value={1}>남성</option>

@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import { adminGetAdminDetail, adminUpdateAdmin, adminDeleteAdmin } from '../../api/memberApi';
-import { fmtDateTime } from '../../util/adminFormatUtil';
+import {
+  fmtDateTime,
+  pwdRegex, PWD_ERROR_MSG,
+  formatTelInput,
+  INPUT_BASE, INPUT_ERR, INPUT_OK
+} from '../../util/adminFormatUtil';
 
 const AdminSettingDetailPage = () => {
   const { memberId } = useParams();
@@ -12,13 +17,6 @@ const AdminSettingDetailPage = () => {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ mname: '', tel: '', mpwd: '', mpwdConfirm: '' });
   const [saving, setSaving] = useState(false);
-
-  const formatTel = (value) => {
-    const nums = value.replace(/[^0-9]/g, '').slice(0, 11);
-    if (nums.length <= 3) return nums;
-    if (nums.length <= 7) return `${nums.slice(0, 3)}-${nums.slice(3)}`;
-    return `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7)}`;
-  };
 
   useEffect(() => {
     if (!memberId) return;
@@ -34,15 +32,14 @@ const AdminSettingDetailPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: name === 'tel' ? formatTel(value) : value });
+    setForm({ ...form, [name]: name === 'tel' ? formatTelInput(value) : value });
   };
 
   const [editSubmitted, setEditSubmitted] = useState(false);
-  const pwdRegex = /^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*]).{8,20}$/;
   const editErrs = {
     mname: !form.mname?.trim() ? '이름을 입력해주세요.' : '',
     tel: !form.tel?.trim() ? '연락처를 입력해주세요.' : '',
-    mpwd: form.mpwd && !pwdRegex.test(form.mpwd) ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : '',
+    mpwd: form.mpwd && !pwdRegex.test(form.mpwd) ? PWD_ERROR_MSG : '',
     mpwdConfirm: form.mpwd && form.mpwd !== form.mpwdConfirm ? '비밀번호가 일치하지 않습니다.' : '',
   };
   const editHasErr = (f) => editSubmitted && editErrs[f];
@@ -53,10 +50,7 @@ const AdminSettingDetailPage = () => {
   };
   const editCls = (f) => {
     const isErr = editHasErr(f) || editLiveErr(f);
-    const state = isErr
-      ? 'border-red-300 focus:border-red-300 focus:ring-red-100'
-      : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100';
-    return `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${state}`;
+    return `${INPUT_BASE} ${isErr ? INPUT_ERR : INPUT_OK}`;
   };
   const editErrMsg = (f) => (editHasErr(f) || editLiveErr(f)) ? (editErrs[f] || '') : '';
 

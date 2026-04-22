@@ -2,26 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import { adminGetMember, adminUpdateMember } from '../../api/memberApi';
-import { formatTelInput, pwdRegex, PWD_ERROR_MSG } from '../../util/adminFormatUtil';
-
-// 공통 스타일
-const inputBase = "w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all";
-const errStyle = "border-red-300 focus:border-red-300 focus:ring-red-100";
-const normalStyle = "border-gray-200 focus:border-blue-300 focus:ring-blue-100";
-const btnPrimary = "px-5 py-2.5 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors";
-const btnSecondary = "px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors";
-
-const Label = ({ text, required }) => (
-  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-    {text}
-    {required && <span className="text-red-500 ml-0.5">*</span>}
-  </label>
-);
-
-const ErrorMsg = ({ msg }) => {
-  if (!msg) return null;
-  return <p className="text-xs text-red-500 mt-1.5">{msg}</p>;
-};
+import {
+  formatTelInput, pwdRegex, PWD_ERROR_MSG,
+  INPUT_BASE, INPUT_ERR, INPUT_OK, BTN_PRIMARY, BTN_SECONDARY
+} from '../../util/adminFormatUtil';
+import { Label, ErrorMsg } from '../../components/admin/AdminFormFields';
 
 const AdminMemberModifyPage = () => {
   const { memberId } = useParams();
@@ -80,7 +65,7 @@ const AdminMemberModifyPage = () => {
     if (f === 'mpwdConfirm') return form.mpwdConfirm && form.mpwd !== form.mpwdConfirm;
     return false;
   };
-  const cls = (f) => `${inputBase} ${hasErr(f) || liveErr(f) ? errStyle : normalStyle}`;
+  const cls = (f) => `${INPUT_BASE} ${hasErr(f) || liveErr(f) ? INPUT_ERR : INPUT_OK}`;
   const errMsg = (f) => (hasErr(f) || liveErr(f)) ? (errs[f] || '') : '';
 
   // 저장 핸들러
@@ -137,10 +122,10 @@ const AdminMemberModifyPage = () => {
               <h2 className="text-2xl font-bold text-gray-900">회원 수정</h2>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => navigate(`/admin/members/${memberId}`)} className={btnSecondary}>
+              <button onClick={() => navigate(`/admin/members/${memberId}`)} className={BTN_SECONDARY}>
                 취소
               </button>
-              <button onClick={handleSubmit} disabled={saving} className={btnPrimary}>
+              <button onClick={handleSubmit} disabled={saving} className={BTN_PRIMARY}>
                 {saving ? '저장 중...' : '저장'}
               </button>
             </div>
@@ -195,7 +180,7 @@ const AdminMemberModifyPage = () => {
                   name="gender"
                   value={form.gender}
                   onChange={handleChange}
-                  className={`${inputBase} max-w-xs bg-white ${normalStyle}`}
+                  className={`${INPUT_BASE} max-w-xs bg-white ${INPUT_OK}`}
                 >
                   <option value={0}>미지정</option>
                   <option value={1}>남성</option>

@@ -5,6 +5,7 @@ import PaginationComponent from '../../components/support/PaginationComponent';
 import { adminGetAdmins, adminDeleteAdmin } from '../../api/memberApi';
 
 import { fmtTel } from '../../util/adminFormatUtil';
+import { DEFAULT_ITEMS_PER_PAGE } from '../../util/boardConstants';
 
 const AdminSettingListPage = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const AdminSettingListPage = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const itemsPerPage = 10;
+  const itemsPerPage = DEFAULT_ITEMS_PER_PAGE;
 
   const [searchInput, setSearchInput] = useState('');
   const [keyword, setKeyword] = useState('');

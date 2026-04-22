@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { addInquiry } from '../../api/boardApi';
+import { isNoticeBoard } from '../../util/boardConstants';
 
 const BoardAddComponent = ({ boardId, onMoveToList }) => {
   const [post, setPost] = useState({
@@ -49,7 +50,7 @@ const BoardAddComponent = ({ boardId, onMoveToList }) => {
           <button onClick={onMoveToList} className="text-sm text-gray-400 hover:text-gray-600 transition-colors mb-1 flex items-center gap-1">
             <span>←</span> 목록으로
           </button>
-          <h2 className="text-2xl font-bold text-gray-900">{boardId === 1 ? '공지사항' : '고객문의'} 등록</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{isNoticeBoard(boardId) ? '공지사항' : '고객문의'} 등록</h2>
         </div>
         <div className="flex gap-2">
           <button onClick={onMoveToList} className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">취소</button>
