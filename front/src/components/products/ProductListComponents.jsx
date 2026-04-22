@@ -24,13 +24,13 @@ const ProductListComponents = () => {
         current: 0
     }
 
-    const [searchParams] = useSearchParams()
-    const categoryId = searchParams.get('categoryId')
+    // const [searchParams] = useSearchParams()
+    // const categoryId = searchParams.get('categoryId')
     const [product,setProduct] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const {page,size,refresh,sort,moveToList,moveToRead} = useCustomMove()
+    const {page,size,refresh,sort,categoryId,moveToList,moveToRead} = useCustomMove()
     const [serverData, setServerData] = useState(initState)
 
     const [categories, setCategories] = useState([])   // 전체 카테고리 트리
@@ -71,7 +71,7 @@ const ProductListComponents = () => {
                 setLoading(true)
     
             // 1. 현재 페이지와 사이즈로 데이터 요청 (Spring Boot는 0페이지부터 시작하므로 page-1)
-                const response = await getProducts({ page: page - 1, size: 12, categoryId: categoryId ?? undefined, sort: sort, });
+                const response = await getProducts({ page: page - 1, size: size, categoryId: categoryId ?? undefined, sort: sort, });
                 console.log("백엔드 전체응답:", response.data)
                 const data = response.data
                 const totalPage = data.totalPages
