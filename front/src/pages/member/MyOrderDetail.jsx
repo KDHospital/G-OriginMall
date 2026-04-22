@@ -5,6 +5,7 @@ import axiosInstance from "../../api/axios";
 import MyPageComponent from "../../components/member/MyPageComponent";
 import { BASE_URL } from "../../util/imagesUtil";
 import { formatPhone } from "../../util/phoneUtil";
+import { getMemberInfo } from "../../api/memberApi";
 
 // ─────────────────────────────────────────
 // 상태 배지
@@ -92,6 +93,8 @@ export default function MyOrderDetail() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [history, setHistory] = useState([]);
+    const [member, setMember] = useState(null);
+    
 
     // 주문 상세 조회
     const fetchOrder = () => {
@@ -135,6 +138,29 @@ export default function MyOrderDetail() {
             });
     };
 
+    useEffect(() => {
+           const savedMember = localStorage.getItem("member");
+                if (!savedMember) {
+                    alert("로그인이 필요한 서비스입니다.");
+                    navigate("/login");
+                    return;
+                }
+        
+                // 회원 정보
+                getMemberInfo()
+                    .then((res) => {
+                        setMember(res.data);
+                    })
+                    .catch((err) => {
+                        console.error("내 정보 불러오기 실패:", err);
+                        alert("세션이 만료되었거나 정보를 가져올 수 없습니다. 다시 로그인해주세요.");
+                        localStorage.removeItem("member");
+                        navigate("/login");
+                    })
+                    .finally(() =>{
+                        setLoading(false)
+                    });
+    }, [navigate]);
     const [cancelling, setCancelling] = useState(false);
 
     // 개별 아이템 취소
@@ -181,7 +207,7 @@ export default function MyOrderDetail() {
             <div className="max-w-7xl mx-auto flex gap-8 p-10 bg-gray-50 min-h-screen">
 
                 {/* 사이드바 */}
-                <MyPageComponent member={null} />
+                <MyPageComponent member={member} />
 
                 {/* 메인 컨텐츠 */}
                 <main className="flex-grow space-y-6">

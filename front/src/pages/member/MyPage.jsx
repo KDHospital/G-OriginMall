@@ -205,11 +205,11 @@ function MyPage() {
                         </div>
                         <table className="w-full text-sm border-t border-gray-100">
                             <tbody>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">아이디</td><td className="p-4">{member.loginId}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">이름</td><td className="p-4">{member.mname}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">연락처</td><td className="p-4">{formatPhoneNumber(member.tel)}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">성별</td><td className="p-4">{genderMap[member.gender] || "정보 없음"}</td></tr>
-                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">가입일</td><td className="p-4">{member.created_at ? member.created_at.split('T')[0] : 정보없음}</td></tr>
+                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">아이디</td><td className="p-4">{member?.loginId}</td></tr>
+                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">이름</td><td className="p-4">{member?.mname}</td></tr>
+                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">연락처</td><td className="p-4">{formatPhoneNumber(member?.tel)}</td></tr>
+                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">성별</td><td className="p-4">{genderMap[member?.gender] || "정보 없음"}</td></tr>
+                                <tr className="border-b border-gray-50"><td className="p-4 w-40 bg-gray-50 font-bold text-gray-600">가입일</td><td className="p-4">{member.created_at ? member.created_at.split('T')[0] : "정보없음"}</td></tr>
                             </tbody>
                         </table>
                     </section>
