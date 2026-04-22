@@ -245,7 +245,7 @@ function SellerDashboardPage() {
                                         className="border-t border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
                                     >
                                         <td className="py-2 text-gray-500">ORDER_{order.orderId}</td>
-                                        <td className="py-2 text-gray-600">{order.receiverName}</td>
+                                        <td className="py-2 text-gray-600">{order.memberName}</td>
                                         <td className="py-2 text-gray-800 font-medium whitespace-nowrap">
                                             {order.totalPrice?.toLocaleString("ko-KR")}원
                                         </td>

@@ -69,7 +69,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
                 .stream()
                 .map(o -> RecentOrderDTO.builder()
                         .orderId(o.getOrderId())
-                        .receiverName(o.getReceiverName())
+                        .memberName(o.getMember().getMname())
                         .totalPrice(o.getTotalPrice())
                         .status(o.getStatus())
                         .statusLabel(switch (o.getStatus().intValue()) {

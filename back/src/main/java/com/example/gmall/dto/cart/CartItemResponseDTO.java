@@ -37,10 +37,12 @@ public class CartItemResponseDTO {
         this.productId = cartItem.getProduct().getProductId();
         this.sellerId = cartItem.getProduct().getSeller().getId();
         
-        // settlementName(정산용 이름) 없으면 mname(회원이름)으로 받음
-        this.sellerName = cartItem.getProduct().getSeller().getSettlementName() != null
-                ? cartItem.getProduct().getSeller().getSettlementName()
-                : cartItem.getProduct().getSeller().getMname();
+        // 1순위 상호명, 2순위 담당자명, 3순위 정산용 이름
+        this.sellerName = (cartItem.getProduct().getSeller().getDescription() != null && !cartItem.getProduct().getSeller().getDescription().isBlank())
+                ? cartItem.getProduct().getSeller().getDescription()
+                : (cartItem.getProduct().getSeller().getMname() != null && !cartItem.getProduct().getSeller().getMname().isBlank())
+                    ? cartItem.getProduct().getSeller().getMname()
+                    : cartItem.getProduct().getSeller().getSettlementName();
         
         this.pname = cartItem.getProduct().getPname();
         this.listPrice = cartItem.getProduct().getListPrice();

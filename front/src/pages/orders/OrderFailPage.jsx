@@ -14,7 +14,7 @@ export default function OrderFailPage() {
     useEffect(() => {
         // orderId가 있으면 결제 실패 처리
         if (orderId) {
-             axiosInstance.patch(`/orders/${orderId}/fail`)  // split 제거
+             axiosInstance.patch(`/orders/${orderId}/fail`)
             .catch((err) => console.error("결제 실패 처리 오류:", err));
         }
     }, []);

@@ -30,7 +30,7 @@ public class AdminDashboardResponseDTO {
     @Builder
     public static class RecentOrderDTO {
         private Long orderId;
-        private String receiverName;
+        private String memberName;
         private Integer totalPrice;
         private Byte status;
         private String statusLabel;
