@@ -245,7 +245,7 @@ export default function AdminOrders() {
                                         ORDER_{order.orderId}
                                     </td>
                                     <td className="p-4 text-xs text-gray-600 whitespace-nowrap">
-                                        {order.receiverName}
+                                        {order.memberName}
                                     </td>
                                     <td className="p-4 text-xs text-gray-600 whitespace-nowrap">
                                         {order.sellerName}

@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { addInquiry } from '../../api/boardApi';
+import useAuth from '../../hooks/useAuth';
+import { BOARD_QNA } from '../../util/boardConstants';
 
 const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
+  const { isLoggedIn } = useAuth();
   // 1. 폼 초기 상태: 기본값을 공개글(isPublic: true)로 설정
   const [formData, setFormData] = useState({
     title: '',
@@ -35,6 +38,12 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
 
   // 등록 제출 핸들러
   const handleSubmit = async () => {
+    // 비로그인 사용자 차단 (서버 호출 전 안내)
+    if (!isLoggedIn) {
+      alert("고객문의는 회원가입 후 등록이 가능합니다.");
+      return;
+    }
+
     if (!formData.title.trim() || !formData.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
@@ -48,21 +57,21 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
         title: formData.title.trim(),
         content: formData.content.trim(),
         isPublic: formData.isPublic,
-        boardId: 2
+        boardId: BOARD_QNA
       };
 
-      await addInquiry(sendData); 
-      
+      await addInquiry(sendData);
+
       alert("문의사항이 성공적으로 등록되었습니다.");
-      
+
       // 상태 초기화 및 닫기
-      onRefresh(); 
-      onClose();   
+      onRefresh();
+      onClose();
       setFormData({ title: '', content: '', isPublic: true }); // 다시 기본값 공개로 초기화
     } catch (error) {
       console.error("등록 실패:", error);
-      if (error.response?.status === 401) {
-        alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        alert("고객문의는 회원가입 후 등록이 가능합니다.");
       } else {
         alert("등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       }
@@ -77,7 +86,12 @@ const InquiryAddModal = ({ isOpen, onClose, onRefresh }) => {
         
         {/* 헤더 */}
         <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center">
-          <h2 className="text-[20px] font-bold text-[#1D3C28]">고객문의 작성</h2>
+          <div className="flex items-baseline gap-3">
+            <h2 className="text-[20px] font-bold text-[#1D3C28]">고객문의 작성</h2>
+            <span className="text-[12px] text-gray-500 font-normal">
+              ※ 고객문의는 회원가입 후 등록이 가능합니다.
+            </span>
+          </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl transition-colors"> &times; </button>
         </div>
 

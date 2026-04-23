@@ -42,12 +42,6 @@ export const removePost = async (id) => {
     return response.data;
 };
 
-// [어드민] 공지사항 등록
-export const addNotice = async (data) => {
-    const response = await axiosInstance.post('/board/inquiry', data);
-    return response.data;
-};
-
 // [어드민] 게시글 수정
 export const adminUpdatePost = async (id, data) => {
     const response = await axiosInstance.put(`/admin/board/post/${id}`, data);
@@ -63,5 +57,29 @@ export const addAnswer = async (postId, answerContent) => {
 // [어드민] 게시글 삭제
 export const adminRemovePost = async (id) => {
     const response = await axiosInstance.delete(`/admin/board/${id}`);
+    return response.data;
+};
+
+// [어드민] 공지사항 목록 조회 (비공개 포함)
+export const fetchAdminBoard = async (page = 0, size = 10, keyword = '') => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    const response = await axiosInstance.get('/admin/board', { params });
+    return response.data;
+};
+
+// [어드민] 고객문의 목록 조회 (비공개 포함)
+export const fetchAdminInquiries = async (page = 0, size = 10, keyword = '', hasAnswer = null, isPublic = null) => {
+    const params = { page, size };
+    if (keyword) params.keyword = keyword;
+    if (hasAnswer !== null) params.hasAnswer = hasAnswer;
+    if (isPublic !== null) params.isPublic = isPublic;
+    const response = await axiosInstance.get('/admin/board/inquiry', { params });
+    return response.data;
+};
+
+// [어드민] 게시글 상세 조회 (비공개 포함)
+export const getAdminBoardOne = async (id) => {
+    const response = await axiosInstance.get(`/admin/board/post/${id}`);
     return response.data;
 };

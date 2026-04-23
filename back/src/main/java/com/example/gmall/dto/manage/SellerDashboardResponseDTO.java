@@ -13,6 +13,7 @@ public class SellerDashboardResponseDTO {
     private long activeProducts;
     private long soldOutProducts;
     private long pendingOrders; // 미처리 주문 (결제전 + 상품준비중)
+
     
     private List<DailySalesDTO> weeklySales;    // 최근 7일 매출 (라인 차트)
     private Map<String, Long> orderStatusCount; // 주문 상태 현황 (도넛 차트)
@@ -24,7 +25,7 @@ public class SellerDashboardResponseDTO {
     @Builder
     public static class RecentOrderDTO {
         private Long orderId;
-        private String receiverName;
+        private String memberName;
         private Integer totalPrice;
         private Byte status;
         private String statusLabel;

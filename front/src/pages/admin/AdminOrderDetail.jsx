@@ -279,7 +279,7 @@ export default function AdminOrderDetail() {
 
                 {/* 회원 정보 — 어드민 전용 */}
                 <section className="bg-white rounded-md p-5 shadow-sm">
-                    <h3 className="text-sm font-bold text-gray-700 mb-4">주문자 정보</h3>
+                    <h3 className="text-sm font-bold text-gray-700 mb-4">판매자 정보</h3>
                     <table className="w-full text-sm border-t border-gray-100">
                         <tbody>
                             <tr className="border-b border-gray-50">

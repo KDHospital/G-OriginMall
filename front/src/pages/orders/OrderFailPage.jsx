@@ -14,7 +14,7 @@ export default function OrderFailPage() {
     useEffect(() => {
         // orderId가 있으면 결제 실패 처리
         if (orderId) {
-             axiosInstance.patch(`/orders/${orderId}/fail`)  // split 제거
+             axiosInstance.patch(`/orders/${orderId}/fail`)
             .catch((err) => console.error("결제 실패 처리 오류:", err));
         }
     }, []);
@@ -53,7 +53,7 @@ export default function OrderFailPage() {
                             다시 시도하기
                         </button>
                         <button
-                            onClick={() => navigate("/")}
+                            onClick={() => navigate("/products")}
                             className="w-full py-2.5 border border-gray-300 text-gray-600 text-sm font-bold rounded hover:bg-gray-50 transition-colors"
                         >
                             쇼핑 계속하기

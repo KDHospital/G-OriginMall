@@ -145,7 +145,7 @@ export default function SellerOrders() {
                                     </td>
                                     {/* 주문자 */}
                                     <td className="p-4 text-xs text-gray-600 whitespace-nowrap">
-                                        {order.receiverName}
+                                        {order.memberName}
                                     </td>
                                     {/* 주문상품 */}
                                     <td className="p-4">

@@ -2,16 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../layouts/AdminLayout';
 import { adminGetSellerDetail, adminUpdateSeller, adminApproveSeller, adminRejectSeller, adminDeleteMember } from '../../api/memberApi';
-
-const DetailField = ({ label, children }) => (
-  <div>
-    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{label}</label>
-    {children}
-  </div>
-);
-
-const DetailText = ({ value }) => <p className="text-sm text-gray-800">{value || '-'}</p>;
-import { fmtBizNo, fmtTel, fmtDateTime } from '../../util/adminFormatUtil';
+import {
+  fmtBizNo, fmtTel, fmtDateTime,
+  pwdRegex, PWD_ERROR_MSG,
+  formatTelInput, formatBizNoInput,
+  INPUT_BASE, INPUT_ERR, INPUT_OK
+} from '../../util/adminFormatUtil';
+import { DetailField, DetailText } from '../../components/admin/AdminFormFields';
 
 const AdminSellerDetailPage = () => {
   const { memberId } = useParams();
@@ -49,21 +46,6 @@ const AdminSellerDetailPage = () => {
 
   useEffect(() => { loadSeller(); }, [memberId]);
 
-  // 입력 포맷
-  const formatTel = (v) => {
-    const n = v.replace(/[^0-9]/g, '').slice(0, 11);
-    if (n.length <= 3) return n;
-    if (n.length <= 7) return `${n.slice(0, 3)}-${n.slice(3)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 7)}-${n.slice(7)}`;
-  };
-
-  const formatBizNo = (v) => {
-    const n = v.replace(/[^0-9]/g, '').slice(0, 10);
-    if (n.length <= 3) return n;
-    if (n.length <= 5) return `${n.slice(0, 3)}-${n.slice(3)}`;
-    return `${n.slice(0, 3)}-${n.slice(3, 5)}-${n.slice(5)}`;
-  };
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
@@ -71,21 +53,19 @@ const AdminSellerDetailPage = () => {
     } else if (name === 'businessVerified') {
       setForm({ ...form, businessVerified: value === 'true' });
     } else if (name === 'tel') {
-      setForm({ ...form, tel: formatTel(value) });
+      setForm({ ...form, tel: formatTelInput(value) });
     } else if (name === 'businessNo') {
-      setForm({ ...form, businessNo: formatBizNo(value) });
+      setForm({ ...form, businessNo: formatBizNoInput(value) });
     } else {
       setForm({ ...form, [name]: value });
     }
   };
 
   const [editSubmitted, setEditSubmitted] = useState(false);
-  const pwdRegex = /^(?=.*[a-zA-Z])(?=.*[0-9!@#$%^&*]).{8,20}$/;
   const editErrs = {
     mname: !form.mname?.trim() ? '이름을 입력해주세요.' : '',
     tel: !form.tel?.trim() ? '연락처를 입력해주세요.' : '',
-    mpwd: form.mpwd && !pwdRegex.test(form.mpwd)
-      ? '8~20자, 영문과 숫자 또는 특수문자(!@#$%^&*)를 포함해야 합니다.' : '',
+    mpwd: form.mpwd && !pwdRegex.test(form.mpwd) ? PWD_ERROR_MSG : '',
     settlementName: !form.settlementName?.trim() ? '예금주를 입력해주세요.' : '',
     settlementBank: !form.settlementBank?.trim() ? '은행을 입력해주세요.' : '',
     bankAccount: !form.bankAccount?.trim() ? '계좌번호를 입력해주세요.' : '',
@@ -94,10 +74,7 @@ const AdminSellerDetailPage = () => {
   const editLiveErr = (f) => f === 'mpwd' && form.mpwd && !pwdRegex.test(form.mpwd);
   const editCls = (f) => {
     const isErr = editHasErr(f) || editLiveErr(f);
-    const state = isErr
-      ? 'border-red-300 focus:border-red-300 focus:ring-red-100'
-      : 'border-gray-200 focus:border-blue-300 focus:ring-blue-100';
-    return `w-full px-4 py-2.5 border rounded-lg text-sm outline-none focus:ring-2 transition-all ${state}`;
+    return `${INPUT_BASE} ${isErr ? INPUT_ERR : INPUT_OK}`;
   };
   const editErrMsg = (f) => (editHasErr(f) || editLiveErr(f)) ? (editErrs[f] || '') : '';
 

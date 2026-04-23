@@ -18,6 +18,7 @@ public class OrderResponseDTO {
     private Integer totalPrice;
     private Byte status;
     private String statusLabel;
+    private String memberName;
 
     // 배송지 정보
     private String receiverName;
@@ -40,9 +41,11 @@ public class OrderResponseDTO {
         this.orderGroupId = orders.getOrderGroupId();
         this.memberId = orders.getMember().getId();
         this.sellerId = orders.getSeller().getId();
-        this.sellerName = orders.getSeller().getSettlementName() != null
-                ? orders.getSeller().getSettlementName()
-                : orders.getSeller().getMname();
+        this.sellerName = (orders.getSeller().getDescription() != null && !orders.getSeller().getDescription().isBlank())
+                ? orders.getSeller().getDescription()
+                : (orders.getSeller().getMname() != null && !orders.getSeller().getMname().isBlank())
+                    ? orders.getSeller().getMname()
+                    : orders.getSeller().getSettlementName();
         this.totalPrice = orders.getTotalPrice();
         this.status = orders.getStatus();
         this.statusLabel = switch (orders.getStatus()) {
@@ -55,6 +58,7 @@ public class OrderResponseDTO {
             default -> "알 수 없음";
         };
         this.receiverName = orders.getReceiverName();
+        this.memberName = orders.getMember().getMname();
         this.receiverTel = orders.getReceiverTel();
         this.zipcode = orders.getZipcode();
         this.address = orders.getAddress();
