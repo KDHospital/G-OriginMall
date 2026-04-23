@@ -376,8 +376,8 @@ export default function OrderFormPage() {
       if (err.code === "USER_CANCEL") {
         if(orderId) {
           await axiosInstance.patch(`/orders/${orderId}/fail`).catch(() => {});
+          navigate(`/orders/fail?orderId=${orderId}&code=USER_CANCEL&message=결제가 취소되었습니다.`);
         }
-        alert("결제가 취소되었습니다.");
         return;
       }
       console.error("결제 오류:", err);
