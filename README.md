@@ -49,8 +49,8 @@
 
 ## 📁 프로젝트 구조
 
-\```
+```
 G-OriginMall/
 ├── back/   # Spring Boot
 └── front/  # React (Vite)
-\```
+```
